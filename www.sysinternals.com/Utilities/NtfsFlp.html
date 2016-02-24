@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - NTFS Support for Floppy Disks</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>NTFS Support for Floppy Disks</h1>
+    <div class="info">
+        Copyright © 1997 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: October 6, 1997, Version 1.0</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        Windows NT has never supported NTFS floppy disks, because Microsoft claims that floppy disks are too small for NTFS data structures. <i>NTFSFlp</i>, a program that will both format and enable NTFS support on floppy disks, proves this to be wrong. Now you can see for yourself why NTFS on floppies, while possible, is not a great idea.
+    </p>
+    <p>
+        <i>NTFSFlp</i> works only on NT 4.0 and requires administrative privilege to run.
+    </p>
+    
+    <h2>Using <i>NTFSFlp</i></h2>
+    <p>
+        <i>Note: NTFSFlp should be run before you access your floppy drive for the first time after a reboot of your machine. If you mount a FAT drive and then run NTFSFlp, the FAT file system driver will crash the machine when the characteristics of the floppy drive change out from under it (see How It Works, below, for more information).</i>
+    </p>
+    <p>
+        The first thing you will want to do is to format an NTFS floppy. Insert a floppy into your a: drive and enter "<b>ntfsflp /f</b>". 
+        Once the format is complete you will be able to access and write to the NTFS floppy in the same way as FAT floppies. You will notice 
+        is that there is significantly more disk activity, even when simple operations are performed, on the NTFS floppy than would occur on 
+        a FAT floppy. In addition, disk activity will continue for some time after you perform a modification of the data on the floppy. For 
+        this reason, I have included <a href="Sync.html">ntsync</a> in this package, so that you can flush data onto an NTFS floppy before removing it.
+    </p>
+    <p>
+        NTFS floppy support must be enabled with <i>NTFSFlp</i> before you can access an NTFS floppy disk. Support is automatically enabled when you format an NTFS floppy, but can also be enabled by running <i>NTFSFlp</i> and not specifying any command-line arguments. You would need to do this if you created an NTFS floppy disk, rebooted the system and wished to access the floppy again.
+    </p>
+    <p>
+        <i>NTFSFlp</i> is a demonstration of NTFS floppy-disk support. It is not envisioned that anyone would want automatic NTFS floppy-disk support every time you run NT, so <i>NTFSFlp</i> must be used to manually enable support.
+    </p>
+    
+    <h2>How NT Prevents NTFS on Floppies</h2>
+    <p>
+        Windows NT actually goes to some lengths to prevent a user from creating an NTFS floppy disk. The first line of prevention is in the format utility. If a user specifies an NTFS format, format checks to make sure that the media is not a floppy. Then it checks to see if the medium is large enough to fit "minimum" NTFS on-disk data structures. Finally, it attempts to make an NTFS log file that is 2MB in size - an operation that will obviously fail on a 1.44MB floppy.
+    </p>
+    <p>
+        If you manage to get past these hurdles and get NTFS on a floppy, the NTFS driver itself will fail to mount floppy disks. Further, NTFS requires that the device driver for the media it is mounting implement the IOCTL_DISK_GET_PARTITION_INFO device I/O control call, something that floppy disk drivers are not required to do (and generally don't).
+    </p>
+    
+    <h2>How It Works</h2>
+    <p>
+        Using SoftICE for Windows NT I was able to trick format into creating an NTFS floppy disk with a log file that is only 256KB in size. This is large enough for NTFS to be able to function, and leaves 1MB of space on the floppy after NTFS structures have been created. To format an NTFS floppy, <i>NTFSFlp</i> copies the image of the NTFS floppy I created onto other floppy disks.
+    </p>
+    <p>
+        To trick NTFS into mounting an NTFS floppy, <i>NTFSFlp</i> loads a device driver, flpflt.sys, that changes the characteristics of the floppy 
+        disk device so that it does not look like a floppy. Flpflt also intercepts Device I/O Control calls that are directed at the floppy 
+        and implements IOCTL_DISK_GET_PARTITION_INFO. Note that flpflt.sys is not a filter driver - it reaches into the floppy0 device object 
+        and changes its characteristics, and replaces the IRP_MJ_DEVICE_CONTROL vector in the floppy driver's request handler table to point 
+        at its own. This technique is an example of another way to intercept and control requests that are sent to a device, and is in many 
+        senses actually more powerful than filtering in the traditional <a href="Filemon.html">NTFilemon</a> way.
+    </p>
+    
+    <h2>Is it useful?</h2>
+    <p>
+        NTFS floppy disks could be useful for storing compressed files on a floppy. In addition, NT 5.0 NTFS supports encryption, which would make it possible to have secure floppy disks. If you find some other use for NTFS floppies, drop me a note.
+    </p>
+
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/NtfsFlp.zip">Download NTFSFlp (365KB)</a>
+    </p>
+    
+    <p>
+        <a href="NtfsFlp.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

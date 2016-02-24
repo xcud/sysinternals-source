@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Fat32 for Windows NT 4.0</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>FAT32 for Windows NT 4.0</h1>
+    <div class="info">
+        Copyright © 1998 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a> and <a href="mailto:cogswell@winternals.com">Bryce Cogswell</a><br />
+        <span>Last Updated: January 10, 2002 v1.06</span>
+    </div>
+    
+    <h2>Awards</h2>
+    <a href="http://www.wugnet.com/"><img src="../images/awards/wugnet.gif" width="114" height="41" alt="WUGNET Shareware Hall of Fame" /></a>
+    
+    <h2>Introduction</h2>
+    <p>
+        <i>FAT32</i> is a FAT32 file system driver for Windows NT 4.0. Once installed, any FAT32 drives present on your system will be fully accessible as native Windows NT volumes.
+    </p>
+    <h2>Recommended FAT32 Configuration</h2>
+    <p class="note">
+        Do not convert your first partition, or your NT boot partition (the one with \winnt on it), to FAT32 as there is no support in Windows NT 4.0 for reading FAT32 drives during the boot sequence.
+    </p>
+    <p>
+        For maximum compatibility in dual boot systems, the recommended partition configuration is to maintain a FAT partition as the first partition on the primary drive. This partition should contain Windows 95/98 as well as Windows NT and should not be used to store applications or data files. The rest of the primary disk and any other disks should be formatted with FAT32.
+    </p>
+    
+    <h2>Setting up Your Partitions</h2>
+    <p>
+        <i>FAT32 for Windows NT</i> does not make it possible to format new FAT32 drives on your Windows NT system, just view existing FAT32 drives. If you wish to benifit from the space efficiency advantages FAT32 has over FAT16 drives and are setting up a new computer, follow these steps.
+    </p>
+    <p>
+        When you partition the drive create at least two partitions: one for system files and one for data files. You may also choose to create two partitions for system files: one for Windows 9x and one for Windows NT. Of course, you may wish to create multiple data file partitions.
+    </p>
+    <p>
+        Install Windows 9x first, placing its system files (the \WINDOWS directory) on the first partition (the C:\ drive), which must be formatted as FAT16. Then format all the data drives as FAT32 drives. Finally, install Windows NT on either the C:\ drive, or the second system drive you created. The second system drive can be formatted as NTFS or FAT16. After installing FAT32 for Windows NT the data drives will be accessible from Windows NT.
+    </p>
+    
+    <h2>Related Pages</h2>
+    <p>
+        These are other utilities here at Sysinternals related to dual booting:
+    </p>
+    <ul>
+        <li><a href="NtfsWindows98.html">NTFS for Windows 98</a>: access your NTFS drives from Windows 95/98</li>
+        <li><a href="NtfsDosProfessional.html">NTFSDOS Professional</a>: access your NTFS drives from DOS</li>
+    </ul>
+
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/Fat32.exe">Download FAT32 for Windows NT 4.0 (715KB)</a>
+    </p>
+    
+    <p>
+        <a href="Fat32.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

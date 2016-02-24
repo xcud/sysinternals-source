@@ -1,0 +1,181 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - PsList</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>PsList</h1>
+    <div class="info">
+        Copyright © 1999-2004 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: August 9, 2004 v1.26</span>
+    </div>
+    
+
+    <h2>Introduction</h2>
+    <p>
+        Most UNIX operating systems ship with a command-line tool called "ps" (or something equivalent) that administrators use to 
+        view detailed information about process CPU and memory usage. Windows NT/2K comes with no such tool natively, but you can 
+        obtain similar tools with the Windows NT Workstation or Server Resource Kits. The tools in the Resource Kits, <i>pstat</i> and <i>pmon</i>, 
+        show you different types of information, and will only display data regarding the processes on the system on which you run the tools.
+    </p>
+    <p>
+        <i>PsList</i> is utility that shows you a combination of the information obtainable individually with <i>pmon</i> and <i>pstat</i>. 
+        You can view process CPU and memory information, or thread statistics. What makes <i>PsList</i> more powerful than the Resource 
+        Kit tools is that you can view process and thread statistics on a remote computer.
+    </p>
+    
+    <h2>Installation</h2>
+    <p>
+        Just copy <i>PsList</i> onto your executable path, and type "pslist".
+    </p>
+    <p>
+        <i>PsList</i> works on NT 4.0, Win2K, Windows XP and Server 2003.
+    </p>
+    
+    <h2>Usage</h2>
+    <p>
+        See the September 2004 issue of Windows IT Pro Magazine for Mark's 
+        <a href="http://www.winnetmag.com/Windows/Article/ArticleID/43569/43569.html">article</a> that covers advanced usage of <i>PsList</i>.
+    </p>
+    <p>
+        The default behavior of <i>PsList</i> is to show CPU-oriented information for all the processes that are currently running on the local system. The information listed for each process includes the time the process has executed, the amount of time the process has executed in kernel and user modes, and the amount of physical memory that the OS has assigned the process. Command-line switches allow you to view memory-oriented process information, thread statistics, or all three types of data.
+    </p>
+    <p>
+        <b>usage: pslist [-?] [-d] [-m] [-x][-t][-s [n] [-r n]][\\computer [-u username] [-p password]] [name | pid]</b> 
+    </p>
+    
+    <dl class="usage">
+        <dt>-?</dt>
+            <dd>Displays the supported options and the units of measurement used for output values.</dd>
+        <dt>-d</dt>
+            <dd>This switch has <i>PsList</i> show statistics for all active threads on the system, grouping threads with their owning process.</dd>
+        <dt>-m</dt>
+            <dd>This switch has <i>PsList</i> show memory-oriented information for each process, rather than the default of CPU-oriented information.</dd>
+        <dt>-x</dt>
+            <dd>With this switch <i>PsList</i> shows CPU, memory and thread information for each of the processes specified.</dd>
+        <dt>-t</dt>
+            <dd>Shows the tree of processes.</dd>
+        <dt>-s [n]</dt>
+            <dd>Has <i>PsList</i> run in task-manager-like updating mode. You can optionally specify the number of seconds it runs and abort it by pressing the escape key.</dd>
+        <dt>-r n</dt>
+            <dd>Task-manager mode refresh rate in seconds (default is 1).</dd>
+        <dt>name</dt>
+            <dd>Instead of listing all the running processes in the system, this parameter narrows <i>PsList</i>'s scan to those processes that begin with the name process. Thus:<br />
+            <b>pslist exp</b><br />
+            would statistics for all the processes that start with "exp", which would include Explorer.</dd>
+        <dt>-u</dt>
+            <dd>username If you want to kill a process on a remote system and the account you are executing in does not have administrative privileges on the remote system then you must login as an administrator using this command-line option. If you do not include the password with the -p option then <i>PsList</i> will prompt you for the password without echoing your input to the display.</dd>
+        <dt>-p</dt>
+            <dd>password This option lets you specify the login password on the command line so that you can use <i>PsList</i> from batch files. If you specify an account name and omit the -p option <i>PsList</i> prompts you interactively for a password.</dd>
+        <dt>\\computer</dt>
+            <dd>Instead of showing process information for the local system, <i>PsList</i> will show information for the NT/Win2K system specified. Include the -u switch with a username and password to login to the remote system if your security credentials do not permit you to obtain performance counter information from the remote system.</dd>
+        <dt>pid</dt>
+            <dd>Instead of listing all the running processes in the system, this parameter narrows <i>PsList's</i> scan to tthe process that has the specified PID. Thus:<br />
+            <b>pslist 53</b><br />
+            would dump statistics for the process with the PID 53.</dd>
+    </dl>
+    
+    <h2>How it Works</h2>
+    <p>
+        Like Windows NT/2K's built-in PerfMon monitoring tool, <i>PsList</i> uses the Windows NT/2K performance counters to obtain the information it displays. You can find documentation for Windows NT/2K performance counters, including the source code to Windows NT's built-in performance monitor, PerfMon, in MSDN.
+    </p>
+    
+    
+    <h2>PsTools</h2>
+    <p>
+        <i>PsList</i> is part of a growing kit of Sysinternals command-line tools that aid in the adminstration of local and remote 
+        Windows NT/2K systems named <a href="PsTools.html">PsTools</a>.
+    </p>
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/PsList.zip">Download PsList (23KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/PsTools.zip">Download PsTools</a>
+    </p>
+    
+    <p>
+        <a href="PsList.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

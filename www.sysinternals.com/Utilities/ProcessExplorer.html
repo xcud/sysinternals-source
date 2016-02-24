@@ -1,0 +1,402 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Process Explorer</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Process Explorer</h1>
+    <div class="info">
+        Copyright © 1998-2006 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: July 10, 2006 v10.2</span></div>
+    
+    <h2>Awards</h2>
+    <img src="../images/awards/ZdNetEditorsPick.gif" width="81" height="81" alt="ZDNet Editor's Pick" />
+    <a href="http://www.wugnet.com/"><img src="../images/awards/wugnet.gif" width="" height="" alt="WUGNET Shareware Hall of Fame" /></a>
+    <img src="../images/awards/pricelessware.gif" width="170" height="63" />  <h2>Introduction</h2>
+    <p>
+        Ever wondered which program has a particular file or directory open? Now you can find out. <i>Process Explorer</i> shows you information about which handles and DLLs processes have opened or loaded.
+    </p>
+    <p>
+        The <i>Process Explorer</i> display consists of two sub-windows. The top window always shows a list of the currently active processes, including the names of their owning accounts, whereas the information displayed in the bottom window depends on the mode that <i>Process Explorer</i> is in: if it is in handle mode you'll see the handles that the process selected in the top window has opened; if <i>Process Explorer</i> is in DLL mode you'll see the DLLs and memory-mapped files that the process has loaded. <i>Process Explorer</i> also has a powerful search capability that will quickly show you which processes have particular handles opened or DLLs loaded.
+    </p>
+    <p>
+        The unique capabilities of <i>Process Explorer</i> make it useful for tracking down DLL-version problems or handle leaks, and provide insight into the way Windows and applications work.
+    </p>
+    <p>
+        <i>Process Explorer</i> works on Windows 9x/Me, Windows NT 4.0, Windows 2000, Windows XP, Server 2003, and 64-bit versions of Windows for x64 processors, and Windows Vista.</p>
+    <img src="../images/screenshots/ProcessExplorer.gif" width="563" height="460" alt="Process Explorer Screenshot" />
+    <br />
+    <br />
+    <img src="../images/screenshots/ProcessExplorer2.gif" width="427" height="391" alt="Process Explorer Screenshot" />
+    <p>What's new in Version 10.2:</p>
+    <ul>
+      <li>Vista integrity level and virtualized columns and process properties</li>
+      <li>Signed driver for 64-bit Vista for x64 processors </li>
+    </ul>
+    <p>What's new in Version 10.1:</p>
+    <ul>
+      <li>Vista process cycle counters in process properties and as column </li>
+      <li>Service permissions viewing and editing</li>
+      <li> Workaround for .NET runtime handle leak</li>
+      <li>Many new I/O columns and process properties</li>
+      <li>System and per-process I/O bytes history graphs </li>
+      <li>I/O history minigraph</li>
+      <li>Memory commit history minigraph</li>
+      <li>Optional I/O history tray icon </li>
+      <li>Windows 64-bit for Itanium support </li>
+    </ul>
+    <p>What's new in Version 10.0:</p>
+    <ul>
+      <li>The process column is locked on the left side so that it doesn't scroll horizontally out of view</li>
+      <li>You can configure custom column selections and save them as easy-to-access column sets</li>
+      <li>Image verification option now verifies images in the background</li>
+      <li>More refresh intervals </li>
+      <li>Runas menu entry in the File menu</li>
+      <li>Run as Limited User menu entry in the File menu to run a process without administrative privileges and group membership</li>
+      <li>Process menu includes Restart item to kill and then restart a selected process</li>
+      <li>Can suspend individual threads on Threads page of Process Properties dialog </li>
+      <li>The Find Window target moves Process Explorer's main window to the back to get it out of the way</li>
+      <li>Close Window command uses same End Task functionality as Task Manager</li>
+      <li>Show New Processes option scrolls display to make new processes visible</li>
+      <li>Heuristics to detect more image packers </li>
+      <li>User name of account in which Process Explorer is running is shown in the title bar</li>
+      <li>Services can be stopped, resumed, and paused from the Services tab of the Process Properties dialog </li>
+      <li>The DLLs that host SvcHost processes are listed in the Services tab of the Process Properties dialog</li>
+      <li>Services running within a process display on the process' tooltip</li>
+      <li>As a parallel to the CPU Usage History column there's now a Private Bytes Usage History column </li>
+      <li>The Process view includes columns that show the working set breakdown of the process in shared, shareable and private pages </li>
+      <li>New delta private-bytes column to show changes in private virtual memory usage </li>
+      <li>Can copy lines from the Process, DLL and Handle views to the clipboard</li>
+      <li>Option to show pagefile-backed (unnamed) sections in DLL view</li>
+      <li>DLL and handle searching consolidated </li>
+      <li>The DLL view includes columns that show the working set contributions in shared, shareable, and private pages</li>
+      <li>The DLL a Rundll32 process hosts is shown in its process tooltip</li>
+      <li>Packed DLL highlighting in DLL view</li>
+      <li>Image signing verification available for DLLs</li>
+      <li>Better DLL properties dialog</li>
+      <li>Object address shown in Object Properties dialog </li>
+      <li>File object share flags column for Handle view </li>
+    </ul>
+    <p>What's new in Version 9.2:</p>
+    <ul>
+      <li>CPU history  in tray icon </li>
+      <li>CPU history column </li>
+      <li>I/O delta column</li>
+      <li>Process security editing</li>
+      <li>Reports loaded 32-bit DLLs on Windows 64-bit </li>
+      <li>Support for Windows Vista </li>
+      <li><a href="http://www.securityfocus.com/bid/14616/info" target="_top">Buffer overflow</a> bugfix in v9.25 and higher</li>
+    </ul>
+    <p>What's new in Version 9.1:
+    </p>
+    <ul>
+        <li>x64 and x86 executables are in a single binary</li>
+        <li>x64 kernel and user-mode stack support</li>
+        <li>New Verified Company column shows image signer information</li>
+        <li>Strings tab in process properties dialog has in-memory image scan option</li>
+        <li>Highlighting for images that are packed (have compressed or encrypted code, which is common in malware)</li>
+        <li>Window menu on process context menu allows for minmizing, maximizing, and restoring windows</li>
+    </ul>    
+    <p>
+        What's new in Version 9.0:
+    </p>
+    <ul>
+        <li>System information dialog has per-CPU graph option with hyperthreaded and NUMA processor information</li>
+        <li>A Users menu duplicates the functionality of Task Manager's Users tab, showing Terminal Services session information and supporting logoff, disconnect, and sending messages</li>
+        <li>On XP SP2 and higher the TCP/IP tab displays the thread stack at the time an endpoint was opened</li>
+        <li>The tray icon context menu includes the shutdown menu</li>
+        <li>Search engine option to use Google or MSN Search</li>
+        <li>Object address column is available for the handle view</li>
+        <li>Image signatures can be checked on-demand in the process properties dialog</li>
+        <li>Process explorer is digitally signed with Sysinternals' Verisign Class 3 signing certificate</li>
+    </ul>
+    
+    <p>
+        What's new in Version 8.61:
+    </p>
+    <ul>
+        <li>Data Execution Protection (DEP) status on process image tab and as column</li>
+        <li>Copy-to-clipboard from process environment variable and strings dialogs</li>
+        <li>Can select and copy text strings of process image properties page</li>
+        <li>Multi-row tabs on process properties dialog</li>
+        <li>Image signing verification on process image properties dialog</li>
+        <li>Mini-CPU usage graph on toolbar</li>
+        <li>Command-line option for specifying <i>Process Explorer</i> priority</li>
+        <li>Manual refresh (F5) forces recheck of job and .NET process status</li>
+        <li>Single-clicking on tray icon minimizes and restores main window</li>
+    </ul>
+    
+    <p>
+        What's new in Version 8.50:
+    </p>
+    <ul>
+        <li>Finder tool for identifying the process that owns a selected window</li>
+        <li>Strings listings for process and DLL images</li>
+        <li>Google menu item for searching process and DLL information</li>
+        <li>Tray tooltip shows highest-CPU consuming process</li>
+        <li>Window status column (like Task Manager's Status column on the Applications tab)</li>
+        <li>DLL view for System process shows list of loaded device drivers</li>
+    </ul>
+    
+    <p>
+        What's new in Version 8.40:
+    </p>
+    <ul>
+        <li>TCP/IP process properties page shows active TCP and UDP endpoints</li>
+        <li>Display updating code eliminates all flicker</li>
+        <li>64-bit version shows which processes are 64-bit on process properties and adds 64-bit process column</li>
+        <li>Additional opacity settings</li>
+        <li>Improved symbol support</li>
+    </ul>
+    
+    <p>
+        What's new in Version 8.30:
+    </p>
+    <ul>
+        <li>Runs in non-admin account</li>
+        <li>Treeview functionality to collapse and expand process subtrees</li>
+        <li>Can bring process-owned window to the foreground</li>
+        <li>System CPU graph shows timestamps and most-active process for any given point</li>
+        <li>Per-process graph data tracked even when main window is minimized to tray</li>
+        <li>Per-process graph data displays timestamps</li>
+        <li>Tray icon has black background</li>
+        <li>Can set process CPU affinity</li>
+        <li>Process tooltip no longer between mouse pointer and process name</li>
+        <li>Ability to add a comment to processes and new comment column</li>
+        <li>More system information, including I/O deltas and paging data</li>
+        <li>New process columns for I/O delta and page-fault delta</li>
+        <li>More process performance information in process properties dialog</li>
+        <li>Improved performance</li>
+    </ul>
+    
+    <p>
+        What's new in Version 8.20:
+    </p>
+    <ul>
+        <li>Can open multiple process properties dialogs simultaneously</li>
+        <li>Process properties and thread stack dialogs are resizable</li>
+        <li>System information dialog CPU and memory usage graphs like Task Manager</li>
+        <li>More performance data on the System Information dialog</li>
+        <li>Per-process CPU and memory graph tab in process properties</li>
+        <li>Opacity settings</li>
+        <li>New tray window context menu options</li>
+        <li>More performance information on process properties dialog</li>
+        <li>Lock option in shutdown menu</li>
+        <li>Reconfigured menu items and highlighting configuration</li>
+        <li>New status bar column options</li>
+    </ul>
+    
+    <p>
+        What's new in Version 8.10:
+    </p>
+    <ul>
+        <li>Status bar information is configurable to show CPU usage, commit charge, # of processes, and more</li>
+        <li>Can terminate individual threads</li>
+        <li>New Shutdown menu for logging off and shutting down the system</li>
+        <li>Only allow one instance option</li>
+        <li>Auto-open of lower pane when a find result is clicked</li>
+    </ul>
+    
+    <p>
+        What's new in Version 8.0:
+    </p>
+    <ul>
+        <li>.NET tab for .NET processes that shows AppDomains and .NET performance counters</li>
+        <li>When the .NET Framework is detected a .NET tab on the column selection dialog for adding .NET performance counters</li>
+        <li>Option to show only .NET processes</li>
+        <li>Option to only show your own processes</li>
+        <li>System Information dialog showing the same memory counters as Task Manager (when symbols are configured, also shows maximum paged and nonpaged pool values)</li>
+        <li>Better symbol configuration guidance</li>
+        <li>Difference highlight duration is configurable</li>
+        <li>Tray icon for CPU usage that's yellow when usage is > 70% and red when > 90%</li>
+        <li>Minimize-to-tray option</li>
+        <li>Highlight color configuration dialog</li>
+        <li>Context switch and context-switch delta columns</li>
+        <li>Run processes using the system Run dialog from the File menu</li>
+        <li>Replace task manager option so that when you run Task Manager <i>Process Explorer</i> runs instead</li>
+        <li>Only non-zero CPU usage, .NET counters and context-switch values are displayed to clearly highlight process activity</li>
+        <li>Search for DLLs or handles regardless of what mode the lower pane is in</li>
+        <li>Correct icons for MMC windows</li>
+        <li>Mouse hover over process names and DLL names shows full path of executable or DLL</li>
+    </ul>
+    
+    <p>
+        Other <i>Process Explorer</i> features include:
+    </p>
+    <ul>
+        <li>Support for full handle viewing on Win9x/Me (with the exception of Registry key handles)</li>
+        <li>Process icons</li>
+        <li>Service process highlighting</li>
+        <li>Process tree display</li>
+        <li>Configurable refresh rate</li>
+        <li>Refresh highlighting: new entries in the process, handle and DLL views are green, and deleted ones red</li>
+        <li>Listview tooltips</li>
+        <li>DLL descriptions in the DLL view</li>
+        <li>Highlights relocated DLLs</li>
+        <li>Jump-to-entry in the find dialog</li>
+        <li>Efficient refresh</li>
+        <li>Runs on Windows 9x/Me</li>
+        <li>Lists all process owners, even on Terminal Server systems</li>
+        <li>Moveable columns</li>
+        <li>Column selection and a wide variety of configurable process, DLL and handle columns</li>
+        <li>Asynchronous updates of all views</li>
+        <li>Configurable refresh highlighting effects</li>
+        <li>Save function saves process view and current bottom view (handle or DLL)</li>
+        <li>Minimize-to-tray option</li>
+        <li>Process suspend/resume</li>
+        <li>Thread details including stacks</li>
+        <li>Fractional CPU usage</li>
+        <li>Job object information</li>
+        <li>Right-justified numeric columns with numeric formatting</li>
+        <li>Mutex properties shows owning thread if mutex is owned</li>
+        <li>More information in process properties</li>
+        <li>Start time and CPU time process columns</li>
+        <li>Option to hide the lower pane</li>
+        <li>Kill process tree</li>
+        <li>More accurate Registry key names for profile unload debugging</li>
+        <li>Extensive help file</li>
+        <li>Service descriptions on services tab of service process properties dialog</li>
+    </ul>
+    
+    <h2>Installation</h2>
+    <p>
+        Simply run <i>Process Explorer</i> (procexp.exe).
+    </p>
+    <p>
+        The help file describes <i>Process Explorer</i> operation and usage.
+If you have problems or questions please visit the <a href="../../forum.sysinternals.com/forum_topics1a16.html?FID=2">Sysinternals Process Explorer Forum</a>. </p>
+    
+    <h2>Related Tools</h2>
+    <p>
+        Here are some other handle and DLL viewing tools available at Sysinternals:
+    </p>
+    <ul>
+        <li><a href="Handle-2.html">Handle</a> - a command-line handle viewer for Win9x/Me and NT/Win2K</li>
+        <li><a href="ListDlls.html">ListDLLs</a> - a command-line DLL viewer for Win9x/Me and NT/Win2K</li>
+        <li><a href="PsList.html">PsList</a> - local/remote command-line process lister for NT/Win2K</li>
+        <li><a href="PsKill.html">PsKill</a> - local/remote command-line process killer for NT/Win2K</li>
+    </ul>
+    
+    <h2>Microsoft Process Explorer KB Articles</h2>
+    <p>
+        The following Microsoft KB articles reference Process Explorer for diagnosing or troubleshooting various problems:
+    </p>
+    <ul>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb%3Ben-us%3B319034">319034: FIX: Thread Handle Leak in PrintReport Method of Data Report</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q232/8/30.ASP">232830: HOWTO: Determine File Handle Ownership</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q242/1/31.ASP">242131: How to: Display a List of Processes That Have Files Open</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q216/3/68.ASP">216368: PRB: Access Violation During Application Setup When File in Use</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q166/1/12.ASP">166112: PRB: Conflict with EOF When Using #import with ADO</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q301/3/57.ASP">301357: PRB: DLLs Not Unloaded After Calling CoFreeUnusedLibraries</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;816683">816683: Process Explorer from SysInternals Does Not Start</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/q247/9/57.asp">247957: SAMPLE: Using DUPS.exe to Resolve DLL Compatibility Problems</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;q313735">313735: XCON: The MTA Process Is Leaking Memory with a High Handle Count</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q276/5/25.asp">276525: Your Computer May Stop Responding When You Monitor Open Handles</a></li>
+    </ul>
+    
+    <p>
+        <b>In order to help us track its use, please download through the link that represents the operating system on which you will use or mostly use Process Explorer.</b>
+    </p>
+    <p>
+        <b>Note that the zip files are identical, and Process Explorer runs on all Windows platforms.</b>
+    </p>
+
+
+
+
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/ProcessExplorer9x.zip">Download Process Explorer (x86 - 1.47 MB) - you plan on using Process Explorer on Win9x/Me</a>
+        <br />
+        <br />
+        
+        <a href="../../download.sysinternals.com/Files/ProcessExplorerNt.zip">Download Process Explorer (x86 - 1.47 MB) - you plan on using Process Explorer on 32-bit NT/2K/XP/Server 2003</a>        <br />
+        <br />
+        
+        <a href="../../download.sysinternals.com/Files/ProcessExplorerAmd64.zip">Download Process Explorer (x64 - 1.47 MB) - you plan on using Process Explorer on x64 64-bit XP/Server 2003</a><br />
+        <br />
+        <a href="../../download.sysinternals.com/Files/ProcessExplorerIa64.zip">Download Process Explorer (x86 - 1.47 MB) - you plan on using Process Explorer on IA64 64-bit Server 2003 </a></p>
+    <p>
+        <a href="ProcessExplorer.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

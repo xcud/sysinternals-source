@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - DiskMon</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>DiskMon</h1>
+    <div class="info">
+        Copyright © 1998-2003 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: December, 11 2003 v2.01</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        <i>DiskMon</i> is an application that logs and displays all hard disk activity on a Windows system. You can also minimize <i>DiskMon</i> to your system tray where it acts as a disk light, presenting a green icon when there is disk-read activity and a red icon when there is disk-write activity.
+    </p>
+    <p>
+        <i>DiskMon</i> works on NT 4.0 and higher.
+    </p>
+    
+    <h2>Installation and Use</h2>
+    <p>
+        Installing <i>DiskMon</i> is as easy as unzipping it and typing, "diskmon." On Windows NT the GUI dynamically loads the driver (based on code from the instdrv sample in the Windows NT DDK), which begins monitoring all hard drives. On Windows 2000 and higher there is no driver component: the GUI relies on kernel event tracing to obtain disk activity. The menus and toolbar buttons can be used to disable event capturing, control the scrolling of the listview, and to save the listview contents to an ASCII file.
+    </p>
+    <p>
+        To have <i>DiskMon</i> function as a disk light in your system tray, select the Options|Minimize to Tray menu item, or start <i>DiskMon</i> with a "/l" (lower-case L) command-line switch e.g. diskmon /l. To reactivate the <i>DiskMon</i> window double-click on the <i>DiskMon</i> tray icon. To create a shortcut to Diskmon in the tray create a shortcut in your Program Files\Startup folder, edit the properties of the shortcut and set the Target to point at the executable with the path in quotations and the switch outside the quotes:
+    </p>
+    <p>
+        "C:\Sysinternals Tools\Diskmon.exe" /l
+    </p>
+    <p>
+        Read and write offsets are presented in terms of sectors (512 bytes). Events can be either timed for their duration (in microseconds), or stamped with the absolute time that they were initiated. The History Depth dialog can be used to specify the maximum number of records that will be kept in the GUI (0 signifies no limit). 
+    </p>
+    <img src="../images/screenshots/DiskMon.gif" width="549" height="210" alt="DiskMon Screenshot" />
+    
+    <h2>Windows NT 4 Implementation</h2>
+    <p>
+        Using standard filtering techniques it is not possible for a dynamically loaded driver like <i>DiskMon</i> to attach to hard disk device objects and see requests originating in file systems.This is because file system drivers open disk devices during system initialization and, unlike the I/O Manager, file system drivers send IRPs directly at these devices. The I/O Manager allows for file system filter drivers to attach to file system devices after initialization because it checks for attached devices whenever it is going to send an Irp to a file system, and will direct the Irps to them instead.
+    </p>
+    <p>
+        <i>DiskMon</i> overcomes this limitation by using the technique I've developed of driver function interception. <i>DiskMon</i> locates a disk device's driver object and replaces the driver's dispatch entry points with its own. The <i>DiskMon</i> filter functions pass Irps it sees onto the hooked driver, and also intercepts completion routines in a similar way so that it can see the results of requests.
+    </p>
+    
+    <h2>Windows 2000 and Higher Implementation</h2>
+    <p>
+        On Windows 2000 and higher Diskmon uses kernel event tracing. Event tracing is documented in the Microsoft Platform SDK and the SDK contains source code to TraceDmp, on which Diskmon is based.
+    </p>
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/DiskMonNt.zip">Download Diskmon for Windows NT 4 (44 KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/DiskMon.zip">Download Diskmon for Windows 2000/XP/2K3 (55 KB)</a>
+    </p>
+    
+    <p>
+        <a href="DiskMon-2.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

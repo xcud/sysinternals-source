@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Inside Native Applications</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Inside Native Applications</h1>
+    <div class="info">
+        Copyright © 1998 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: February 8, 1998</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        If you have some familiarity with NT's architecture you are probably aware that the API that Win32 applications use isn't the "real" NT API. NT's operating environments, which include POSIX, OS/2 and Win32, talk to their client applications via their own APIs, but talk to NT using the NT "native" API. The native API is mostly undocumented, with only about 25 of its 250 functions described in the Windows NT Device Driver Kit.
+    </p>
+    <p>
+        What most people don't know, however, is that "native" applications exist on NT that are not clients of any of the operating environments. These programs speak the native NT API and can't use operating environment APIs like Win32. Why would such programs be needed? Any program that must run before the Win32 subsystem is started (around the time the logon box appears) must be a native application. The most visible example of a native application is the "autochk" program that runs chkdsk during the initialization Blue Screen (its the program that prints the "."'s on the screen). Naturally, the Win32 operating environment server, CSRSS.EXE (Client-Server Runtime Subsystem), must also be a native application.
+    </p>
+    <p>
+        In this article I'm going to describe how native applications are built and how they work. I also provide you the source code for an example native application, Native, that you can easily install and that will print out a string you specify on the boot-time Blue Screen.
+    </p>
+    
+    <h2>How Does Autochk Get Executed</h2>
+    <p>
+        <i>Autochk</i> runs in between the time that NT's boot and system start drivers are loaded, and when paging is turned on. 
+        At this point in the boot sequence Session Manager (smss.exe) is getting NT's user-mode environment off-the-ground and no 
+        other programs are active. The <b>HKLM\System\CurrentControlSet\Control\Session Manager\BootExecute</b> value, a MULTI_SZ, contains 
+        the names and arguments of programs that are executed by Session Manager, and is where Autochk is specified. Here is what 
+        you'll typically find if you look at this value, where "Autochk" is passed "*" as an argument:
+    </p>
+    <p>
+        Autocheck Autochk *
+    </p>
+    <p>
+        <i>Session Manager</i> looks in the &lt;winnt&gt;\system32 directory for the executables listed in this value. When 
+        <i>Autochk</i> runs there are no files open so <i>Autochk</i> can open any volume in raw-mode, including the boot drive, and manipulate 
+        its on-disk data structures. This wouldn't be possible at any later point.
+    </p>
+    
+    <h2>Building Native Applications</h2>
+    <p>
+        Microsoft doesn't document it, but the NT DDK Build utility knows how to make native applications (and its probably 
+        used to compile <i>Autochk</i>). You specify information in a SOURCES file that defines the application, the same as would be 
+        done for device drivers. However, instead of indicating to Build that you want a driver, you tell it you want a native 
+        applicationin the SOURCES file like this:
+    </p>
+    <p>
+        TARGETTYPE=PROGRAM
+    </p>
+    <p>
+        The <i>Build</i> utility uses a standard makefile to guide it, \ddk\inc\makefile.def, which looks for a run-time library named nt.lib when compiling native applications. Unfortunately, Microsoft doesn't ship this file with the DDK (its included in the Server 2003 DDK, but I suspect that if you link with that version your native application won't run on XP or Windows 2000). However, you can work around this problem by including a line in makefile.def that overrides the selection of nt.lib by specifying Visual C++'s runtime library, msvcrt.lib
+    </p>
+    <p>
+        If you run <i>Build</i> under the DDK's "Checked Build" environment it will produce a native application with full debug information under %BASEDIR%\lib\%CPU%\Checked (e.g. c:\ddk\lib\i386\checked\native.exe), and if you invoke it in the "Free Build" environment a release version of the program will end up in %BASEDIR%\lib\%CPU%\Free. These are the same places device driver images are placed by Build.
+    </p>
+    <p>
+        Native applications have ".exe" file extensions but you cannot run them like Win32 .exe's. If you try you'll get the message:
+    </p>
+    <p>
+        The &lt;Application Name&gt; application cannot be run in Windows NT mode.
+    </p>
+    
+    <h2>Inside a Native Application</h2>
+    <p>
+        Instead of <b>winmain</b> or <b>main</b>, the entry point for native applications is <b>NtProcessStartup</b>. Also unlike the other Win32 entry points, native applications must reach into a data structure passed as its sole parameter to locate command-line arguments.
+    </p>
+    <p>
+        The majority of a native application's runtime environment is provided by NTDLL.DLL, NT's native API export library. 
+        Native applications must create their own heap from which to allocate storage by using <b>RtlCreateHeap</b>, a NTDLL function. 
+        Memory is allocated from a heap with <b>RtlAllocateHeap</b> and freed with <b>RtlFreeHeap</b>. If a native application wishes to print 
+        something to the screen it must use the function <b>NtDisplayString</b>, which will output to the initialization Blue Screen.
+    </p>
+    <p>
+        Native applications don't simply return from their startup function like Win32 programs, since there is no runtime code to 
+        return to. Instead, they must terminate themselves by calling <b>NtProcessTerminate</b>.
+    </p>
+    <p>
+        The NTDLL runtime consists of hundreds of functions that allow native applications to perform file I/O, interact with device drivers, and perform interprocess communications. Unfortunately, as I stated earlier, the vast majority of these functions are undocumented.
+    </p>
+    
+    <h2>An Example Native Application</h2>
+    <p>
+        I've created a toy native application that demonstrates how native applications are built and how they work. The program, 
+        <i>Native</i>, is installed by running the install.bat batch file. The batch file copies native.exe to your &lt;winnt&gt;\system32 
+        directory and adds the following entry to the <b>BootExecute</b> Registry value:
+    </p>
+    <p>
+        native Hello world!
+    </p>
+    <p>
+        When you reboot, <i>Session Manager</i> executes Native after running Autochk. Native allocates some heap, locates its 
+        command line argument and then prints the argument ("Hello world!") to the Blue Screen, using the functions I described 
+        above. If you want it to print something else simply edit the <b>BootExecute</b> value under Regedit or Regedt32 and change 
+        "Hello world!" to your message.
+    </p>
+    <p>
+        To uninstall Native execute the uinstall.bat batch file. This deletes native.exe from &lt;winnt&gt;\system32 and changes <b>BootExecute</b> back to its typical value.
+    </p>
+    <p>
+        If you want to build Native you must have the Windows NT Device Driver Kit. Copy the makefile.def included with Native's 
+        sources to \ddk\inc and then you can run <i>Build</i>.
+    </p>
+    
+    
+    <p class="download">
+        <a href="../Files/Native.html">Download Native Plus Source (16KB)</a>
+    </p>
+        
+    
+    <p>
+        <a href="NativeApplications.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

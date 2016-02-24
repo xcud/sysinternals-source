@@ -1,0 +1,278 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Windows 2000 Quantums</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Win2K Quantums</h1>
+    <div class="info">
+        Copyright © 1997 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: December 11, 1997</span>
+    </div>
+    
+    <h2>Win2K Quantums</h2>
+    <p>
+        Since its release the Sysinternals <a href="../Utilities/Frob.html"><i>NTFrob</i></a> program has been a popular download. 
+        This is because Windows NT 4 Server provides no way to control the quantum (time-slice) lengths of threads, and Windows NT 
+        Workstation provides very little. The size of a quantum determines how long a thread will be able to execute on a CPU before 
+        the NT scheduler might decide to give a different thread of the same priority a turn to run. At the end of a quantum the 
+        scheduler can decay the priority of an executing thread if it has been previously boosted, which might cause it to be switched 
+        off the processor and be replaced with one of a higher priority. Long quantums generally favor CPU-intensive applications whereas 
+        short quantums are better for environments with many interactive threads of the same priority levels (see my 
+        <a href="../Publications.html">June and July '98Windows NT Magazine NT Internals columns</a> on the scheduler for more information).
+    </p>
+    <p>
+        As one of NT's dynamic tuning measures, quantum lengths hardwired into Workstation and Server assume certain workload 
+        characteristics. In Server, all processes have the same quantum length, which is relatively long. This makes Server conducive 
+        to environments where there are a small number of applications that are possibly computation-bound. Workstation's quantums are 
+        variable and shorter, where lengths can be influenced by whether a process owns the foreground window or not. This arrangement 
+        works well for systems where there are several applications running simultaneously, and the applications are interactive in 
+        nature. However, many NT users use Workstation or Server in roles that are more typical of the opposite product type, which 
+        has lead to a desire for quantum-configurability. Windows 2000 internally includes the quantum-knobs <i>NTFrob's</i> appeal 
+        has demonstrated users want, but unfortunately it doesn't expose them (it did in its first Beta).
+    </p>
+    
+    <h2>NT 4 Quantums</h2>
+    <p>
+        Before describing Win2K's quantum settings, let's review what is present in NT 4. As I mentioned, NT 4 Server and Workstation have different quantum lengths. The Server and Workstation O/S image is identical, so the different lengths are taken from an internal quantum-length table that is filled in by NT during its initialization. The values used for Workstation and Server are shown below. The table contain three entries that specify quantum lengths expressed in quantum units. Three quantum units elapse every tick of NT's quantum-tracking timer, and a timer tick period is either 10 milliseconds or 15 milliseconds in length. Uniprocessor x86 systems generally have 10ms periods whereas multiprocessor x86 systems and Alphas have 15ms periods - the HAL is where the period length is defined and thus different vendors and motherboards can have different tick periods.
+    </p>
+
+    <p style="margin-bottom: 0"><b><i>Workstation Quantum Table</i></b></p>
+    <table width="150" cellspacing="1" cellpadding="2" border="1" style="margin: 0 0 0 10px">
+        <tr>
+            <td>6</td>
+            <td>12</td>
+            <td>18</td>
+        </tr>
+    </table>
+    
+    <p style="margin-bottom: 0"><b><i>Server Quantum Table</i></b></p>
+    <table width="150" cellspacing="1" cellpadding="2" border="1" style="margin: 0 0 0 10px">
+        <tr>
+            <td>36</td>
+            <td>36</td>
+            <td>36</td>
+        </tr>
+    </table>
+
+    <p>
+        <b>Table 1. NT 4 Quantum Tables</b>
+    </p>
+    <p>
+        What indexes the table is the foreground window priority boost that you configure in the Control Panel System applet under the Performance Tab. The boost slider shown on the dialog (see the screenshot below) has three settings that correspond directly to the index used in the quantum table. Threads belonging to background windows always have a boost index of 0. Foreground threads get their index from the setting in the applet, so their index is 0, 1 or 2 into the table. With the Server quantum table the foreground setting is effectively ignored since the quantum table's entries are all identical, but on Workstation foreground threads can have quantums that are 2 or 3 times longer than background threads. This quantum stretch can enhance the responsiveness of foreground applications. Performing the math with the quantum unit lengths, Workstation threads have quantums that are typically between 10 and 60ms, whereas Server threads have quantums of 120ms.
+    </p>
+    <img src="../images/screenshots/Windows2000Quantums.gif" width="410" height="466" alt="NT4 Foreground Boost Slider" />
+    <p>
+        <b>Figure 1. NT 4 Foreground Boost Slider</b>
+    </p>
+    <p>
+        So what exactly happens when you move the slider and hit "Apply"? Two things. The first is that the applet writes the boost 
+        setting to <b>HKLM\System\CurrentControlSet\Control\PriorityControl\Win32PrioritySeperation</b>. This is so that NT can remember 
+        your setting across boots. The second is that the applet calls the native NT function <b>NtSetSystemInformation</b> (see my January 1997 
+        <a href="http://www.ddj.com/">Dr. Dobb's Journal</a> <i>NTRegmon</i> article for more about the native API). The call communicates 
+        the setting to NT's scheduler, which sets the quantum table index variable <b>PsPrioritySeparation</b>. The table itself is named 
+        <b>PspForegroundQuantum</b>. When a process is created a variable in its control block is set to the background quantum length 
+        (index 0) retrieved from the table. Whenever a thread is created or starts a new quantum it obtains its quantum length from 
+        the length stored in the control block of its owning process.
+    </p>
+    <p>
+        The Win32 kernel-mode component Win32K.sys is responsible for keeping track of which process owns the foreground window, so 
+        when this changes it calls the NT Process Manager function <b>PsSetProcessPriorityByClass</b>. <b>PsSetProcessPriorityByClass</b> is called 
+        once for the process that is losing the foreground and again for the process that is gaining it, and the function sets the quantum 
+        length in the process' control block to the value obtained from the <b>PspForegroundQuantum</b> table - <b>PsPrioritySeparation</b> is used as an 
+        index for the process that owns the foreground window.
+    </p>
+    
+    <h2>Win2K Quantums</h2>
+     <p>
+         Win2K keeps the same concept as a quantum table and a foreground window boost, but it has introduced significantly more flexibility, and quantum lengths are no longer tied in any way to whether the system is Workstation or Server. The quantum table is still 3 entries, but there are now 4 different sets of values that the table can contain. All of Win2K's quanutum settings were exposed in Win2K Beta 1, where two settings in the Win2K Performance dialog, seen below, determined which values are used: the quantum type and the quantum length. The quantum type can be fixed or variable. If the quantum type is fixed then foreground window threads always have the same quantum as background threads because the quantum table is initialized with 3 identical values. When the type is variable the values are different so the boost slider has an effect on quantum lengths. The quantum length setting is used to select short or long quantum values. Unfortuately, in the release version of Win2K this control is not present - you'll have to wait for a Sysinternals tool to make them accessible for you.
+     </p>
+    <img src="../images/screenshots/Windows2000Quantums2.gif" width="410" height="466" alt="NT4 Foreground Boost Slider" />
+    <p>
+        <b>Figure 2. Win2K Quantum Controls</b>
+    </p>
+    <p>
+        The quantum values in the 4 combinations possible with these two controls are shown below. Like in NT 4, the <b>PsForegroundQuantum</b> 
+        is the name of the table. Unlike NT 4, however, the 4 tables are all present in memory and <b>PsForegroundQuantum</b> is directed to 
+        point at the current one. In Win2K the NT 4 Workstation quantums can be achieved with Short-Variable and the NT 4 Server quantums 
+        are achievable with Long-Fixed.
+    </p>
+    <table cellspacing="0" cellpadding="0" border="0">
+        <tr>
+            <th>&nbsp;</th>
+            <th>Short</th>
+            <th>Long</th>
+        </tr>
+        <tr>
+            <th>Variable</th>
+            <td>
+                <table cellspacing="1" cellpadding="2" border="1" style="margin: 0">
+                    <tr>
+                        <td>6</td>
+                        <td>12</td>
+                        <td>18</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table cellspacing="1" cellpadding="2" border="1" style="margin: 0">
+                    <tr>
+                        <td>12</td>
+                        <td>24</td>
+                        <td>36</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <th>Fixed</th>
+            <td>
+                <table cellspacing="1" cellpadding="2" border="1" style="margin: 0">
+                    <tr>
+                        <td>18</td>
+                        <td>18</td>
+                        <td>18</td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <table cellspacing="1" cellpadding="2" border="1" style="margin: 0">
+                    <tr>
+                        <td>36</td>
+                        <td>36</td>
+                        <td>36</td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <p style="margin: 0 0 20px 35px">
+        <b>Table 2. Win2K Quantum Tables</b>
+    </p>
+    <p>
+        The Win2K performance applet causes the quantum settings to be written to the same Registry value for storage as in NT 
+        4 and it invokes <b>NtSetSystemInformation</b> to convey the user's choice to the scheduler. Instead of just specifying a boost, 
+        though, it passes the quantum type and length information as well. This quantum control value is encoded as shown below:
+    </p>
+    
+    <table cellspacing="0" cellpadding="3" border="1">
+        <tr>
+            <td>S</td><td>L</td><td>F</td><td>V</td><td>B1</td><td>B0</td>
+        </tr>
+        <tr>
+            <td>5</td><td>4</td><td>3</td><td>2</td><td>1</td><td>0</td>
+        </tr>
+    </table>
+    <p style="margin: 0 0 20px 35px">
+        <b>Table 3. Bit Layout for Win2K Quantum Control</b>
+    </p>
+    <p>
+        Here are the definitions for the bit positions - a bit value of 1 indicates that the choice is in effect:
+    </p>
+    <ul>
+        <li>L - Long quantums</li>
+        <li>S - Short quantums</li>
+        <li>V - Variable quantums</li>
+        <li>F - Fixed quantums</li>
+        <li>B1, B0 - Foreground boost</li>
+    </ul>
+    <p>
+        Note that with this encoding method that "undefined" combinations are possible (e.g. having both the Fixed and Variable bits set or cleared). The scheduler falls back to its NT 4 logic in such cases (the quantums would be fixed on Server and variable on Workstation if the F and V bits are identical).
+    </p>
+    <p>
+        The quantum control value is decoded to set up the <b>PsForegroundQuantum</b> and <b>PsPrioritySeparation</b> by the new function 
+        <b>PsChangeQuantumTable</b>. After determining the new quantum settings <b>PsChangeQuantumTable</b> proceeds to update the quantum values 
+        stored in all the existing process control blocks so that changes have global effect - this is something that <i>NTFrob</i> does as well.
+    </p>
+    <p>
+        The flexible new quantum configuration in Win2K should satisfy those that want more precise control over the scheduler time 
+        slicing policy. I think that its fair to say that <b>NTFrob</b> significantly influenced these changes.
+    </p><br />
+
+
+    
+    
+    <p>
+        <a href="Windows2000Quantums.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

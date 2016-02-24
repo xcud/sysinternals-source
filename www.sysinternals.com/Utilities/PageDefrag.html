@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - PageDefrag</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>PageDefrag</h1>
+    <div class="info">
+        Copyright © 1998-2005 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: July 11, 2005 v2.32</span>
+    </div>
+    
+    <h2>Awards</h2>
+    <p><img src="../images/awards/Award_CHIPOnline.gif" width="99" height="86" /> <img src="../images/awards/softpedia_award.gif" width="100" height="100" /></p>
+    <h2>Introduction</h2>
+    <p>
+        One of the limitations of the Windows NT/2000 defragmentation interface is that it is not possible to defragment files that are open for exclusive access. Thus, standard defragmentation programs can neither show you how fragmented your paging files or Registry hives are, nor defragment them. Paging and Registry file fragmentation can be one of the leading causes of performance degradation related to file fragmentation in a system.
+    </p>
+    <p>
+        <i>PageDefrag</i> uses advanced techniques to provide you what commercial defragmenters cannot: the ability for you to see how fragmented your paging files and Registry hives are, and to defragment them. In addition, it defragments event log files and Windows 2000/XP hibernation files (where system memory is saved when you hibernate a laptop).
+    </p>
+    <p>
+        <i>PageDefrag</i> works on Windows NT 4.0, Windows 2000, Windows XP, and Server 2003.
+    </p>
+    
+    <h2>Installation and Use</h2>
+    <p>
+        When you run <i>PageDefrag</i> (pagedfrg.exe) you will be presented a listbox that tells you how many clusters make up your paging files, event log files, and Registry hives (SAM, SYSTEM, SYSTEM.ALT, SECURITY, SOFTWARE, .DEFAULT), as well as how many fragments those files are in. If you feel that these files are fragmented enough to warrant a shot at defragmenting them, or if you want to defragment them at every boot, select the appropriate radio button choice and click OK.
+    </p>
+    <p>
+        When you direct <i>PageDefrag</i> to defragment, the next time the system boots it will attempt to do so. Immediately after CHKDSK 
+        examines your hard drives <i>PageDefrag</i> uses the standard file defragmentation APIs (see my 
+        <a href="../Information/DiskDefragmenting.html">Inside Windows NT Disk Defragmenting</a> 
+        page for documentation of these APIs) to defragment the files. As it processes each file <i>PageDefrag</i> will print on the boot-time 
+        startup screen the file name and its success at defragmenting it. If it is successful at reducing the fragmentation it will tell 
+        you the number of clusters the file started with and the number it consists of after the defragmentation.
+    </p>
+    <p>
+        In some cases <i>PageDefrag</i> may be unable to reduce fragmentation on one or more of the files, and it will indicate so on the 
+        boot-time Blue Screen. This can happen either because there is not enough space on the drive for defragmentation, or the free space 
+        itself is highly fragmented. For the best results you should use <i>PageDefrag</i> in conjunction with a commercial defragmentation 
+        utility or my free <a href="Contig.html">Contig defragmenter</a>.
+    </p>
+    
+    <h2>Command-Line Options</h2>
+    <p>
+        You can run <i>PageDefrag</i> non-interactively by specifying a command-line option for the setting you want:
+    </p>
+    <p>
+        <b>usage: pagedefrag [-e | -o | -n] [-t &lt;seconds&gt;]</b></p>
+    <dl class="usage">
+        <dt>-e</dt>
+            <dd>Defrag every boot</dd>
+        <dt>-o</dt>
+            <dd>Defrag once</dd>
+        <dt>-n</dt>
+            <dd>Never defrag</dd>
+            <dd></dd>
+            <dt>-t</dt>
+            <dd>Set countdown to specified number of seconds</dd>
+            <dt><img src="../images/screenshots/PageDefrag.gif" width="497" height="403" alt="PageDefrag Screenshot" />    </dt>
+    </dl>
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/PageDefrag.zip">Download PageDefrag (x86- 35KB)</a>
+    </p>
+    
+    <p>
+        <a href="PageDefrag.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

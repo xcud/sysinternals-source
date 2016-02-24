@@ -1,0 +1,128 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - PMon</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>PMon</h1>
+    <div class="info">
+        Copyright © 1997 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a> and <a href="mailto:cogswell@winternals.com">Bryce Cogswell</a><br />
+        <span>Last Updated: July 9, 1997, Version 1.0</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        <i>PMon</i> is a Windows NT device driver/GUI combination that logs and displays all process activity on a Windows NT 4.0 system. The device driver uses several undocumented hooking functions that cause it to be called whenever a process or thread is created or deleted. In addition, if run on the Checked build of NT or the Multiprocessing kernel, an undocumented context-swap hook is installed that has <i>PMon</i> optionally display all context switch activity.
+    </p>
+    
+    <h2>Installation and Use</h2>
+    <p>
+        <i>PMon</i> works on all builds of NT 4.0. Installing <i>PMon</i> is as easy as unzipping it and typing, "ntpmon." The GUI 
+        dynamically loads the driver (based on code from the instdrv sample in the Windows NT DDK), which installs hooks for process 
+        and thread creation and deletion. The menus can be used to disable event capturing, control the scrolling of the listview, 
+        and to save the listview contents to an ASCII file. Where possible, <i>PMon</i> displays the name of the process that owns 
+        a thread that is part of a thread creation or deletion, or a context swap. The thread ID immediately follows the process 
+        name. In some cases the owning process does not exist anymore, in which case <i>PMon</i> displays "???" for the name. The 
+        "Elapsed" column indicates the time in seconds between successive events in the display. Note that many times this will be 
+        0, which simply means that the events happened inside of one system timer clock tick. Clock ticks are normally 10 milliseconds 
+        apart, so alot can happen (for more information on the NT system timer, see 
+        <a href="../Information/HighResolutionTimers.html">Inside NT High Resolution Timers</a>).
+    </p>
+    <p>
+        The context-swap hook is only present in multiprocessor builds of NT, and is by default not enabled. To turn on context-switch monitoring when it is present, select the "Context Swap" menu entry under the "Events" menu. Note that monitoring context swaps generates many records rapidly. In order to try and minimize the amount of non-interesting context-swap noise, <i>PMon</i> ignores swaps between system threads 0 and 1, which occur frequently as system work items are dispatched.
+    </p>
+    <p>
+        If you have MSDN membership, you have the checked build. You can install a minimal checked build environment by replacing NTOSKRNL.EXE with the NTOSKRNL.EXE on the checked build CD, and by replacing HAL.DLL with the appropriate version on the checked build. To determine the correct HAL to copy over to your system, search for HAL.DLL in its [winnt]\repair\setup.log file. Copy the one with the same name on the checked CD to HAL.DLL in your [winnt]\system32 directory. Be sure and back up your existing copies of these files so that you can go back to the free build.
+    </p>
+    <img src="../images/screenshots/PMon.gif" width="" height="" alt="PMon Screenshot" />
+    
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/PMon.zip">Download PMon (23KB)</a>
+    </p>
+    
+    <p>
+        <a href="PMon.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

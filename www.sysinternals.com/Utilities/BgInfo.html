@@ -1,0 +1,226 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - BgInfo</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>BGInfo</h1>
+    <div class="info">
+        Copyright © 2000-2004 <a href="mailto:cogswell@winternals.com">Bryce Cogswell</a><br />
+        <span>Last Updated: October 31, 2004 v4.07</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        How many times have you walked up to a system in your office and needed to click through several diagnostic windows to remind yourself of important aspects of its configuration, such as its name, IP address, or operating system version? If you manage multiple computers you probably need <i>BGInfo</i>. It automatically displays relevant information about a Windows computer on the desktop's background, such as the computer name, IP address, service pack version, and more. You can edit any field as well as the font and background colors, and can place it in your startup folder so that it runs every boot, or even configure it to display as the background for the logon screen.
+    </p>
+    <p>
+        Because <i>BGInfo</i> simply writes a new desktop bitmap and exits you don't have to worry about it consuming system resources or interfering with other applications.
+    </p>
+    <p>
+        <i>BGInfo</i> works on 95 and higher, and Windows NT 4.0 and higher.
+</p>
+    <p>Sysinternals BgInfo     </p>
+    <img src="../images/screenshots/BgInfo.gif" width="576" height="432" alt="BGInfo Screenshot" />
+    
+    <h2>Installation and Use</h2>
+    <p>
+    See Mark's Windows IT Pro Magazine <a href="http://www.windowsitpro.com/Article/ArticleID/46950/46950.html?Ad=1">Power Tools article</a> for a primer on using BgInfo. If you have questions or problems please visit the <a href="../../forum.sysinternals.com/forum_topicsda12.html?FID=5">Sysinternals BgInfo Forum</a>. </p>
+    <p>By placing <i>BGInfo</i> in your <b>Startup</b> folder you can ensure that the system information being displayed is up to date each time you boot. Once you've settled on the information to be displayed use the command line option /timer:0 to update the display without showing the dialog box. </p>
+    <p>
+        You can also use the Windows Scheduler to run <i>BGInfo</i> on a regular basis to ensure long-running systems are kept up to date.
+    </p>
+    <p>
+        If you create a <i>BGInfo</i> configuration file (using the <b>File|Save Settings</b> menu item) you can automatically import 
+        and use those settings on other systems by adding the <b>/I&lt;path&gt;</b> or <b>/iq&lt;path&gt;</b> command line option.
+    </p>
+    <img src="../images/screenshots/BgInfo2.gif" width="551" height="467" alt="BGInfo Screenshot" />
+    
+    <h2>Using BgInfo</h2>
+    <p>
+        When you run <i>BGInfo</i> it shows you the appearance and content of its default desktop background. If left untouched it will 
+        automatically apply these settings and exit after its 10 second count-down timer expires.
+    </p>
+    <p>
+        Selecting any button or menu item will disable the timer, allowing you to customize the layout and content of the background information.
+    </p>
+    <p>
+        If you want <i>BGInfo</i> to edit or use a configuration stored in a file (instead of the default configuration which is stored in the registry) specify the name of the file on the command line:
+        <br /><br />
+        BGInfo MyConfig.bgi
+    </p>
+    
+    <h2>Appearance Buttons</h2>
+    <p>
+        <b>Fields:</b> Selects what information appears on the desktop, and the order in which it is displayed. For networking fields (NIC, IP, MAC, etc.) a separate entry is created for each network card on the system. Use the Custom button to add special information you define yourself.
+    </p>
+    <p>
+        <b>Background:</b> Selects the color and/or wallpaper to use for the background. If you select the <b>Copy existing settings</b> option then <i>BGInfo</i> will use whatever information is currently selected by the logged on user. This option allows end users to personalize their desktop while still displaying the <i>BGInfo</i> information.
+    </p>
+    <p>
+        <b>Position:</b> Selects the location on the screen at which to place the text. If some items are very long (for example some 
+        network card names) you can use the <b>Limit Lines to</b> item to truncate them. The <b>Compensate for Taskbar position</b> checkbox adjusts 
+        the position of the text to ensure that it is not covered by the Taskbar. The <b>Multiple Monitor Configuration</b> button allows you 
+        to specify how multiple monitors attached to a single console should be handled.
+    </p>
+    <p>
+        <b>Desktops:</b> Selects which desktops are updated when the configuration is applied. By default only the <b>User Desktop</b> 
+        wallpaper is changed. <b>Enabling the Logon Desktop for Console users</b> option specifies that the wallpaper should be displayed on 
+        the logon desktop that is presented before anyone has logged onto the system. On Windows 95/98/ME systems the same desktop is 
+        used for users and the login screen, so this option has no effect. Enabling the <b>Logon Desktop for Terminal Services users</b> option 
+        specifies that the wallpaper should be displayed on the Terminal Services login screen. This option is useful only on servers 
+        running Terminal Services.
+    </p>
+    <p>
+        <b>Preview:</b> Displays the background as it will appear when applied to your system.
+    </p>
+    
+    <h2>Configuration Menu Items</h2>
+    <p>
+        These are options that control how the bitmap is produced, where it is located and how to import/export settings.
+    </p>
+    <p>
+        <b>File | Open:</b> Opens a <i>BGInfo</i> configuration file.
+    </p>
+    <p>
+        <b>File | Save As:</b> Saves a copy of the current <i>BGInfo</i> configuration to a new file. Once created, you can have 
+        <i>BGInfo</i> use the file later by simply specifying it on the command line, or by using <b>File|Open</b> menu option.
+    </p>
+    <p>
+        <b>File|Reset Default Settings:</b> Removes all configuration information and resets <i>BGInfo</i> to its default (install-time) state. Use this if you can't determine how to undo a change, or if <i>BGInfo</i> becomes confused about the current state of the bitmap.
+    </p>
+    <p>
+        <b>File|Database:</b> Specifies a .XLS, .MDB or .TXT file or a connection string to an SQL database that <i>BGInfo</i> should use to store the information it generates. Use this to collect a history of one or more systems on your network. You must ensure that all systems that access the file have the same version of MDAC and JET database support installed. It is recommended you use at least MDAC 2.5 and JET 4.0. If specifying an XLS file the file must already exist.
+    </p>
+    <p>
+        If you prefer to have <i>BGInfo</i> update the database without modifying the user's wallpaper you can unselect all desktops 
+        in the <b>Desktops</b> dialog; <i>BGInfo</i> will still update the database.
+    </p>
+    <p>
+        <b>Bitmap|256 Colors:</b> Limits the bitmap to 256 colors. This option produces a smaller bitmap.
+    </p>
+    <p>
+        <b>Bitmap|High Color/True Color:</b> Creates a 16-bit or 24-bit color bitmap.
+    </p>
+    <p>
+        <b>Bitmap|Match Display:</b> Creates a bitmap with color depth matching that of the display. Because the bitmap generated by <i>BGInfo</i> is not updated when a user changes the display's color depth you may see unexpected results (especially dithering of the text and background) with some combinations of bitmap and display depth.
+    </p>
+    <p>
+        <b>Bitmap|Location:</b> Specifies the location to place the output bitmap file. On Terminal Services servers the bitmap should be placed in a location that is unique to each user.
+    </p>
+    <p>
+        <b>Edit|Insert Image:</b> Allows you to insert a bitmap image into the output. Because <i>BGInfo</i>'s configuration information is stored in the registry and Windows limits the size of registry values you may encounter errors when inserting larger images. On Windows 9x/Me systems the limit is 16K, while on NT/2000/XP systems the limit is 64K.
+    </p>
+    
+    <h2>Command Line Options</h2>
+    <p>
+        <b>&lt;path&gt;</b> Specifies the name of a configuration file to use for the current session. Changes to the configuration are automatically saved back to the file when OK or Apply is pressed. If this parameter is not present <i>BGInfo</i> uses the default configuration information which is stored in the registry under the current user ("HKEY_CURRENT_USER\Software\Winternals\<i>BGInfo</i>").
+    </p>
+    <p>
+        <b>/timer</b> Specifies the timeout value for the countdown timer, in seconds. Specifying zero will update the display without displaying the configuration dialog. Specifying 300 seconds or longer disables the timer altogether.
+    </p>
+    <p>
+        <b>/popup</b> Causes <i>BGInfo</i> to create a popup window containing the configured information without updating the desktop. The information is formatted exactly as it would if displayed on the desktop, but resides in a fitted window instead. When using this option the history database is not updated.
+    </p>
+    <p>
+        <b>/taskbar</b> Causes <i>BGInfo</i> to place an icon in the taskbar's status area without updating the desktop. Clicking the icon causes the configured information to appear in a popup window. When using this option the history database is not updated.
+    </p>
+    <p>
+        <b>/all</b> Specifies that <i>BGInfo</i> should change the wallpaper for any and all users currently logged in to the system. This option is useful within a Terminal Services environment, or when <i>BGInfo</i> is scheduled to run periodically on a system used by more than one person (see Using a Schedule below).
+    </p>
+    <p>
+        <b>/log</b> Causes <i>BGInfo</i> to write errors to the specified log file instead of generating a warning dialog box. This is useful for tracking down errors that occur when <i>BGInfo</i> is run under the scheduler.
+    </p>
+    <p>
+        <b>/rtf</b> Causes <i>BGInfo</i> to write its output text to an RTF file. All formatting information and colors are included.
+    </p>
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/BgInfo.zip">Download BgInfo (244 KB)</a>
+    </p>
+
+
+    <p>
+        <a href="BgInfo.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - NTFSDOS Professional Edition</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>NTFSDOS Professional Edition</h1>
+    <div class="info">
+        Copyright © 1999-2002 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a> and <a href="mailto:cogswell@winternals.com">Bryce Cogswell</a><br />
+        <span>Last Updated: February 28, 2002 v4.01</span><br />
+        <a href="http://www.winternals.com/"><img src="../images/WinternalsProduct.gif" width="87" height="29" /></a>
+    </div>
+    
+    <h2>Awards</h2>
+    <a href="http://www.hotfiles.com/zdawards/zdawards.html"><img src="../images/awards/ZiffDavis.gif" width="90" height="90" alt="Ziff Davis Shareware Finalist" /></a>
+    
+    <h2>Introduction</h2>
+    <p>
+        <i>If you are interested in accessing NTFS drives from Windows 95 or Windows 98 you should use 
+        <a href="NtfsWindows98.html">NTFS for Windows 98</a> rather than NTFSDOS Professional, which is available as part of 
+        <a href="http://www.winternals.com/products/repairandrecovery/index.asp">Winternals Administrator's Pak</a>. If you want to salvage 
+        files off a corrupt NTFS volume or repair an NTFS boot sector or partition table, see Winternals' Disk Commander, also part of the 
+        <a href="http://www.winternals.com/products/repairandrecovery/index.asp">Administrator's Pak</a></i>
+    </p>
+    <p>
+        NTFSDOS Professional mounts your NTFS volumes and gives them drive letters, so you can run applications and use files on NTFS volumes transparently. NTFSDOS Professional is small enough to run from a MS-DOS boot diskette so you can even access NTFS volumes on a system where Windows NT/2000/XP isn't installed or able to boot. This makes it ideal for repairing corrupt files or configuration problems that prevent a Windows NT/2000/XP system from booting.
+    </p>
+    <p>
+        The advantage NTFSDOS Professional has over <a href="NtfsDos.html">NTFSDOS</a> is that it relies on Microsoft's 
+        implementation of NTFS rather than our own information on the NTFS file-system layout. However, NTFSDOS is still sometimes 
+        useful for cases where you want to recover data off of a NTFS drive that Windows NT/2K no longer recognizes, because NTFSDOS 
+        is more lax about recognizing NTFS drives than the Windows NT/2K NTFS driver.
+    </p>
+    <p>
+        NTFSDOS Professional also comes with NTFSCHK, a tool for running the Windows NT/2000/XP CHKDSK program from within MS-DOS. NTFSCHK allows you to verify and repair the NTFS disk structure in case of accidental corruption.
+    </p>
+    <p>
+        Please read this entire file before contacting us for help.
+    </p>
+    
+    <h2>How it Works</h2>
+    <p>
+        NTFSDOS Professional runs on MS-DOS and mounts NTFS drives so your MS-DOS applications can use them. It takes the files and drivers that compose NTFS from an existing Windows NT/2000/XP installation and simulates the environment they normally run in, allowing them to run inside of MS-DOS. This approach allows NTFSDOS Professional to access your NTFS volumes using the same Microsoft drivers that Windows NT/2000/XP uses, ensuring compatibility with your NTFS drives regardless of the version and Service Pack of NT you happen to use.
+    </p>
+    <img src="../images/screenshots/NtfsDosProfessional.gif" width="" height="" alt="NTFSDOS Professional Diagram" />
+    
+    <p>
+        NTFSDOS Professional is a 32-bit application that uses the DOS Protected Mode Interface (DPMI) to allow it to run in the 16-bit MS-DOS environment. It implements a network file system redirector, allowing the programs on your system to think they are making requests to a network drive, when in fact the requests are being routed to the NTFS file system driver and then to your local hard disk.
+    </p>
+    
+    <h2>Installation</h2>
+    <p>
+        Installing NTFSDOS Professional is a two-step process. The first step is installing the configuration utility and help files on a Windows NT system, and the second step is creating your MS-DOS disks with the necessary Windows NT/2000/XP drivers. (If you ran a setup program to install this Help file then the first step is already done.)
+    </p>
+    <p>
+        When you first receive NTFSDOS Professional you will want to run the Setup program on the Windows NT/2000/XP workstation or server that you wish to have the help files installed on, and that you wish to use to create NTFSDOS Professional diskettes. If you are installing on a dual-boot Windows NT/2000/XP and MS-DOS/Win9x system then you should run the Setup program on Windows NT/2000/XP.
+    </p>
+    <p>
+        Once installed, you can run the Creator utility to place NTFSDOS Professional and the Windows NT/2000/XP system files it requires on either your local disk(s) or a MS-DOS diskette.
+    </p>
+    
+    <h2>Requirements</h2>
+    <p>
+        You must have the following components in order to install and run NTFSDOS Professional:
+    </p>
+    <ul>
+        <li>A Windows NT/2000/XP Workstation or Windows NT/2000/XP Server installation (version 4.0 Service Pack 3 or higher).</li>
+        <li>MS-DOS 5.0 or higher. It is strongly recommended that you use MS-DOS version 7.0 (the version of MS-DOS that ships with Windows 95/98), since it is the only version that will allow you to use long filenames with your NTFS drives. Using earlier versions of MS-DOS restrict you to using file names in 8.3 format.</li>
+        <li>If your hard disk is 4GB or larger then your BIOS must support the Extended Int 13 interface (defined in the Enhanced Disk Drive Specification). Most newer systems provide such support, as it is necessary for Windows 95/98 to access large disks.</li>
+        <li>NTFSDOS Professional does not include licensing for MS-DOS or Windows NT/2000/XP. You should have a license for MS-DOS (or Windows 95/98) and Windows NT/2000/XP for each system on which you intend to run NTFSDOS Professional.</li>
+        <li>NTFSDOS Professional does not support Windows NT/2000/XP fault-tolerant or multi-volume drives. There is no support forvolume sets, mirrors, stripe sets, or stripe sets with parity.</li>
+    </ul>
+    
+    <h2>Creating an NTFSDOS Disk</h2>
+    <p>
+        You must run the Creator program in order to create disks from which you wish to run NTFSDOS Professional. You can create regular diskettes, bootable diskettes, or hard disk installations. You can use a single diskette on any number of systems, but note that the version of NTFS might vary from one machine to the next depending on the version of Windows NT/2000/XP installed.
+    </p>
+    <p>
+        When creating a bootable diskette you can add MS-DOS to the diskette either before or after installing NTFSDOS Professional on it. You can create a MS-DOS 7.0 boot diskette from within Windows 95/98 using either the "FORMAT /S A:" command or "SYS A:" from the command prompt.
+    </p>
+    <p>
+        The Creator program is installed in the program group where you installed NTFSDOS Professional. When run, it will take you through the following configuration screens:
+    </p>
+    <ul>
+        <li><b>Welcome screen:</b> Click Next to proceed.</li>
+        <li><b>Locate Windows NT/2000/XP System Files:</b> NTFSDOS Professional utilizes several files that are installed with Windows NT/2000/XP. You can select either the top level directory of your Windows NT/2000/XP installation (for example E:\WINNT) or a directory to which you have copied the necessary system files, and Creator will automatically locate the files for you.</li>
+        <li><b>Choose Destination Disk or Directory:</b> Choose the disk or directory where you would like NTFSDOS Professional to be installed. This can be any directory on your hard disk or floppy disk including the root directory, but it should be a directory accessible by MS-DOS (i.e. a FAT or FAT32 volume). If you specify a location on drive A: then Creator will create two diskettes: The first diskette will contain the NTFSPRO.EXE executable and related files, which allows you to mount NTFS drives and access them. The second disk will contain the NTFSCHK.EXE executable and related files, which allows you to CHKDSK your NTFS drives. Creator will automatically compress all Windows NT/2000/XP system files when copying them to a diskette, so the names and sizes of files may differ from those on your hard disk.</li>
+        <li><b>Copying Files:</b> Press Next to begin copying files. If you selected drive A:\ as the destination you will be prompted for two disks during the copy operation.</li>
+        <li><b>Finish:</b> At this point all files have been copied and you are ready to begin using NTFSDOS Professional.</li>
+    </ul>
+    
+    <h2>Using NTFSDOS Professional</h2>
+    <p>
+        Once you have run Creator you are ready to boot into MS-DOS and begin using NTFSDOS Professional.
+    </p>
+    <p>
+        To start NTFSDOS Professional, simply execute it from the DOS command line or from your AUTOEXEC.BAT. NTFSDOS must be started from the directory that contains its support files. When NTFSDOS Professional starts it will scan all hard-disk partitions on your system looking for NTFS drives. It will mount each NTFS drive it finds with a unique DOS drive letter.
+    </p>
+    <p>
+        Once the NTFS drives are mounted you can treat them just as you do any other drive on your system.
+    </p>
+    <p>
+        NTFSDOS Professional indicates the locations of the partitions it mounts using the BIOS unit number and partition. The unit, starting at 80, indicates the physical hard disk, while partitions are numbered sequentially on each unit starting at 1. The screenshot indicates that NTFS volumes were found on the 3rd partition of the first disk, and the 1st partition of the second disk.
+    </p>
+    <p>
+        You can specify your time zone by either using the /T command line option ("/T-5:00") or by setting the "TZ" environment variable ("TZ=-5:00"). The general form of the time zone specification is [+|-]hh[:mm[:ss]] where hh is hours, mm is minutes and ss is seconds.
+    </p>
+    <p>
+        It may not be important to you to set the time zone information before using NTFSDOS Professional, but remember that file times will be reported to you up to 12 hours off their actual times, and when you boot back into Windows NT/2000/XP any files you have modified will similarly have incorrect time stamps.
+    </p>
+    <p>
+        NTFSDOS Professional supports long file names, just as Windows 95/98/NT/2000/XP do. Long file name support was introduced to MS-DOS in version 7.0 (the version released with Windows 95), so if you use MS-DOS 7.0 you will see your Windows NT/2000/XP files with the regular names, rather than the 8.3 names. If you use an earlier version of MS-DOS you can still access your files, but you will need to use names like "PROGRA~1" rather than "Program Files".
+    </p>
+    <p>
+        Many people believe that MS-DOS doesn't support long file names at all, but that isn't the case. It is the MS-DOS FAT file system driver that lacks support, rather than MS-DOS itself. When used with a file system that supports long file names MS-DOS handles them fine, as do MS-DOS applications that are written to take advantage of the support.
+    </p>
+    <p>
+        The result of this situation is that if you copy a file with a long file name from NTFS to a local FAT drive, you will lose the long file name. However, if you copy it to a network drive that supports long file names, or to another NTFS drive, the long file name will be preserved. Similarly, if you use an archiver (such as one of the ZIP compressors) that supports long file names on an NTFS drive, the long file name information will be preserved.
+    </p>
+    <p>
+        The performance of NTFSDOS Professional is surprisingly good, considering that it runs on MS-DOS. NTFSDOS Professional is a 32-bit protected mode program, which means that the code usually executes at the same rate as for programs running under Windows NT/2000/XP and Windows 95/98. NTFSDOS Professional is not as fast as Windows NT/2000/XP overall, however, because it must switch back to 16-bit mode in order to interface to MS-DOS and the BIOS, to access the disk, and to interact with other applications.
+    </p>
+    <p>
+        NTFSDOS Professional implements its own disk cache for use when accessing NTFS volumes. You can increase the size of the disk cache in order to increase performance by using the /C option ("/C2000" sets the cache to 2000KB). The cache uses a write-through policy, meaning that while data read from the disk is served from the cache (if available), data written to disk is always committed to disk immediately. This is done to minimize loss of data in case of a crash.
+    </p>
+    <p>
+        NTFSDOS Professional is capable of using up to 64MB of physical memory for caching and other operations.
+    </p>
+    <p>
+        You can change the default behavior of NTFSDOS Professional by specifying one or more command line options. NTFSPRO.EXE understands the following options:
+    </p>
+    <dl class="usage">
+        <dt>/L:&lt;letter&gt;</dt>
+            <dd>Specify the set of drive letters you wish to NTFSDOS Professional to use when mounting NTFS volumes. Multiple drive letters may be listed, and each NTFS drive will be mounted according to its position in the sequence</dd>
+        <dt>/C:&lt;size&gt;</dt>
+            <dd>Allocates the specified amount of memory for the disk cache.</dd>
+        <dt>/T:[+|-]hh[:mm[:ss]]</dt>
+            <dd>Specifies the local time zone in effect, for translating NTFS time stamps from Universal Coordinated Time to local time.</dd>
+    </dl>
+    
+    <h2>Using NTFSCHK</h2>
+    <p>
+        NTFSCHK is the second component of NTFSDOS Professional. NTFSCHK allows you to run the Windows NT/2000/XP CHKDSK program from MS-DOS.
+    </p>
+    <p>
+        You cannot run NTFSCHK while NTFSPRO is running. If you need to run NTFSCHK after starting NTFSPRO you must reboot before doing so.
+    </p>
+    <p>
+        You run NTFSCHK by simply specifying the drive you wish to check, for example "NTFSCHK E:". By default NTFSCHK runs in read-only mode, just as the regular CHKDSK does. If you wish to have NTFSCHK repair errors it finds, use the /F (fix) option. If you wish to check all drives on the system you can specify "*" as the drive letter.If you aren't certain what drives are available you can use the /S option to get a list of drives.
+    </p>
+    <p>
+        You can change the default behavior of NTFSDOS Professional by specifying one or more command line options. NTFSCHK.EXE understands the following options:
+    </p>
+    <dl class="usage">
+        <dt>[drive:]</dt>
+            <dd>Specifies which volume to check. Use '*' to check all NTFS volumes.</dd>
+        <dt>/F</dt>
+            <dd>By default NTFSCHK operates in read-only mode. This option tells NTFSCHK to repair any errors it finds.</dd>
+        <dt>/S</dt>
+            <dd>Display a list of the NTFS drives on the system, without checking them. This is useful if you are not certain what drives are on the system.</dd>
+        <dt>/Q</dt>
+            <dd>By default NTFSCHK will perform a thorough analysis of the disk every time it runs, just as CHKDSK does under Windows NT/2000/XP. This option tells NTFSCHK to test the disk only if it appears to be dirty (was dismounted uncleanly). This mimics the behavior the AUTOCHK service (run at boot time) which Windows NT/2000/XP features.</dd>
+    </dl>
+    
+    <h2>Reporting Bugs</h2>
+    <p>
+        If you encounter a problem while running NTFS Professional, please determine if it is reproducible, and if so, how. Send 
+        steps on reproducing the problem and the following configuration information to 
+        <a href="mailto:support@winternals.com">support@winternals.com</a>:
+    </p>
+    <ul>
+        <li>Version of NTFS</li>
+        <li>Version of Windows 95/98</li>
+        <li>Number and size of NTFS drives</li>
+    </ul>
+
+
+
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/NtfsDosProfessional.exe">Download NTFSDOS Pro (Read-Only) (1.8MB)</a>
+    </p>
+    
+    <p>
+        <a href="NtfsDosProfessional.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

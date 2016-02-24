@@ -1,0 +1,582 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - NT 4.0 ACL Editors</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<div class="contentbox">
+    <h1>Documentation for NT 4.0 ACL Editors</h1>
+    <div class="info">
+        Copyright � 1998-2002 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: May 3, 2002</span>
+    </div>
+    
+    <h2>ACL Editor Documentation</h2>
+    <p>
+        Windows 2000 introduces new security editors that are fully documented in the Platform SDK. However, NT 4.0's security 
+        editors, which are used by Reged32 and Explorer, have never been documented by Microsoft. Back when I implemented 
+        <a href="../Utilities/WinObj.html">WinObj v2.0</a> I derived the interfaces for the NT system ACL (Access Control List) editors, which are implemented by acledit.dll. I've decided to now finally publicly document the APIs, which are useful for applications that wish to support standard security editing features under NT 4.0.
+    </p>
+    
+    <h2>SedDiscretionaryAclEditor</h2>
+    <p>
+        This function pops up a discretionary ACL editor dialog box.
+    </p>
+<pre><b>DWORD SedDiscretionaryAclEditor</b>(
+    <b>HWND</b> <i>Owner</i>,
+    <b>HINSTANCE</b> <i>Instance</i>,
+    <b>PWCHAR</b> <i>MachineName, // optional</i>
+    <b>PACLDLGCONTROL</b> <i>AclDlgControl</i>,
+    <b>PACLEDITCONTROL</b> <i>AclEditControl</i>,
+    <b>PWCHAR</b> <i>ObjectName</i>,
+    <b>PACLCHANGE</b> <i>ChangeCallback</i>,
+    <b>PVOID</b> <i>ChangeCallbackContext</i>,
+    <b>PSECURITY_DESCRIPTOR</b> <i>ObjectSecurity</i>,
+    <b>BOOLEAN</b> <i>NoReadPermission</i>,
+    <b>BOOLEAN</b> <i>ReadOnly</i>,
+    <b>PDWORD</b> <i>ChangeContextStatus</i>,
+    <b>PVOID</b> <i>MustBeZero</i>
+<b>);</b></pre>
+
+    <h3>Parameters</h3>
+    <h4>Owner</h4>
+    <p>
+        Handle to window of dialog owner.
+    </p>
+    <h4>Instance</h4>
+    <p>
+        This is the instance handle of the application that will be associated with the dialog box.
+    </p>
+    <h4>MachineName</h4>
+    <p>
+        This is an optional parameter that specifies the name of the computer (e.g. \\mark) where local account lookups for security descriptors will be performed. Specify NULL for the local machine.
+    </p>
+    <h4>AclDlgControl</h4>
+    <p>
+        Points to a caller supplied ACL dialog control data structure.
+    </p>
+    <h4>AclEditControl</h4>
+    <p>
+        Points to a caller-supplied ACL edit entry control data structure.
+    </p>
+    <h4>ObjectName</h4>
+    <p>
+        Specifies the text of the object name (e.g. "C:\temp\") field printed in the dialog box.
+    </p>
+    <h4>ChangeCallback</h4>
+    <p>
+        Callback that is invoked if the user enters changes into the editor and then dismisses the dialog.
+    </p>
+    <h4>ChangeCallbackContext</h4>
+    <p>
+        Context parameter that will be passed unchanged to the ChangeCallback procedure.
+    </p>
+    <h4>ObjectSecurity</h4>
+    <p>
+        The security descriptor associated with the object. The descriptor is interpreted with respect to user accounts and permissions and the information is displayed in the dialog box.
+    </p>
+    <h4>NoReadPermission</h4>
+    <p>
+        Tell the user that they cannot view the security information, but they can attempt to overwrite it if they want. The object security descriptor information is not displayed in the dialog.
+    <p>
+    <h4>ReadOnly</h4>
+    <p>
+        Tell the user that they can only view the object's security information. The Add and Remove buttons on the dialog are disabled.
+    </p>
+    <h4>ChangeContextStatus</h4>
+    <p>
+        The dialog ignores this value which it passes as a parameter to the change callback function. The change callback function can return a status code to the code that invoked the dialog box if a pointer to a status variable is passed for this parameter.
+    </p>
+    <h4>MustBeZero</h4>
+    <p>
+        Set to zero.
+    </p>
+    
+    <h3>Returns</h3>
+    <p>
+        The function returns a non-zero value on failure. Failure is returned if the security context is invalid for example.
+    </p>
+    
+    <h2>SedTakeOwnership</h2>
+    <p>
+        This function pops up an ownership editor dialog box.
+    <p>
+<pre><b>DWORD SedTakeOwnership</b>(
+    <b>HWND</b> <i>Owner</i>,
+    <b>HINSTANCE</b> <i>Instance</i>,
+    <b>PWCHAR</b> <i>MachineName, // optional</i>
+    <b>PWCHAR</b> <i>ObjectType</i>,
+    <b>PWCHAR</b> <i>ObjectName</i>,
+    <b>DWORD</b> <i>ObjectCount</i>,
+    <b>PACLCHANGE</b> <i>ChangeCallback</i>,
+    <b>PVOID</b> <i>ChangeCallbackContext</i>,
+    <b>PSECURITY_DESCRIPTOR</b> <i>ObjectSecurity</i>,
+    <b>BOOLEAN</b> <i>NoReadPermission</i>,
+    <b>BOOLEAN</b> <i>NoOwnerChange</i>,
+    <b>PDWORD</b> <i>ChangeContextStatus</i>,
+    <b>PACLHELPCONTROL</b> <i>HelpInfo</i>,
+    <b>PVOID</b> <i>MustBeZero</i>
+<b>);</b></pre>
+    
+    <h3>Parameters</h3>
+    <h4>Owner</h4>
+    <p>
+        Handle to window of dialog owner.
+    </p>
+    <h4>Instance</h4>
+    <p>
+        This is the instance handle of the application that will be associated with the dialog box.
+    </p>
+    <h4>MachineName</h4>
+    <p>
+        This is an optional parameter that specifies the name of the computer (e.g. \\mark) where local account lookups for security descriptors will be performed. Specify NULL for the local machine.
+    </p>
+    <h4>ObjectType</h4>
+    <p>
+        Specifies the text that will displayed for the object type (e.g. "Directory").
+    </p>
+    <h4>ObjectName</h4>
+    <p>
+        Specifies the text of the object name (e.g. "C:\temp\") field printed in the dialog box.
+    </p>
+    <h4>ObjectCount</h4>
+    <p>
+        If more than one then ObjectName is ignored.
+    </p>
+    </p>
+    <h4>ChangeCallback</h4>
+    <p>
+        Callback that is invoked if the user enters changes into the editor and then dismisses the dialog.
+    </p>
+    <h4>ChangeCallbackContext</h4>
+    <p>
+        Context parameter that will be passed unchanged to the ChangeCallback procedure.
+    </p>
+    <h4>ObjectSecurity</h4>
+    <p>
+        The security descriptor associated with the object. The descriptor is interpreted with respect to user accounts and permissions and the information is displayed in the dialog box.
+    </p>
+    <h4>NoReadPermission</h4>
+    <p>
+        Tell the user that they cannot view the security information, but they can attempt to overwrite it if they want. The object security descriptor information is not displayed in the dialog.
+    </p>
+    <h4>NoOwnerChange</h4>
+    <p>
+        Set to true to indicate that the user doesn't have permission to change ownership of the object.
+    </p>
+    <h4>ChangeContextStatus</h4>
+    <p>
+        The dialog ignores this value which it passes as a parameter to the change callback function. The change callback function can return a status code to the code that invoked the dialog box if a pointer to a status variable is passed for this parameter.
+    </p>
+    <h4>HelpInfo</h4>
+    <p>
+        Pointer to a help information structure that is referenced when the user enters the Help button on the dialog box.
+    </p>
+    <h4>MustBeZero</h4>
+    <p>
+        Set to zero.
+    </p>
+    
+    <h3>Returns</h3>
+    <p>
+        The function returns a non-zero value on failure. Failure is returned if the security context is invalid for example.
+    </p>
+    
+    <h2>SedSystemAclEditor</h2>
+    <p>
+        This function pops up a system ACL editor dialog box.
+    <p>
+<pre><b>DWORD SedSystemAclEditor</b>(
+    <b>HWND</b> <i>Owner</i>,
+    <b>HINSTANCE</b> <i>Instance</i>,
+    <b>PWCHAR</b> <i>MachineName, // optional</i>
+    <b>PACLDLGCONTROL</b> <i>AclDlgControl</i>,
+    <b>PACLEDITCONTROL</b> <i>AclEditControl</i>,
+    <b>PWCHAR</b> <i>ObjectName</i>,
+    <b>PACLCHANGE</b> <i>ChangeCallback</i>,
+    <b>PVOID</b> <i>ChangeCallbackContext</i>,
+    <b>PSECURITY_DESCRIPTOR</b> <i>ObjectSecurity</i>,
+    <b>BOOLEAN</b> <i>NoReadPermission</i>,
+    <b>PDWORD</b> <i>ChangeContextStatus</i>,
+    <b>PVOID</b> <i>MustBeZero</i>
+<b>);</b></pre>
+
+    <h3>Parameters</h3>
+    <h4>Owner</h4>
+    <p>
+        Handle to window of dialog owner.
+    </p>
+    <h4>Instance</h4>
+    <p>
+        This is the instance handle of the application that will be associated with the dialog box.
+    </p>
+    <h4>MachineName</h4>
+    <p>
+        This is an optional parameter that specifies the name of the computer (e.g. \\mark) where local account lookups for security descriptors will be performed. Specify NULL for the local machine.
+    </p>
+    <h4>AclDlgControl</h4>
+    <p>
+        Points to a caller supplied ACL dialog control data structure.
+    </p>
+    <h4>AclEditControl</h4>
+    <p>
+        Points to a caller-supplied ACL edit entry control data structure.
+    </p>
+    <h4>ObjectName</h4>
+    <p>
+        Specifies the text of the object name (e.g. "C:\temp\") field printed in the dialog box.
+    </p>
+    <h4>ChangeCallback</h4>
+    <p>
+        Callback that is invoked if the user enters changes into the editor and then dismisses the dialog.
+    </p>
+    <h4>ChangeCallbackContext</h4>
+    <p>
+        Context parameter that will be passed unchanged to the ChangeCallback procedure.
+    </p>
+    <h4>ObjectSecurity</h4>
+    <p>
+        The security descriptor associated with the object. The descriptor is interpreted with respect to user accounts and permissions and the information is displayed in the dialog box.
+    </p>
+    <h4>NoReadPermission</h4>
+    <p>
+        Tell the user that they do not have a privilege required for viewing the object's auditing information.
+    </p>
+    <h4>ChangeContextStatus</h4>
+    <p>
+        The dialog ignores this value which it passes as a parameter to the change callback function. The change callback function can return a status code to the code that invoked the dialog box if a pointer to a status variable is passed for this parameter.
+    </p>
+    <h4>MustBeZero</h4>
+    <p>
+        Set to zero.
+    </p>
+    
+    <h3>Returns</h3>
+    <p>
+        The function returns a non-zero value on failure. Failure is returned if the security context is invalid for example.
+    </p>
+    
+    <h2>ACLDLGCONTROL</h2>
+    <p>
+        The ACLDLGCONTROL structure specifies the attributes of the SedDiscritionaryAclEditor and SedSystemAclEditor dialog boxes.
+    </p>
+<pre><b>typedef struct {</b>
+    <b>UCHAR</b> <i>Version</i>;
+    <b>BOOLEAN</b> <i>IsContainer</i>;
+    <b>BOOLEAN</b> <i>AllowNewObject</i>;
+    <b>BOOLEAN</b> <i>MapSpecificToGeneric</i>; 
+    <b>PDWORD</b> <i>GenericAccessMap</i>; 
+    <b>PDWORD</b> <i>GenericMappingNewObjects</i>; 
+    <b>PWCHAR</b> <i>DialogTitle</i>;
+    <b>PACLHELPCONTROL</b> <i>HelpInfo</i>;
+    <b>PWCHAR</b> <i>SubReplaceTitle</i>;
+    <b>PWCHAR</b> <i>SubReplaceObjectsTitle</i>;
+    <b>PWCHAR</b> <i>SubReplaceConfirmation</i>;
+    <b>PWCHAR</b> <i>SpecialAccess</i>;
+    <b>PWCHAR</b> <i>SpecialNewAccess</i>; 
+<b>} ACLDLGCONTROL,       *PACLDLGCONTROL;</b></pre>
+
+
+
+    <h4>Members Version</h4>
+    <p>
+        Set to 1.
+    </p>
+    <h4>IsContainer</h4>
+    <p>
+        Indicates if object is a container.
+    </p>
+    <h4>AllowNewObject</h4>
+    <p>
+        Allow permissions to be applied to new (non-existent) objects.
+    </p>
+    <h4>MapSpecificToGeneric</h4>
+    <p>
+        Determines if generic mapping entry is used.
+    </p>
+    <h4>GenericAccessMap</h4>
+    <p>
+        Points to a <b>GENERIC_MAPPING</b> (defined in the Win32 SDK) structure that specifies a mapping of generic to specific and standard access types. The access map array used by Explorer is:
+    </p>
+<pre>DWORD            AccessMasks[4] = {
+            0x120089, 0x120116, 0x1200A0, 0x1F01FF
+};</pre>
+    <p>
+        The access map array used by Regedt32 is:
+    </p>
+<pre>DWORD            RegistryAccessMasks[4] = {
+            0x120019, 0x20006, 0x20019, 0xF003F
+}</pre>
+
+
+
+    <h4>GenericMappingNewObjects</h4>
+    <p>
+        Interpreted as specific access types for new objects. Pass the same <b>GENERIC_MAPPING</b> structure as for the GenericAccessMap parameter.
+    </p>
+    <h4>DialogTitle</h4>
+    <p>
+        Specifies the text that will be displayed in the title bar of the dialog box.
+    </p>
+    <h4>HelpInfo</h4>
+    <p>
+        Points to <b>PACLHELPCONTROL</b> structure that defines the help actions taken when the user presses the dialog box's Help button.
+    </p>
+    <h4>SubReplaceTitle</h4>
+    <p>
+        Specifies the text that is included next to the check box that allows a user to recursively replace security descriptors on children containers of the object that is being edited.
+    </p>
+    <h4>SubReplaceObjectsTitle</h4>
+    <p>
+        Specifies the text that is included next to the check box that allows a user to recursively replace security descriptors on children objects of the object that is being edited.
+    </p>
+    <h4>SubReplaceConfirmation</h4>
+    <p>
+        Species the text in the dialog box that is presented the user if they checked the check box that will result in a replacement of the security descriptors of all the children of the object being edited.
+    </p>
+    <h4>SpecialAccess</h4>
+    <p>
+        Specifies the text that is displayed for the entry in the pre-defined security settings drop down menu that the user can select to open a specific access editor dialog. Regedt32 and Explorer specify "Special Access..." for this string.
+    </p>
+    <h4>SpecialNewAccess</h4>
+    <p>
+        Specifies the text that is displayed for the entry in the pre-defined security settings drop down menu that the user can select to open a specific access editor dialog for new objects.
+    </p>
+
+    <h2>ACLEDITCONTROL</h2>
+    <p>
+        The <b>ACLEDITCONTROL</b> structure specifies security masks that the security editor dialog box uses when the user specifies that they want to edit specific security attributes for an object. They can do this by either selecting the "Special Access..." entry in the security settings drop-down list or by double clicking on an existing security entry in the dialog's main window.
+    </p>
+<pre><b>typedef struct {</b>
+    <b>DWORD</b>           <i>NumberOfEntries</i>;
+    <b>PACLEDITENTRY</b>   <i>Entries</i>;
+    <b>PWCHAR</b>          <i>DefaultPermissionName</i>;
+<b>} ACLEDITCONTROL, *PACLEDITCONTROL;</b></pre>
+
+    <h3>Members</h3>
+    <h4>NumberOfEntries</h4>
+    <p>
+        Specifies the number of entries being passed.
+    </p>
+    <h4>Entries</h4>
+    <p>
+        Points to an array of <b>ACLEDITENTRY</b> structures. Each entry in the list will result in an additional check box in the specific access security editor dialog box. When the user selects the entry the corresponding access mask bits will be added to the resulting security descriptor entry.
+    </p>
+    <h4>DefaultPermissionName</h4>
+    <p>
+        The permission that should be selected by default in the combo box in the Add permission dialog.
+    </p>
+
+    <h2>ACLEDITENTRY</h2>
+    <p>
+        The <b>ACLEDITENTRY</b> structure specifies security masks that the security editor dialog box uses when the user specifies that they want to edit specific security attributes for an object.
+    </p>
+<pre><b>typedef struct {</b>
+            <b>DWORD</b>            <i>Type</i>;
+            <b>DWORD</b>            <i>AccessMask</i>;
+            <b>DWORD</b>            <i>AccessMask1; // optional</i>
+            <b>PWCHAR</b>          <i>Name</i>;
+<b>} ACLEDITENTRY,         *PACLEDITENTRY;</b></pre>
+
+    <h3>Members</h3>
+    <h4>Type</h4>
+    <p>
+        Specifies whether the entry is a generic access entry, a specific access entry or a combination.
+    </p>
+    <h4>AccessMask</h4>
+    <p>
+        If the user checks the box for this entry this access mask will be applied to the entry that the user is defining.
+    </p>
+    <h4>AccessMask1</h4>
+    <p>
+        Used for special access or ignored.
+    </p>
+    <h4>Name</h4>
+    <p>
+        Specifies the text label that will identify this access setting (e.g. "Read").
+    </p>
+    <p>
+        See the following pages for the definitions for these data structures used by Explorer and Regedt32.
+    </p>
+    
+    <h3>Registry Editor Key Settings</h3>
+<pre>ACLEDITENTRY aclEditEntryRegistry[] = {
+            { 2, KEY_QUERY_VALUE,                 0, L"&amp;Query Value" },
+            { 2, KEY_SET_VALUE,                   0, L"&amp;Set Value" },
+            { 2, KEY_CREATE_SUB_KEY,              0, L"&amp;Create Subkeys"},
+            { 2, KEY_ENUMERATE_SUB_KEYS,          0, L"&amp;Enumerate Subkeys" },
+            { 2, KEY_NOTIFY,                      0, L"No&amp;tify" },
+            { 2, KEY_CREATE_LINK,                 0, L"Create &amp;Link" },
+            { 2, DELETE,                          0, L"&amp;Delete" },
+            { 2, WRITE_DAC,                       0, L"&amp;Write DAC" },
+            { 2, WRITE_OWNER,                     0, L"Write &amp;Owner" },
+            { 2, READ_CONTROL,                    0, L"&amp;Read Control" },
+            { 1, 0x2019,                          0, L"Read" },
+            { 1, GENERIC_ALL,                     0, L"Full Control" },
+};</pre>
+
+    <h3>Explorer Directory Settings</h3>
+<pre>ACLEDITENTRY aclEditEntryDirectory[] = {
+            { 2, GENERIC_READ,                    0, L"&amp;Read (R)" },
+            { 2, GENERIC_WRITE,                   0, L"&amp;Write (W)" },
+            { 2, GENERIC_EXECUTE,                 0, L"E&amp;xecute (X)"},
+            { 2, ACCESS_SYSTEM_SECURITY,          0, L"&amp;View/Change Audits (A)" },
+            { 2, DELETE,                          0, L"&amp;Delete (D)" },
+            { 2, WRITE_DAC,                       0, L"Change &amp;Permissions (P)" },
+            { 2, WRITE_OWNER,                     0, L"Take &amp;Ownership (O)" },
+            { 2, FILE_LIST_DIRECTORY,             0, L"&amp;List (L)" },
+            { 2, FILE_ADD_FILE,                   0, L"Add &amp;Entry (N)" },
+            { 2, READ_CONTROL,                    0, L"Read &amp;Control (T)" },
+            { 3, 0,                               0, L"No Access" },
+            { 3, FILE_LIST_DIRECTORY|READ_CONTROL, (DWORD) -1, L"List" },
+            { 3, GENERIC_READ|GENERIC_EXECUTE, 
+                 GENERIC_READ|GENERIC_EXECUTE, L"Read" },
+            { 3, GENERIC_WRITE|GENERIC_EXECUTE, (DWORD) -1, L"Add" },
+            { 3, GENERIC_WRITE|GENERIC_READ|GENERIC_EXECUTE, 
+                 GENERIC_READ|GENERIC_EXECUTE, L"Add Read" },
+            { 3, GENERIC_WRITE|GENERIC_READ|GENERIC_EXECUTE|DELETE, 
+                 GENERIC_WRITE|GENERIC_READ|
+                 GENERIC_EXECUTE|DELETE, L"Change" },
+            { 3, GENERIC_ALL, GENERIC_ALL, L"Full Control" },
+            { 4, GENERIC_READ,                    0, L"Read" },
+            { 4, GENERIC_WRITE,                   0, L"Write" },
+            { 4, DELETE,                          0, L"Delete (D)"},
+            { 4, WRITE_DAC,                       0, L"Change Permissions (P)" },
+            { 4, WRITE_OWNER,                     0, L"Take Ownership (O)" },
+};</pre>
+
+    <h3>Explorer File Settings</h3>
+<pre>ACLEDITENTRY aclEditEntryFile[] = {
+            { 2, GENERIC_READ,                    0, L"&amp;Read (R)" },
+            { 2, GENERIC_WRITE,                   0, L"&amp;Write (W)" },
+            { 2, GENERIC_EXECUTE,                 0, L"E&amp;xecute (X)" },
+            { 2, DELETE,                          0, L"&amp;Delete (D)" },
+            { 2, WRITE_DAC,                       0, L"Change &amp;Permissions (P)" },
+            { 2, WRITE_OWNER,                     0, L"Change &amp;Owner (O)" },
+            { 1, 0,                               0, L"No Access" },
+            { 1, GENERIC_READ|GENERIC_EXECUTE,    0, L"Read" },
+            { 1, GENERIC_READ|GENERIC_WRITE|GENERIC_EXECUTE,
+                                                            0, L"Change" },
+            { 1, GENERIC_ALL,                     0, L"Full Control" },
+};</pre>
+    
+    <h3>Explorer and Registry SACL Settings</h3>
+    <p>
+        The following is the entry used for the <b>SedSystemAclEditor</b> function:
+    </p>
+<pre>ACLEDITENTRY saclEditEntry[] = {
+    { 5, GENERIC_READ|ACCESS_SYSTEM_SECURITY, 0, L"&amp;Read" },
+    { 5, GENERIC_WRITE|ACCESS_SYSTEM_SECURITY, 0, L"&amp;Write" },
+    { 5, GENERIC_EXECUTE, 0, L"E&amp;xecute"  },
+    { 5, DELETE, 0, L"&amp;Delete" },
+    { 5, WRITE_DAC, 0, L"Change &amp;Permissions" },
+    { 5, WRITE_OWNER, 0, L"&amp;Take Ownership" },
+};</pre>
+
+    <h2>ACLHELPCONTROL</h2>
+    <p>
+        The <b>ACLHELPCONTROL</b> structure specifies the help item that will be displayed when a user presses the Help button in one of the security editor dialog boxes.
+    </p>
+<pre><b>typedef struct {</b>
+    <b>PWCHAR</b>    <i>HelpFile</i>;
+    <b>DWORD</b>     <i>MainDialogTopic</i>;
+    <b>DWORD</b>     <i>ACLEditorDialogTopic</i>;
+    <b>DWORD</b>     <i>Reserved1</i>;
+    <b>DWORD</b>     <i>AddEntryDialogTopic</i>;
+    <b>DWORD</b>     <i>Reserved2</i>;
+    <b>DWORD</b>     <i>Reserved3</i>;
+    <b>DWORD</b>     <i>AccountDialogTopic</i>;
+<b>} ACLHELPCONTROL, *PACLHELPCONTROL;</b></pre>
+
+    <h3>Members</h3>
+    <h4>HelpFile</h4>
+    <p>
+        Specifies the name of the help file that will be accessed (e.g. "Application.hlp".
+    </p>
+    <h4>Topic</h4>
+    <p>
+        Specifies the topic ID in the help file that will be displayed, if appropriate.
+    </p>
+    <h4>SubTopic</h4>
+    <p>
+        Specifies the subtopic ID if appropriate.
+    </p>
+
+    <h2>ACLCHANGE</h2>
+    <p>
+        An <b>ACLCHANGE</b> function is a callback function called by a security editor dialog box when the user indicates that they want to change a security descriptor. The function is invoked if the user presses the Okay button.
+    </p>
+<pre><b>typedef DWORD CALLBACK (*ACLCHANGE )( </b>
+    <b>HWND</b> <i>Owner</i>, 
+    <b>HANDLE</b> <i>Instance</i>, 
+    <b>PVOID</b> <i>CallbackContext</i>, 
+    <b>PSECURITY_DESCRIPTOR</b> <i>NewSD</i>,
+    <b>PSECURITY_DESCRIPTOR</b> <i>NewObjectSD</i>,
+    <b>BOOLEAN</b> <i>ApplyToSubContainers</i>,
+    <b>BOOLEAN</b> <i>ApplyToSubObjects</i>,
+    <b>PDWORD</b> <i>ChangeContextStatus</i>
+<b>);</b></pre>
+
+    <h3>Parameters</h3>
+    <h4>Owner</h4>
+    <p>
+        Handle to dialog box owner window.
+    </p>
+    <h4>Instance</h4>
+    <p>
+        This is the instance handle of the application.
+    </p>
+    <h4>CallbackContext</h4>
+    <p>
+        The unchanged context parameter that was passed to the dialog function.
+    </p>
+    <h4>NewSD</h4>
+    <p>
+        The modified security descriptor. It is up to the callback function to apply this new security descriptor to the object if appropriate.
+    </p>
+    <h4>NewObjectSD</h4>
+    <p>
+        The security descriptor that should be applied to the new object if the dialog is for new object creation.
+    </p>
+    <h4>ApplyToSubContainers</h4>
+    <p>
+        Indicates that permissions should be applied to subcontainers.
+    </p>
+    <h4>ApplyToSubObjects</h4>
+    <p>
+        Indicates that permissions should be applied to subobjects.
+    </p>
+    <h4>ChangeContextStatus</h4>
+    <p>
+        A status that can be returned to the caller of the original dialog box function. The security editor dialog function does not look at this value.
+    </p>
+
+    <h3>Returns</h3>
+    <p>
+        The function should return a non-zero value to indicate failure
+    </p><br />
+           
+    
+    <p>
+        <a href="AclEditors.html#top">Back to Top</a>
+    </p>
+</div>
+
+<div class="footer">
+	Copyright � 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

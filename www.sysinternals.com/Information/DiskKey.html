@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Inside the Disk Key</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Inside the Disk Key</h1>
+    <div class="info">
+        Copyright © 1997 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: November 5, 1997</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        The <b>HKLM\System\Disk</b> key is the heart of Windows NT 4.0's volume management. Under this key, which is created by the 
+        NT Disk Administrator program, you'll find a binary-data value called Information. Its this value that contains the 
+        configuration of recognized partitions, their drive-letter assignment information, and the definition of any fault-tolerant 
+        or multi-volume logical drives that exist on a machine. The <b>Disk</b> key has been around since the first releases of NT, but 
+        Microsoft has never documented its format. In this article I'm going to describe the layout of the <b>Disk</b> key and present 
+        a program, Diskkey, that will (what else?) read, decode, and print the information stored in the <b>Disk\Information</b> value. 
+        If you've ever been curious about how fault-tolerant drives are constructed in NT, or you wish to write your own version 
+        of the Resource Kit's FT-Edit program for managing NT volumes, then you'll find the information here interesting and/or useful.
+    </p>
+    
+    <h2>What's Under the Disk Key?</h2>
+    <p>
+        The <b>HKLM\System\Disk</b> key is created the first time you run <i>Disk Administrator</i>. <i>Disk Administrator</i> makes a value called 
+        <b>Information</b>, where it initially stores information about each hard-disk in the system, including the layout of partitions 
+        on the drive. As you use <i>Disk Administrator</i> to assign drive letters, create and delete partitions, or configure fault-tolerant 
+        drives, the <b>Information</b> value is updated to reflect changes.
+    </p>
+    <p>
+        You may also find another other value under the <b>Disk</b> key if you've specified that you want a particular drive letter to be 
+        mapped to your CD-ROM. The value's name will usually be <b>\device\CdRom0</b> and it is a string value representing the assigned 
+        drive letter (e.g. "G:"). Of course, if you have more than one CD-ROM on your system you might have more values with similar 
+        names for them.
+    </p>
+    <p>
+        Besides <i>Disk Administrator</i>, the other components in an NT system that read the <b>Disk</b> key include the fault-tolerant disk driver 
+        (ftdisk.sys), and Win32. During its initialization FT-Disk determines what fault-tolerant and multi-volume drives exist on the 
+        machine by decoding the <b>Information</b> value. These drive types include mirrored drives, stripe sets, stripe sets with parity, and 
+        volume sets. Win32 reads the <b>Information</b> value, and possibly the \device\CdRomXX values, when assigning drive letters to represent 
+        partitions.
+    </p>
+    
+    <h2>Decoding the Information Value</h2>
+    <p>
+        The <b>Information</b> value is variable length, since there is not a fixed number of disks or fault-tolerant drives that can exist in NT. The data stored in the value is hierarchical in nature, and a particular data structure is used to describe components at each level in the hierarchy. The diagram below shows how the data is organized with an example system that has two hard drives. The first hard drive has two partitions on it, one of which is half of a mirrored drive. The second hard drive consists of only one partition that is the other half of the mirror-set.
+    </p>
+    <img src="../images/screenshots/DiskKey.gif" width="540" height="217" alt="Disk Configuration Diagram" />
+    <p>
+        At the top of the diagram is the disk header, which is represented with the DISK_CONFIG_HEADER data structure. Besides a version number, the important fields in this data structure locate the header for the disk description and the fault-tolerant description headers. The disk description header, DISK_REGISTRY (not shown), precedes information about the disks in the system. In turn, each disk header, of type DISK_DESCRIPTION, precedes the data that describes the partitions on the disk. The partitions are described in DISK_PARTITION data structures.
+    </p>
+    <p>
+        A similar approach is taken on the fault-tolerant side of the tree, where a FT_REGISTRY data structure (not shown) precedes the description of each fault-tolerant set on the system (mirrored drive, stripe-set, etc.). Each fault-tolerant set starts off with a header of type FT_DESCRIPTION, and is followed by FT_MEMBER_DESCRIPTION that describe each component of the particular fault-tolerant set.
+    </p>
+    <p>
+        For the example configuration shown in the figure above, the <b>Information</b> value would be laid out as shown below.
+    </p>
+    <img src="../images/screenshots/diskkey2.gif" width="350" height="400" alt="Information Value Diagram" />
+    <p>
+        Note how each level in the hierarchy locates the components within it. In addition, fault tolerant members, such as the 
+        members of the mirror set in the example, locate the disk partition they correspond to both by referencing the logical 
+        partitions disk and partition number, and by specifying an offset into the <b>Information</b> value where the partition's description 
+        is located.
+    </p>
+    <p>
+        Each level in the structure may have zero or more pieces. A disk can have no partitions or 5 partitions (for instance),and a fault-tolerant set can consist of one or more members (partitions). The number of partitions or fault-tolerant members is stored in the disk or fault-tolerant description data structures. Likewise, the number of disks in the system is stored in the disk registry structure and the number of fault-tolerant sets is stored in the fault-tolerant registry structure. At the top of the tree, the disk configuration data structure locates the disk registry and fault-tolerant registry data structures with their offsets into the Information value.
+    </p>
+    <p>
+        Thus, to traverse the fault-tolerant information for example, the fault-tolerant registry is first located using its offset in 
+        the configuration header. Then the number of fault-tolerant sets is noted and the members are iterated by using the size of the 
+        data structures as indexes into the <b>Information</b> value.
+    </p>
+    
+    <h2>Interesting Fields</h2>
+    <p>
+        Some of the interesting information stored within the data structures include drive letter assignments. Each partition has a 
+        field that indicates whether the user has specified that a particular drive letter should be assigned, or if the system should 
+        assign a letter. In the fault-tolerant member data structures, as well as the fault-tolerant set data structures, are stored the 
+        state of the fault-tolerant component. You'll typically see that the members and sets are healthy, but its possible to find that 
+        a part of a mirror has been orphaned, or that a stripe set member is regenerating, if there were errors encountered on the drive. 
+        Finally, you'll see the values of the disk signatures that <i>Disk Administrator</i> indicates it writes to the drives it has seen.
+    </p>
+    
+    <h2>The Diskkey Program</h2>
+    <p>
+        The <i>Diskkey</i> program is included here to both demonstrate how to read the <b>Disk</b> key and to provide header files that can be used 
+        in your own volume management programs. <i>Diskkey </i>does nothing more than dump the information it finds in the <b>Disk</b> key.
+    </p>
+    <p>
+        Some of the data structures defined in diskkey.h are taken from their definitions in the NTDDK file ntddft.h, while others have been derived through experimentation and correlation with the ntddft.h structures.
+    </p>
+    
+    <h2>How Win2K Does It</h2>
+    <p>
+        Disk management has undergoing some major changes in Win2K, with the incorporation of Veritas' volume-management technology. The HKM\Disk\Information value is still present, but fault-tolerant information is no longer stored there.
+    </p>
+    <p>
+        Fault-tolerant information in Win2K is stored directly on disk, which makes the loss of fault-tolerant drives less likely. You 
+        can find more information on the new formatting used for volumes in <a href="../WindowsInternals.html">Windows Internals </a>, 
+        download <a href="../Utilities/LdmDump.html">LDMDump</a>, a program that dumps the contents of the Win2K on-disk partitioning 
+        database and <a href="../Utilities/DiskExt.html">DiskExt</a>, a utility that uses an IOCTL to get volume disk-maps.
+    </p>
+    
+    
+    <p class="download">
+        <a href="../Files/DiskKey.html">Download Diskkey Plus Source (26KB)</a>
+    </p>
+    
+    <p>
+        <a href="DiskKey.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - PsKill</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>PsKill</h1>
+    <div class="info">
+        Copyright © 2000-2005 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: August 2, 2005 v1.11</span>
+    </div>
+    
+
+    <h2>Introduction</h2>
+    <p>
+         Windows NT/2000 does not come with a command-line 'kill' utility. You can get one in the Windows NT or Win2K Resource Kit, but the kit's utility can only terminate processes on the local computer. <i>PsKill</i> is a kill utility that not only does what the Resource Kit's version does, but can also kill processes on remote systems. You don't even have to install a client on the target computer to use <i>PsKill</i> to terminate a remote process.
+    </p>
+    
+    <h2>Installation</h2>
+    <p>
+        Just copy <i>PsKill</i> onto your executable path, and type pskill with command-line options defined below.
+    </p>
+    <p>
+        <i>PsKill</i> works on NT 4 and higher.
+    </p>
+    
+    <h2>Usage</h2>
+    <p>
+        See the September 2004 issue of Windows IT Pro Magazine for <a href="http://www.windowsitpro.com/Article/ArticleID/43569/43569.html?Ad=1" target="_blank">Mark's article</a> that covers advanced usage of <i>PsKill</i>.
+    </p>
+    <p>
+        Running <i>PsKill</i> with a process ID directs it to kill the process of that ID on the local computer. If you specify a process name <i>PsKill</i> will kill all processes that have that name.
+    </p>
+    <p>
+        <b>usage: pskill [-?] [-t] [\\computer [-u username] [-p password]] &lt;process name | process id&gt;</b> 
+    </p>
+    
+    <dl class="usage">
+        <dt>-?</dt>
+            <dd>Displays the supported options.</dd>
+        <dt>-t</dt>
+            <dd>Kill the process and its descendants.</dd>
+        <dt>\\computer</dt>
+            <dd>Specifies the computer on which the process you want to terminate is executing. The remote computer must be accessible via the NT network neighborhood.</dd>
+        <dt>-u username</dt>
+            <dd>If you want to kill a process on a remote system and the account you are executing in does not have administrative privileges on the remote system then you must login as an administrator using this command-line option. If you do not include the password with the -p option then <i>PsKill</i> will prompt you for the password without echoing your input to the display.</dd>
+        <dt>-p password</dt>
+            <dd>This option lets you specify the login password on the command line so that you can use PsList from batch files. If you specify an account name and omit the -p option PsList prompts you interactively for a password.</dd>
+        <dt>process id</dt>
+            <dd>Specifies the process ID of the process you want to kill.</dd>
+        <dt>process name</dt>
+            <dd>Specifies the process name of the process or processes you want to kill.</dd>
+    </dl>
+    
+    <h2>PsKill Microsoft KB Article</h2>
+    <p>
+        This Microsoft KB article references <i>PsKill</i>:
+    </p>
+    <p>
+        <a href="http://support.microsoft.com/default.aspx?scid=kb%3Ben-us%3B810596">810596: PSVR2002: "There Is No Information to Display in This View" Error Message When You Try to Access a Project View</a>
+    </p>
+    
+    
+    
+    <h2>PsTools</h2>
+    <p>
+        <i>PsKill</i> is part of a growing kit of Sysinternals command-line tools that aid in the adminstration of local and remote 
+        Windows NT/2K systems named <a href="PsTools.html">PsTools</a>.
+    </p>
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/PsKill.zip">Download PsKill (42 KB)</a>
+        <br />
+        <br />
+        
+        <a href="../../download.sysinternals.com/Files/PsTools.zip">Download PsTools</a>
+    </p>
+    
+    <p>
+        <a href="PsKill.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

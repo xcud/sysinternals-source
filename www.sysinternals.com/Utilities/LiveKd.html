@@ -1,0 +1,143 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - LiveKd</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>LiveKd</h1>
+    <div class="info">
+        Copyright © 2001-2005 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: August , 2005 v3.0</span></div>
+    
+    <h2>Introduction</h2>
+    <p>
+        <i>LiveKD</i>, a utility I wrote for the CD included with Inside Windows 2000, 3rd Edition, 
+        is now freely available. <i>LiveKD</i> allows you to run the Kd and Windbg Microsoft kernel debuggers, which are part of the 
+        <a href="http://www.microsoft.com/whdc/devtools/debugging/default.mspx" target="_blank">Debugging Tools for Windows package</a>, locally on a live system. Execute all the debugger commands that work on crash dump files to look deep inside the system. See the Debugging Tools for Windows documentation and our book for information on how to explore a system with the kernel debuggers.
+    </p>
+    <p>
+        While the latest versions of Windbg and Kd have a similar capability on Windows XP and Server 2003, <i>LiveKD</i> works on NT 4 through Server 2003, including x64 versions of Windows, and enables more functionality, such as viewing thread stacks with the !thread command, than Windbg and Kd's own live kernel debugging facility.
+    </p>
+    
+    <h2>Installation</h2>
+    <p>
+        First download and install the Debugging Tools for Windows package from Microsoft's web site:
+    </p>
+    <p> <a href="http://www.microsoft.com/whdc/devtools/debugging/debugstart.mspx">http://www.microsoft.com/whdc/devtools/debugging/debugstart.mspx </a> 
+  </p>
+    <p>
+        If you install the tools to their default directory of \Program Files\Microsoft\Debugging Tools for Windows, you can run <i>LiveKD</i> from any directory; otherwise you should copy LiveKD to the directory in which the tools are installed.
+    </p>
+    <p>
+        If you haven't installed symbols for the system on which you run <i>LiveKD</i>, <i>LiveKD</i> will ask if you want it to automatically configure the system to use Microsoft's symbol server (see the Debugging Tools for Windows documentation for information on symbol files and the Microsoft symbol server).
+    </p>
+    <p>
+        <i>NOTE:</i> The Microsoft debugger will complain that it can't find symbols for LIVEKDD.SYS. This is expected, since I have not made symbols for LIVEKDD.SYS available, and does not affect the behavior of the debugger.
+    </p>
+    
+    <h2>Usage</h2>
+    <p>
+        <b>usage: livekd [-w] [-d] [-k ] [debugger options]</b>
+    </p>
+    <dl class="usage">
+        <dt>-w</dt>
+            <dd>Runs windbg instead of Kd (Kd is the default)</dd>
+        <dt>-d</dt>
+            <dd>Runs Dumpchk exam instead of Kd (Kd is the default)</dd>
+        <dt>-k</dt>
+            <dd>Specifices complete path and filename of debugger image to execute</dd>
+    </dl>
+    <p>
+        All other options are passed through to Kd/Windbg/Dumpchk. Note: Use Ctrl-Break to terminate and restart the debugger if it hangs.
+    </p>
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/LiveKd.zip">Download LiveKd (69 KB)</a>
+    </p>
+        
+    
+    <p>
+        <a href="LiveKd.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

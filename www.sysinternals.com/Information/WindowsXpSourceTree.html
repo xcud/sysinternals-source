@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Windows XP Source Tree</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>WinXP Source Tree</h1>
+    <div class="info">
+        Copyright © 2001 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: May 28, 2001</span>
+    </div>
+    
+    <p>
+        No, what you see here isn't the source code to Windows XP Beta 2, nor do I even have access to source code. This is the source tree layout of the Windows XP Beta 2 sources, complete with file names.
+    </p>
+
+<div class="treeview">   
+<!-- Infrastructure code for the tree -->
+<script src="../includes/treeview.js"></script>
+<!-- Execution of the code that actually builds the specific tree -->
+<script src="../includes/xpsrctree.js"></script>
+<script>
+initializeDocument()
+</script>
+</div>
+    
+    <p>
+        The source tree layout above probably represents about 90% of the tree for the NTOSKRNL.EXE (multiprocessor version) image file, the NTFS file system driver (NTFS.SYS), the TCP/IP driver (TCPIP.SYS) and the multiprocessor HAL (HALMPS.DLL). 
+    </p>
+    <p>
+        NTOSKRNL.EXE contains all of Windows XP's executive subsystems, including the Cache Manager, Memory Manager, Process Manager, Object Manager, and I/O Manager. It also contains the Kernel, which implements NTs synchronization mechanisms. I threw in the other drivers so that the relationship of the HAL tree and key drivers with respect to the main NTOSKRNL source would be apparent. 
+    </p>
+    <p>
+        So how did I get the information used to build the tree? I extracted file names from the checked (debug) build images of various operating system image files. The checked build version of the Windows XP (and Windows NT and Windows 2000, for that matter) operating system includes many "assert" statements. An assert statement is simply a run-time expression that should be true. If it isn't, then some program variable has attained a value considered impossible by the program and the assert statement flags the condition in some way visible to a programmer. Developers sprinkle code with assertions to catch faulty assumptions and programming errors. 
+    </p>
+    <p>
+        In Windows XP, device drivers and kernel-mode subsystems include assertions by using the ASSERT macro. This is an example ASSERT from the keyboard class driver, the source of which comes with the Windows 2000 Device Driver Kit (DDK): 
+    </p>
+<pre>ASSERT(0 < deviceExtension->TrustedSubsystemCount);</pre>
+    <p>
+        The ASSERT macro is defined in the NTDDK.H DDK header file as: 
+    </p>
+<pre>        #if DBG
+
+        #define ASSERT( exp ) \
+        if (!(exp)) \
+        RtlAssert( #exp, __FILE__, __LINE__, NULL )
+
+        #else
+
+        #define ASSERT( exp )
+
+
+        #endif</pre>
+    <p>
+        This means that the ASSERT is a no-op in release builds, but if the assertion test fails in a debug build the function 
+        RtlAssert is invoked. RtlAssert prints the expression, file, and line number information as a debug output, and causes a 
+        debug break so that a developer can examine the conditions that lead to the assertion failure from inside a kernel debugger. 
+        The file name parameter causes the source file's file name to be embedded in its image file, and it can be extracted with a 
+        string-search utility like my own <a href="../Utilities/Strings.html">Strings</a>.
+    </p>
+    
+    <p>
+        <a href="WindowsXpSourceTree.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

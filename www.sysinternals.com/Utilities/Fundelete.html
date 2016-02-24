@@ -1,0 +1,173 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Fundelete</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Fundelete for Windows NT</h1>
+    <div class="info">
+        Copyright © 1997-2002 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: February 24, 2000 Version 2.02</span>
+    </div>
+    
+    <h2>Awards</h2>
+    <a href="../images/w2knews.html"><img src="../images/awards/W2KNews.jpg" width="" height="" alt="W2K News Target Awards Winner" /></a>
+    
+    <h2>Introduction</h2>
+    <p>
+        Although NT 4.0 provides a Recycle Bin, it is of very limited use. Only files deleted from the Explorer GUI end up being placed there. Any files zapped from a command window or from within a program are lost forever. <i>Fundelete</i> is a utility that replaces NT 4.0's Recycle Bin to provide full protection of files deleted from anywhere. <i>Fundelete</i> includes the same configurability as Recycle Bin's Properties dialog, including which drives should have protection enabled, and how large the <i>Fundelete</i> Bin should be allowed to grow. <i>Fundelete</i> also provides a filtering dialog that allows you to prevent files of specific extensions not to be sent to the Bin, such as editor backup files, and temporary files. You can also specify directories that will be excluded from protection.
+    </p>
+    <p>
+        Note that <i>Fundelete</i> does not enable you to recover files that were deleted before <i>Fundelete</i> was installed. To recover 
+        valuable files that may have already been deleted, try 
+        <a href="http://www.winternals.com/products/repairandrecovery/filerestore.asp">FileRestore</a> from Winternals Software.
+    </p>
+    
+    <h2>A Note About the Name</h2>
+    <p>
+        <i>Fundelete</i> was originally named Undelete for Windows NT. A year after we released our "Undelete" Executive Software decided to rename one of their products, which provides some of the same functionality as our utility, to Undelete for Windows NT. We were subsequently informed by attorneys representing Executive Software International, Inc. that we were violating their registered trademark on the word "undelete" by using it in the title of our program. Apparantly, the word "undelete", despite being standard computer terminology and arguably a necessary addendum to the modern English language (it is listed in many computer dictionaries), has been owned by Executive Software since 1987 (we wonder if Microsoft knew that when they added the undelete command to DOS 5 in 1991). We therefore renamed our Undelete for Windows NT to <i>Fundelete</i> for Windows NT.
+    </p>
+    
+    <h2>Installation and Use</h2>
+    <p>
+        <i>Fundelete</i> is installed with a self-extracting install program. No file extension filters are automatically installed, so after installation you might want to run the <i>Fundelete</i> filter dialog (placed in the <i>Fundelete</i> program group) and add to it extensions and directories that you want <i>Fundelete</i> support disabled for. After rebooting, any files you delete from within programs or the command prompt , which are not being filtered from protection, will be moved to the Recycle Bin. Simply use the <i>Fundelete</i> Bin as you would for files deleted from Explorer to recover deleted files.
+    </p>
+    
+    <h2>The Source Code</h2>
+    <p>
+        We have posted the source code to one of the modules of the <i>Fundelete</i> device driver. This module, undelete.c, demonstrates several powerful techniques that are useful for device driver writers, and that are not documented anywhere else. Several of them include :
+    </p>
+    <ul>
+        <li>Synchronizing access to a file that is accessed from a GUI and a driver. The <i>Fundelete</i> GUI passes a mutex handle to the driver, which obtains a mutex object pointer from it. Thereafter the GUI and driver can access the <i>Fundelete</i> Bin files without interfering with each other through the use of the shared mutex.</li>
+        <li>Enumerating the contents of a directory from within a driver. <i>Fundelete</i> must honor the Recycle Bin's size setting so it must dynamically calculate the size of a Bin (the size of all the files it contains).</li>
+        <li>How a filter driver can both stall IRPs headed to a file system, and create and dispatch new IRPs before completing an original request. This highlights the use of STATUS_PENDING and STATUS_MORE_PROCESSING_REQUIRED as return codes.</li>
+        <li>Dynamically determining the SID of a user from within its driver when <i>Fundelete</i> must store a file in a NTFS recycle bin.</li>
+    </ul>
+    
+    <h2>Obtaining the Current SID in a Driver</h2>
+    <p>
+        One technique that is of particular interest for developers is <i>Fundelete</i>'s method for determining the SID of the user that is performing a file system operation. This is acommplished in several steps. First, <i>Fundelete</i> references the current access token, obtaining a pointer to its object body:
+    </p>
+<pre>completeContext->Token=PsReferencePrimaryToken(PsGetCurrentProcess());</pre>
+    <p>
+        The next step is for it to obtain a handle to the token object, because token query operations are handle-based. 
+        <i>Fundelete</i> accomplishes this through the use of an undocumented API, <b>ObOpenObjectByPointer</b>, that will take an object 
+        and create a handle for it in the currently executing process:
+    </p>
+<pre>ntStatus=ObOpenObjectByPointer( CompleteContext->Token, 
+    0, NULL, TOKEN_QUERY, NULL, 
+    KernelMode, &tokenHandle );
+ObDereferenceObject( CompleteContext->Token );</pre>
+    <p>
+        After the handle is returned <i>Fundelete</i> can query the token using the <b>NtQueryInformationToken</b> native API. This function 
+        is the basis for the Win32-equivalent, <b>GetTokenInformation</b>, so determining its parameters and their formats is straight-forward. 
+        Definitions from the Win32 header files are included in <i>Fundelete</i>'s header so that <i>Fundelete</i> can perform a <b>TokenUser</b> query on 
+        the token, which returns the token's user information including the SID.
+    </p>
+<pre>tokenInfoBuffer=(PTOKEN_USER) ExAllocatePool( NonPagedPool, requiredLength ); 
+ntStatus=NtQueryInformationToken( tokenHandle, 
+    TokenUser, tokenInfoBuffer, 
+    requiredLength, &amp;requiredLength );
+ZwClose( tokenHandle );</pre>
+    <p>
+        The final step <i>Fundelete</i> performs is to convert the binary representation of the SID into a textual representation. 
+        Another undocumented API, <b>RtlConvertSidToUnicodeString</b>, performs this.
+    </p>
+<pre>memset( sidStringBuffer, 0, sizeof(sidStringBuffer )); 
+sidString.Buffer=(PWCHAR) sidStringBuffer; 
+sidString.MaximumLength=sizeof(sidStringBuffer); 
+ntStatus=RtlConvertSidToUnicodeString( &amp;sidString, tokenInfoBuffer->User.Sid, FALSE );</pre>
+
+
+  
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/Fundelete.exe">Download Fundelete (894KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/FundeleteSource.zip">Download Fundelete Undelete.c Source Code (13KB)</a>
+    </p>
+    
+    <p>
+        <a href="Fundelete.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,97 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - VxDMon</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<div class="contentbox">
+    <h1>VxDMon</h1>
+    <div class="info">
+        Copyright � 1997 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a> and <a href="mailto:cogswell@winternals.com">Bryce Cogswell</a><br />
+        <span>Last Updated: July 9, 1997 </span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        Windows 95 does not provide any native support for monitoring the performance of VxD services. <i>VxDMon</i> is a system monitoring tool that allows you to profile Windows 95 VxD performance and behavior. <i>VxDMon's</i> functionality is built on VxD service hooking. By using service hooking, <i>VxDMon</i> is able to monitor and time, via the Pentium's rdtsc (ReaD Time Stamp Counter) instruction, any and all VxD services including those of VxDs built into Windows and those added by a developer. In addition, <i>VxDMon</i> keeps track of VxD service call histories so that it can display useful information such as the list of all services that were called by a particular service during a monitoring session. This combination of VxD performance and call history information provides a never-before-seen look into the behavior of Windows.
+    </p>
+    
+    <h2>Installation and Use</h2>
+    <p>
+        <i>VxDMon</i> was designed for Pentium processors and requires that VXDMON.EXE be in the same directory as VXDMON.VXD. It will run on a 386 or 486 processor, but performance information will not be available since only the Pentium has a cycle counter. VXDMON.VXD is a dynamic VxD, meaning that no changes to system.ini or the registry are necessary. The typical way <i>VxDMon</i> is used is demonstrated in the following steps:
+    </p>
+    <ol>
+        <li>Select services to be monitored</li>
+        <li>Collect performance and control-flow information</li>
+        <li>View the gathered statistics</li>
+    </ol>
+    <p>
+        When <i>VxDMon</i> is started it checks to see if a hook profile exists in a file in the current directory called 
+        profile.dat. If a profile exists, <i>VxDMon</i> will ask if you desire that the services listed in the profile should 
+        be hooked. If no profile exists, the main window will open without a prompt. To create a hook profile the <b>Options|Select</b> 
+        Services menu item must be selected, which will open a tree-view containing all the services listed in a file called 
+        services.dat. When a service is clicked upon in this view, it will toggle between a selected state, indicated with a 
+        green icon, and an unselected state, indicated with a red icon. Yellow icons are used to identify VxDs that have some, 
+        but not all, of their services selected for monitoring. After a profile has been created, <i>VxDMon</i> must be told to 
+        begin monitoring the services selected. Choose the <b>Options|Hook</b> Now menu item in the selection window. A profile can be 
+        saved by choosing <b>Options|Sav</b>e Hook List.
+    </p>
+    <p>
+        Monitoring begins as soon as the services are hooked, and the statistics gathered by <i>VxDMon's</i> VxD can be imported 
+        into the user interface by choosing <b>Options|Update</b> Statistics in the main window. The latest statistics are read from the 
+        VxD by selecting <b>Options|Update</b>, and reset to zero by selecting <b>Options|Reset</b>. Depending on the value of the <b>Preferences|Zero 
+        Statistics on Update</b> selection, <b>Options|Update</b> either accumulates the counts (off), or gives the counts since the previous 
+        Update (on).
+    </p>
+    <p>
+        Control-flow information can be seen by double clicking on a service in the main window, or by highlighting a service and 
+        choosing <b>Options|Show Ancestors</b> or <b>Options|Show Descendants</b>. A services ancestors are all services that preceeded the service 
+        in the control-flow. The immediate ancestors of a service include all the services that directly called it. Correspondingly, 
+        the descendants of a service are those services that followed it in the control-flow. The immediate descendants are those 
+        services that were directly called by the service. When ancestor or descendant information is selected, a new sub-window is 
+        opened that displays the control-flow hierarchy as a tree-view. The same ancestor/descendant selection facilities are available 
+        in the sub-window so that other services can have control-flow windows opened for them. Finally, both the main window and the 
+        control-flow windows have save capabilities that dump the windows contents in formatted ASCII to a file.
+    </p>
+    <p>
+        <i>VxDMon</i> includes full on-line help that describes these steps in detail. It also tells you how you can add information about your own VxD to <i>VxDMon's</i> database in order that <i>VxDMon</i> can monitor your own VxD services.
+    </p>
+    <img src="../images/screenshots/VxDMon.gif" width="549" height="295" alt="VxDMon Screenshot" />
+    <br /><br />
+    <img src="../images/screenshots/VxDMon2.gif" width="299" height="169" alt="VxDMon Screenshot" />
+    <p>
+        This is a screenshot of VxDMon's statistics for a sample of typical Win95 activity, and a call-graph showing VxD services that invoke a particular VMM service.
+    </p>
+    <h2>Source Code</h2>
+    <p>
+        <i>VxDMon</i> comes with full source code. Unlike many of our other Windows 95 VxD's, <i>VxDMon</i> is written in assembly language so you can build it with the Windows 95 DDK. The <i>VxDMon</i> GUI was built with Visual C++ 2.x. 
+    </p>
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/VxDMon.zip">Download VxDMon (62KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/VxDMonSource.zip">Download VxDMon Plus Source (316KB)</a>
+    </p>
+
+</div>
+
+<div class="footer">
+	Copyright � 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Filemon</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Filemon for Windows</h1>
+    <div class="info">
+        Copyright © 1996-2006 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a> and <a href="mailto:cogswell@winternals.com">Bryce Cogswell</a><br />
+        <span>Last Updated: July 13, 2005 v7.03</span></div>
+    
+    <h2>Awards</h2>
+    <img src="../images/awards/ZdNetEditorsPick.gif" width="81" height="81" alt="ZDNet Editor's Pick" />
+    <a href="http://www.wugnet.com/"><img src="../images/awards/wugnet.gif" width="114" height="41" alt="WUGNET Shareware Hall of Fame" /> </a><img src="../images/awards/pricelessware.gif" width="170" height="63" />
+    <h2>Introduction</h2>
+    <p>
+        <i>FileMon</i> monitors and displays file system activity on a system in real-time. Its advanced capabilities make it a powerful tool for exploring the way Windows works, seeing how applications use the files and DLLs, or tracking down problems in system or application file configurations. Filemon's timestamping feature will show you precisely when every open, read, write or delete, happens, and its status column tells you the outcome. <i>FileMon</i> is so easy to use that you'll be an expert within minutes. It begins monitoring when you start it, and its output window can be saved to a file for off-line viewing. It has full search capability, and if you find that you're getting information overload, simply set up one or more filters.
+    </p>
+    <p>
+        <i>FileMon</i> works on NT 4.0, Windows 2000, Windows XP, Windows XP and Windows Server 2003 64-bit Edition, Windows 2003 Server, Windows 95, Windows 98 and Windows ME.
+    </p>
+    <img src="../images/screenshots/Filemon.gif" width="549" height="253" alt="Filemon Screenshot" />
+    
+    <h2>Installation and Use</h2>
+    <p>If you have questions or problems please visit the <a href="../../forum.sysinternals.com/forum_topicse2b5.html?FID=3">Sysinternals Filemon Forum</a>. </p>
+    <p>Simply run <i>FileMon</i> (filemon.exe). You must have administrator privilege to run <i>FileMon</i>. When <i>FileMon</i> is started for the first time it will monitor all local hard drives. Menus, hot-keys, or toolbar buttons can be used to clear the window, select and deselect monitored volumes including network volumes (Windows NT/2K/XP), save the monitored data to a file, and to filter and search output.
+    </p>
+    <p>
+        If you've specified filters then <i>FileMon</i> will ask you to confirm filters used from the last session each time you start it. To start <i>FileMon</i> without it prompting you specify the /q switch on the command line. When <i>FileMon</i> starts it automatically captures file system activity. To start it with capture disabled use the /o switch on the command-line.
+    </p>
+    <p>
+        As events are printed to the output, they are tagged with a sequence number. If Filemon's internal buffers are overflowed during extremely heavy activity, this will be reflected with gaps in the sequence number.
+    </p>
+    <p>
+        Each time you exit <i>FileMon</i> it remembers the filters you've configured, position of the window and the widths of the output columns.
+    </p>
+    
+    <h2>Filtering</h2>
+    <p>
+        Use the Filter dialog, which is accessed with a toolbar button or the Edit|Filter/Highlight menu selection, to select what data will be shown in the list view. The '*' wildcard matches arbitrary strings, and the filters are case-insensitive. Only matches shown in the include filter, but that are not excluded with the exclude filter, are displayed. Use ';' to separate multiple strings in a filter (e.g. "filemon;temp"). Windows NT/2000 note: because of the asynchronous nature of file I/O, its not possible to filter on the result field.
+    </p>
+    <p>
+        For example, if the include filter is "c:\temp", and the exclude filter is "c:\temp\subdir", all references to files and directories under c:\temp, except to those under c:\temp\subdir will be monitored.
+    </p>
+    <p>
+        Wildcards allow for complex pattern matching, making it possible to match specific file accesses by specific applications, for example. The include filter "Winword*Windows" would have <i>FileMon</i> only show accesses by Microsoft Word to files and directories that include the word "Windows".
+    </p>
+    <p>
+        Use the highlight filter specify output that you want to have highlighted in the listview output. Select highlighting colors with Edit|Highlight Colors.
+    </p>
+    <p>
+        Additional filter options select or deselect read, write or open operations. In many troubleshooting scenarios only open operations are of interest, for example.
+    </p>
+    
+    <h2>Selecting Volumes (Windows NT/2K/XP/2K3)</h2>
+    <p>
+        The Volumes menu can be used to select and deselect monitored volumes. Select the Network menu item to monitor accesses to any network resources, including remote shares and UNC path name accesses to remote volumes.
+    </p>
+    
+    <h2>Limiting Output</h2>
+    <p>
+        The History Depth dialog, accessed via toolbar button or the Edit|History menu item, allows you to specify the maximum number of lines that will be remembered in the output window. A depth of 0 is used to signify no limit.
+    </p>
+    
+    <h2>Searching the Output</h2>
+    <p>
+        You can search the output window for strings using the Find menu item (or the find toolbar button). You can repeat the search in the forward direction with the F3 key and in reverse with Shift+F3. To start a search at a particular line in the output, select the desired line by clicking on the far left column (the index number). If no line is selected a new search starts at the first entry in searching down, and at the last entry for searching up.
+    </p>
+    
+    <h2>Options</h2>
+    <p>
+        <i>FileMon</i> can either timestamp events or show their duration. The Options menu and the clock toolbar button let you toggle between the two modes. The button on the toolbar shows the current mode with a clock or a stopwatch. When showing duration the Time field in the output shows the number of seconds it took for the underlying file system to service particular requests. The Options|Show Milliseconds menu entry lets you add millisecond resolution to times presented when <i>FileMon</i> shows clock times.
+    </p>
+    <p>
+        You can toggle <i>FileMon</i> to always remain a top window with the Options|Always On Top menu item. In addition, you can toggle <i>FileMon</i> not to scroll the listview via the Options|Auto Scroll menu item or corresponding toolbar button.
+    </p>
+    
+    <h2>Named Pipes and Mail Slots</h2>
+    <p>
+        Starting in version 4.1 <i>FileMon</i> is able to monitor named pipe and mail slot file system activity on Windows NT/2K. Named pipes are commonly used as a communications mechanism in NT/Win2K by core subsystems like the Local Security Authority Subsystem (LSASS), and are used by DCOM. They are also used by network components such as the Browser service. To see named pipe activity with <i>FileMon</i> select Named Pipes in the Drives menu and perform an operation on a shared network resource, or open an application such as Regedt32 that interacts with the security subsystem.
+    </p>
+    
+    <h2>How FileMon Works</h2>
+    <p>
+        For the Windows 9x driver, the heart of <i>FileMon</i> is in the virtual device driver, Filevxd.vxd. It is dynamically 
+        loaded, and in its initialization it installs a file system filter via the VxD service, <b>IFSMGR_InstallFileSystemApiHook</b>, 
+        to insert itself onto the call chain of all file system requests. On Windows NT the heart of <i>FileMon</i> is a file system 
+        driver that creates and attaches filter device objects to target file system device objects so that <i>FileMon</i> will see all 
+        IRPs and FastIO requests directed at drives. When <i>FileMon</i> sees an open, create or close call, it updates an internal hash 
+        table that serves as the mapping between internal file handles and file path names. Whenever it sees calls that are handle based, 
+        it looks up the handle in the hash table to obtain the full name for display. If a handle-based access references a file opened 
+        before <i>FileMon</i> started, <i>FileMon</i> will fail to find the mapping in its hash table and will simply present the handle's 
+        value instead.
+    </p>
+    <p>
+        Information on accesses is dumped into an ASCII buffer that is periodically copied up to the GUI for it to print in its listbox.
+    </p>
+    
+    <h2>Related Utilities</h2>
+    <p>
+        Here are some other monitoring tools available at Sysinternals:
+    </p>
+    <ul>
+        <li><a href="Regmon.html">Regmon</a> - a Registry monitor</li>
+        <li><a href="TdiMon.html">TDIMon</a> - a TCP/IP monitor</li>
+        <li><a href="Portmon.html">Portmon</a> - a serial and parallel port monitor</li>
+        <li><a href="Pmon-2.html">PMon</a> - a process and thread monitor (NT/Win2K)</li>
+        <li><a href="Diskmon.html">Diskmon</a> - a hard disk monitor (NT/Win2K)</li>
+        <li><a href="DebugView.html">DebugView</a> - a debug output monitor</li>
+    </ul>
+    
+    <h2>More Information</h2>
+    <p>
+        The following serve as additional sources of information on the Windows 9x file system:
+    </p>
+    <ul>
+        <li>The Windows 95/98 DDK</li>
+        <li>"Examining the Windows 95 Layered File System," by Mark Russinovich and Bryce Cogswell, Dr. Dobb's Journal, December 1995</li>
+        <li>"<a href="../Resources.html#Books">Systems Programming for Windows 95</a>," by Walter Oney, Microsoft Press, 1996 (a must-have for VxD writers)</li>
+        <li>"<a href="../Resources.html#Books">Inside the Windows 95 File System</a>," by Stan Mitchell, O'Reilly and Associates, 1996</li>
+    </ul>
+    <p>
+        These are sources of information on the Windows NT/2000 file system and/or <i>FileMon</i>:
+    </p>
+    <ul>
+        <li><a href="../InsideWindows2000.html">Inside Windows 2000, 3rd Edition</a> by David Solomon and Mark Russinovich, 2000</li>
+        <li>"Examining The Windows NT File System," by Mark Russinovich and Bryce Cogswell, Dr. Dobb's Journal, Febrary 1997</li>
+        <li>"<a href="http://www.ntmag.com/">Inside NT Utilities</a>," Windows NT Magazine, February 1999.</li>
+        <li>"<a href="../Resources.html#Books">Windows NT File System Internals</a>," by Rajeev Nagar, O'Reilly and Associates, 1997</li>
+    </ul>
+     
+    <h2>Microsoft Filemon KB Articles</h2>
+    <p>
+        These KB article reference <i>Filemon</i> to help diagnose or troubleshoot various problems:
+    </p>
+    <ul>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;830903">830903: A file in a network folder opens as read-only or returns an error message that the file type cannot be recognized</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;319844">319844: ACC2002: Error Message: ActiveX Component Can't Create Object</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;830761">830761: Best practices for deploying Visual Basic 6.0 applications</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;837932">837932: Event ID 2108 and Event ID 1084 occur during inbound replication of Active Directory in Windows 2000 Server and in Windows Server 2003</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;819612">819612: FIX: Slow Performance When the Browser Capabilities Evaluator Is Removed from the Cache</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q286/1/98.ASP">286198: HOWTO: Track "Permission Denied" Errors on DLL Files</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;Q308940">308940: HOWTO: Troubleshoot Error 1928 "Error Registering COM+ Application"</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;814774">814774: HOW TO: Troubleshoot Site Deployment Issues in Microsoft Content Management Server 2002</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q183/0/60.ASP">183060: INFO: Troubleshooting Guide for 80004005 and Other Error Messages</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;198038">198038: INFO: Useful Tools for Package and Deployment Issues</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;q319440">319440: Logon Delays Over Slow Links if Oplock Is Not Granted for the Policy File</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q260/5/13.ASP">260513: PRB: An Error Occurs When You Install Visual Studio Products</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;q306269">306269: PRB: Error 80004005 "The Microsoft Jet Database Engine Cannot Open the File '(Unknown)'</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;q306386">306386: PRB: FileMon Shows That DAO360.dll Fails to Load MSJet49.dll, MSJet48.dll, and Other MSJetxx.dll Files</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q243/5/83.ASP">243583: PRB: Mib.bin Causes Visual Studio Setup to Fail</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q302/6/51.ASP">302651: SMS: Software Inventory Agent Generates an Invalid Page Fault Error Message</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;310586">310586: The Exchange MSSearch instance does not come online on a cluster and event IDs 3055 and 10006 are logged</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;555069">555069: Top 10 Potential Problematic Security Settings for Microsoft Windows XP Professional Edition and Microsoft Windows Server 2003.</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q196/4/53.ASP">196453: Troubleshooting NTVDM and WOW Startup Errors</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=KB;EN-US;Q318746&amp;">296136: XADM: Error Message: Error 123: The Filename, Directory Name, or Volume Label Syntax Is Incorrect</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q296/1/36.ASP">296136: XADM: Event ID 3036 and 3026 Messages Occur When You Populate Mailbox Store</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;830075">830075: Winmgmt.exe uses more CPU resources than you expect</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;867651">867651: You cannot add a TLS certificate to a computer that is running Office Live Communications Server 2003</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;319844">319844: You receive a "ActiveX component can't create object" error message when using Access</a></li>
+    </ul>
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsProduct.gif" width="87" height="29" alt="Winternals Product" /></a>
+    <p>
+        <i>Filemon Enterprise Edition</i>, the commercial version of <i>FileMon</i>, extends the functionality of <i>FileMon</i> with s
+        everal powerful features, including the ability to monitor remote systems and save output to a log file as the output generates. 
+        It is available as part of <a href="http://www.winternals.com/products/repairandrecovery/index.asp">Winternals Adminstrator's Pak</a>.
+    </p>
+    <p>
+        <b>In order to help us track its use, please download through the link that represents the operating system on which you will use or mostly use <i>Filemon</i>. Note that the 32-bit zip files (the first two) are identical, and works on either Win9x or NT as well as 64-bit (x64) Windows XP and Server 2003.</b>
+    </p>
+
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/Filemon.zip">Download Filemon (x86 - 197 KB) - you plan on using Filemon on Win9x</a>
+        <br />
+        <br />
+        
+        <a href="../../download.sysinternals.com/Files/FilemonNt.zip">Download Filemon (x86 - 197 KB) - you plan on using Filemon on 32-bit versions of NT/2K/XP/Server 2003 </a></p>
+    <p class="download"><a href="../../download.sysinternals.com/Files/Filemonamd64.zip">Download Filemon (x64 - 197 KB) - you plan on using Filemon on 64-bit XP/Server 2003</a></p>
+    <p>
+        <a href="Filemon.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

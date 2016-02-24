@@ -1,0 +1,313 @@
+a:hover {
+    text-decoration: none;}
+body {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #000;
+    background: #f0f3ff url(../images/background.gif) top left repeat-y;}
+form {
+    margin: 10px;}
+h1 {
+    /*postion: relative;*/
+    margin: 0;
+    padding: 0;
+    /*height: 35px;*/
+    vertical-align: middle;
+    line-height: 35px;
+    text-indent: 7px;
+    font-family: Impact, Tahoma, Arial;
+    font-size: 24px;
+    color: #fff;
+    background: #bdb8e6 url(../images/title-background.gif) top left repeat-y;}
+h1 span {
+    color: #d7d4f0;}
+h2 {
+    margin: 13px 10px 10px 10px;
+    font-size: 1.3em;
+    color: #10579a;}
+h2 a {
+    color: #10579a;}
+h2 span {
+    font-size: 12px;
+    font-weight: normal;}
+h3 {
+    margin: 10px;
+    font-size: 1.2em;}
+h4 {
+    margin: 10px;}
+hr {
+    clear: both;
+    margin: 20px 10px 20px 10px;
+    height: 4px;
+    color: #bdb8e6;
+    background-color: #bdb8e6;
+    border-color: #bdb8e6;}
+pre {
+    margin: 10px 10px 10px 25px;
+    font-family: "Courier New", Courier, mono;}
+table {
+    margin: 10px 10px 10px 35px;}
+th {
+    width: 120px;
+    vertical-align: top;
+    text-align: left;}
+td {
+    vertical-align: top;}
+
+
+
+.contentalternate {
+    position: absolute;
+    top: 97px;
+    right: 8px;
+    margin: 14px 7px 0 0;
+    width: 180px;}
+.contentalternate h2 {
+    margin: 0;}
+.contentalternate img {
+    margin-bottom: 20px;
+    border: none;}
+.contentalternate p {
+    margin: 10px;
+    line-height: 16px;
+    font-size: .8em;}
+.contenthome {
+    margin: 14px 208px 14px 184px;}
+.contenthome .contentbox {
+    margin: 0 0 14px 0;}
+.contentbox {
+    margin: 14px 14px 14px 14px;
+    margin-bottom: 10px;
+    font-size: .8em;
+    background-color: #fff;
+    border: 1px solid #b8c1e6;}
+.contentbox a {
+    color: #043F77;}
+.contentbox img {
+    margin-left: 10px;
+    border: none;}
+.contentbox p {
+    margin: 10px;
+    line-height: 1.3em;}
+.contentbox .download {
+    margin: 30px 10px 35px 10px;
+    font-weight: bold;}
+.footer {
+	margin: 14px 14px 14px 14px;
+    margin-bottom: 10px;
+	padding: 5px;
+    font-size: .75em;
+    background-color: #fff;
+    border: 1px solid #b8c1e6;}
+.header {
+    height: 97px;
+    background: url(../images/header.gif) top left no-repeat;}
+.header a {
+    position: absolute;
+    top: 0;
+    left: 190px;
+    width: 340px;
+    height: 77px;}
+.header a span {
+    position: absolute;
+    top: -200px;}
+.header ul{
+    position: absolute;
+    top: 15px;
+    left: 600px;
+    list-style-position: inside;
+    margin: 0;
+    padding: 0;
+    font-size: 13px;
+    font-weight: bold;
+    color: #10579a;}
+.headercontainer {
+    display:none;
+    position: relative;
+    height: 97px;
+    background: url(../images/header-background.gif) top left repeat-x;}
+
+.info {
+    margin: 10px;
+    padding: 3px 0 3px 0;
+    font-weight: bold;
+    border-top: 4px solid #10579a;
+    border-bottom: 2px solid #10579a;}
+.info img {
+    margin: 5px 0 0 0;}
+.info span {
+    font-size: .7em;
+    font-weight: normal;}
+
+.listpage p {
+    padding-bottom: 7px;
+    background: url(../images/paragraph-border.gif) bottom left repeat-x;}
+.listpage p a {
+    font-weight: bold;}
+
+.navmain,
+.navmain ul {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0;}
+.navmain li {
+    display: inline;
+    font-size: 14px;
+    font-weight: bold;}
+.navmain li a {
+    display: block;
+    padding-left: 7px;
+    height: 23px;
+    line-height: 23px;
+    text-decoration: none;
+    color: #f5b61e;
+    background: url(../images/navmain-background.gif) top left repeat-x;}
+.navmain li a:hover {
+    color: #fff;}
+.navmain li ul {
+    margin: 0;}
+.navmain li ul li {
+    font-size: 11px;}
+.navmain li ul li a {
+    padding-left: 32px;
+    color: #fff;
+    background: url(../images/navmain-sub-background.gif);}
+.navmain li ul li a:hover {
+    color: #f5b61e;}
+.navmaincontainer {
+    display: none;
+    position: absolute;
+    top: 100px;
+    left: 0;
+    margin-top: -35px;
+    width: 170px;}
+.navmaincontainer div {
+    border-top: 1px solid #3347a2;
+    border-bottom: 1px solid #8090de;}
+.navmaincontainer form {
+    margin: 0;
+    padding: 10px;
+    border-bottom: 1px solid #3347a2;}
+.navmisc {
+    display: none;
+    position: absolute;
+    top: 77px;
+    left: 187px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    height: 18px;}
+.navmisc li {
+    display: inline;
+    padding-top: 3px;
+    padding-right: 10px;
+    line-height: 19px;
+    font-size: .7em;
+    font-weight: bold;}
+.navmisc li a {
+    text-decoration: none;
+    color: #0c2d83;}
+.navmisc li a:hover {
+    color: #000;}
+
+.note {
+    color: #ff0000;}
+
+.usage {
+    margin: 25px 10px 20px 45px;}
+.usage dt{
+    font-weight: bold;}
+.usage dd {
+    margin-left: 20px;
+    margin-bottom: 8px;}
+
+
+
+
+
+
+.bootinilist {
+    margin-left: 10px;
+    line-height: 17px;}
+.bootinilist dd {
+    margin: 0 0 10px 0;}
+.bootinilist .win2k {
+    color: #ff0000;}
+.bootinilist .winxp-2k3 {
+    color: #0000ff;}
+
+.event {
+    clear: right;
+    padding-bottom: 0;
+    width: 100%;}
+.event img {
+    float: right;
+    margin: 0 10px 10px 20px;}
+
+.output h3 {
+    font-style: italic;}
+.output p {
+    margin-left: 25px;}
+.output ul {
+    list-style: none;
+    margin-left: 40px;}
+
+.treeview {
+    margin-left: 10px;
+    line-height: 10px;}
+.treeview img {
+    margin: 0;}
+.treeview table {
+    margin: 0;}
+
+.sitemap {
+    margin: 20px;
+    padding: 0;
+    list-style: none;}
+.sitemap b {
+    line-height: 18px;
+    font-size: 1.2em;
+    font-weight: bold;}
+.sitemap li {
+    line-height: 1.7em;}
+.sitemap li a {
+    font-size: 1.3em;
+    font-weight: bold;}
+.sitemap li ul li,
+.sitemap li ul li a {
+    line-height: 1.6em;
+    font-size: .95em;
+    font-weight: normal;}
+.sitemap li ul li ul li {
+    line-height: 1.65em;
+    font-size: 1em;
+    font-weight: normal;}
+
+
+.blogComments {
+    margin: 10px;}
+.blogComment {
+    margin: 10px 0 10px 0;
+    padding: 5px;
+    background-color: #f6f6f6;
+    border: 1px solid #b8c1e6;}
+.blogComment .byline {
+    margin-top: 5px;
+    font-size: .7em;}
+.contentblog {
+    margin: 14px 208px 14px 184px;}
+.contentblog .contentbox {
+    margin: 0 0 14px 0;}
+.contentblog h2 {
+    text-transform: capitalize;}
+    
+
+
+#newsletter a {
+    background: none;
+    border-top: 1px solid #8090de;}
+#rss2 {
+    margin: 7px 0 0 7px;
+    border: none;}

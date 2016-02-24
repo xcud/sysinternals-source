@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - SDelete</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>SDelete</h1>
+    <div class="info">
+        Copyright © 1999-2003 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: October 15, 2003 v1.4</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        One feature of Windows NT/2000's (Win2K) C2-compliance is that it implements object reuse protection. This means that when an 
+        application allocates file space or virtual memory it is unable to view data that was previously stored in the resources Windows
+         NT/2K allocates for it. Windows NT zero-fills memory and zeroes the sectors on disk where a file is placed before it presents 
+         either type of resource to an application. However, object reuse does not dictate that the space that a file occupies before it 
+         is deleted be zeroed. This is because Windows NT/2K is designed with the assumption that the operating system controls access 
+         to system resources. However, when the operating system is not active it is possible to use raw disk editors and recovery tools 
+         to view and recover data that the operating system has deallocated. Even when you encrypt files with Win2K's Encrypting File 
+         System (EFS), a file's original unencrypted file data is left on the disk after a new encrypted version of the file is created.
+    </p>
+    <p>
+        The only way to ensure that deleted files, as well as files that you encrypt with EFS, are safe from recovery is to use a 
+        secure delete application. Secure delete applications overwrite a deleted file's on-disk data using techiques that are shown 
+        to make disk data unrecoverable, even using recovery technology that can read patterns in magnetic media that reveal weakly 
+        deleted files. <i>SDelete</i> (Secure Delete) is such an application. You can use <i>SDelete</i> both to securely delete existing files, as 
+        well as to securely erase any file data that exists in the unallocated portions of a disk (including files that you have already 
+        deleted or encrypted). <i>SDelete</i> implements the Department of Defense clearing and sanitizing standard DOD 5220.22-M, to give you 
+        confidence that once deleted with <i>SDelete</i>, your file data is gone forever. <i>SDelete</i> is presented with full source code so that you 
+        can verify yourself that it works as advertized. Note that <i>SDelete</i> securely deletes file data, but not file names located in free 
+        disk space.
+    </p>
+    <p>
+        SDelete works on Windows 95, 98, NT 4.0 and Win2K.
+    </p>
+    
+    <h2>SDelete Usage</h2>
+    <p>
+        <i>SDelete</i> is a command line utility that takes a number of options. In any given use, it allows you to delete one or more files and/or directories, or to cleanse the free space on a logical disk. <i>SDelete</i> accepts wild card characters as part of the directory or file specifier.
+    </p>
+    <p>
+        <b>Usage: sdelete [-p passes] [-s] [-q] &lt;file or directory&gt;<br />
+                sdelete [-p passes] -z [drive letter]</b>
+    </p>
+    <dl class="usage">
+        <dt>-p passes</dt>
+            <dd>Specifies number of overwrite passes</dd>
+        <dt>-s</dt>
+            <dd>Recurse subdirectories</dd>
+        <dt>-q</dt>
+            <dd>Don't print errors (quiet)</dd>
+        <dt>-z</dt>
+            <dd>Cleanse free space</dd>
+    </dl>
+    
+    <h2>How SDelete Works</h2>
+    <p>
+        Securely deleting a file that has no special attributes is relatively straight-forward: the secure delete program simply overwrites the file with the secure delete pattern. What is more tricky is securely deleting Windows NT/2K compressed, encrypted and sparse files, and securely cleansing disk free spaces.
+    </p>
+    <p>
+        Compressed, encrypted and sparse are managed by NTFS in 16-cluster blocks. If a program writes to an existing portion of such a file NTFS allocates new space on the disk to store the new data and after the new data has been written, deallocates the clusters previously occupied by the file. NTFS takes this conservative approach for reasons related to data integrity, and in the case of compressed and sparse files, in case a new allocation is larger than what exists (the new compressed data is bigger than the old compressed data). Thus, overwriting such a file will not succeed in deleting the file's contents from the disk.
+    </p>
+    <p>
+        To handle these types of files <i>SDelete</i> relies on the defragmentation API. Using the <a href="../Information/DiskDefragmenting.html">defragmentation API</a> <i>SDelete</i> can 
+        determine precisely which clusters on a disk are occupied by data belonging to compressed, sparse and encrypted files. Once <i>SDelete</i> 
+        knows which clusters contain the file's data, it can open the disk for raw access and overwrite those clusters.
+    </p>
+    <p>
+        Cleaning free space presents another challenge. Since FAT and NTFS provide no means for an application to directly address free space, 
+        <i>SDelete</i> has one of two options. The first is that it can, like it does for compressed, sparse and encrypted files, open the disk for 
+        raw access and overwrite the free space. This approach suffers from a big problem: even if <i>SDelete</i> were coded to be fully capable of 
+        calculating the free space portions of NTFS and FAT drives (something that's not trivial), it would run the risk of collision with 
+        active file operations taking place on the system. For example, say <i>SDelete</i> determines that a cluster is free, and just at that moment 
+        the file system driver (FAT, NTFS) decides to allocate the cluster for a file that another application is modifying. The file system 
+        driver writes the new data to the cluster, and then <i>SDelete</i> comes along and overwrites the freshly written data: the file's new data 
+        is gone. The problem is even worse if the cluster is allocated for file system metadata since <i>SDelete</i> will corrupt the file system's 
+        on-disk structures.
+    </p>
+    <p>
+        The second approach, and the one <i>SDelete</i> takes, is to indirectly overwrite free space. First, <i>SDelete</i> allocates the largest file it can. <i>SDelete</i> does this using non-cached file I/O so that the contents of the NT file system cache will not be thrown out and replaced with useless data associated with <i>SDelete</i>'s space-hogging file. Because non-cached file I/O must be sector (512-byte) aligned, there might be some left over space that isn't allocated for the <i>SDelete</i> file even when <i>SDelete</i> cannot further grow the file. To grab any remaining space <i>SDelete</i> next allocates the largest cached file it can. For both of these files <i>SDelete</i> performs a secure overwrite, ensuring that all the disk space that was previously free becomes securely cleansed.
+    </p>
+    <p>
+        On NTFS drives <i>SDelete</i>'s job isn't necessarily through after it allocates and overwrites the two files. <i>SDelete</i> must also fill any existing free portions of the NTFS MFT (Master File Table) with files that fit within an MFT record. An MFT record is typically 1KB in size, and every file or directory on a disk requires at least one MFT record. Small files are stored entirely within their MFT record, while files that don't fit within a record are allocated clusters outside the MFT. All <i>SDelete</i> has to do to take care of the free MFT space is allocate the largest file it can - when the file occupies all the available space in an MFT Record NTFS will prevent the file from getting larger, since there are no free clusters left on the disk (they are being held by the two files <i>SDelete</i> previously allocated). <i>SDelete</i> then repeats the process. When <i>SDelete</i> can no longer even create a new file, it knows that all the previously free records in the MFT have been completely filled with securely overwritten files.
+    </p>
+    <p>
+        To overwrite file names of a file that you delete, <i>SDelete</i> renames the file 26 times, each time replacing each character of the file's name with a successive alphabetic character. For instance, the first rename of "foo.txt" would be to "AAA.AAA".
+    </p>
+    <p>
+        The reason that <i>SDelete</i> does not securely delete file names when cleaning disk free space is that deleting them would require direct manipulation of directory structures. Directory structures can have free space containing deleted file names, but the free directory space is not available for allocation to other files. Hence, <i>SDelete</i> has no way of allocating this free space so that it can securely overwrite it.
+    </p>
+
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/SDelete.zip">Download SDelete (x86- 20KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/SDeleteSource.zip">Download SDelete Plus Source (x86- 54KB)</a>
+    </p>
+    
+    <p>
+        <a href="SDelete.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

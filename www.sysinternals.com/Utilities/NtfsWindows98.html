@@ -1,0 +1,213 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - NTFS for Windows 98</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>NTFS for Windows 98</h1>
+    <div class="info">
+        Copyright © 1999-2002 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a> and <a href="mailto:cogswell@winternals.com">Bryce Cogswell</a><br />
+        <span>Last Updated: October 2, 2002 v2.0 Read-Only</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        <i><i>NTFS for Windows 98</i></i> is a NTFS file system driver for Windows 95 and Windows 98. Once installed, any NTFS drives present 
+        on your system will be fully accessible as native Windows 98 volumes. This version provides read-only capabilities.
+    </p>
+    <p>
+        Please read this entire file before contacting us for help.
+    </p>
+    
+    <h2>Approach</h2>
+    <p>
+        <i>NTFS for Windows 98</i> takes a unique approach to providing cross-platform file system support. Rather than implement code to read and write NTFS drives, <i>NTFS for Windows 98</i> uses the NTFS and NTOSKRNL system files from a Windows NT/2000/XP configuration. <i>NTFS for Windows 98</i> wraps the Windows NT/2000/XP NTFS driver in a run-time environment that simulates the Windows NT environment the NTFS driver is written to use. Thus, <i>NTFS for Windows 98</i> does not rely on potentially unreliable reverse-engineered information about NTFS, provides ultimate compatibility with NTFS, and takes advantage of Microsoft NTFS bug fixes whenever you update the NTFS driver file <i>NTFS for Windows 98</i> uses to a more recent version.
+    </p>
+    <img src="../images/screenshots/NtfsWindows98.gif" width="401" height="299" alt="NTFS for Windows 98 Diagram" />
+    
+    <p>
+        The picture above depicts <i>NTFS for Windows 98</i>'s relationship with NTFS, NTOSKRNL and the Windows 95/98 file system. <i>NTFS for Windows 98</i> provides an external interface that looks like a standard Windows 95/98 file system, while internally it presents an interface to NTFS that looks like the Windows NT/2000/XP environment. <i>NTFS for Windows 98</i> uses a number of services within NTOSKRNL to help implement this environment. Note that <i>NTFS for Windows 98</i> does not load NTFS or NTOSKRNL unless you have at least one NTFS drive on your system.
+    </p>
+    
+    <h2>Version Information</h2>
+    <p>
+        This version of <i>NTFS for Windows 98</i> is read-only. <i>NTFS for Windows 98</i> has been tested to work with the following versions of NTFS:
+    </p>
+    <ul>
+        <li>NTFS for Windows NT 4.0, SP3 and higher</li>
+        <li>NTFS for Windows 2000</li>
+        <li>NTFS for Windows XP</li>
+    </ul>
+    <p>
+        <i>NTFS for Windows 98</i> works on the following versions of Windows:
+    </p>
+    <ul>
+        <li>Windows 95</li>
+        <li>Windows 95 OSR2</li>
+        <li>Windows 98</li>
+        <li>Windows 98 SE</li>
+        <li>Windows Me</li>
+    </ul>
+    
+    <h2>Limitations</h2>
+    <p>
+        Because the Windows 95/98 environment is different than that of Windows NT/2000/XP, the level of NTFS support that <i>NTFS for Windows 98</i> provides is not equivalent to that provided on Windows NT/2000/XP. For example, <i>NTFS for Windows 98</i> does not enforce the Windows NT/2000 security model. All files and directories are accessible, regardless of their security permissions settings. In addition, <i>NTFS for Windows 98</i> is not compatible with Windows 2000's Encrypting file System (EFS). Any files encrypted using EFS will not be accessible under Windows 98 using <i>NTFS for Windows 98</i>.
+    </p>
+    
+    <h2>Recommended Configuration</h2>
+    <p class="note">
+        Do not convert your first partition, or your Windows 95/98 boot partition (the one with \windows on it), to NTFS as there is no support in Windows 95 or Windows 98 for reading NTFS drives during the boot sequence.
+    </p>
+    <p>
+        For maximum compatibility in dual boot systems, the recommended partition configuration is to maintain a FAT partition as the first partition on the primary drive. This partition should contain Windows 95/98 and should not be used to store applications or data files. The rest of the primary disks, and any other disks that you wish to share between Windows 98 and Windows NT/2000/XP can be formatted with NTFS or other file system types (FAT16 or FAT32) that are understood by the operating systems from which you wish to access them. Your Windows NT/2000/XP system directory can be placed on either a FAT or NTFS drive (note that Windows NT 4.0 cannot be placed on a FAT32 drive, nor boot from a FAT32 drive).
+    </p>
+    <p>
+        Below is a file system compatibility chart that can help you determine which file systems to use for compatibility in your dual boot environment.
+    </p>
+    <img src="../images/screenshots/NtfsWindows982.gif" width="553" height="150" alt="NTFS for Windows 98 Diagram" />
+    
+    <h2>Installation</h2>
+    <p>
+        Before you run the <i>NTFS for Windows 98</i> installation program, you must have access to a number of files (listed below) from the Windows NT/2000/XP installation you use to access your NTFS drives. This means that if the files are located on a NTFS drive you will have to copy them to a FAT drive accessible from Windows 98.
+    </p>
+    <p>
+        During the <i>NTFS for Windows 98</i> setup procedure you will be prompted for the location of these files. You may specify either the system directory of a Windows NT/2000/XP installation (e.g. c:\winnt), or a directory into which you've copied the necessary files. The files that you must make available to <i>NTFS for Windows 98</i> are:
+    </p>
+    <ul>
+        <li><b>NTFS.SYS:</b> this file is located at \system32\drivers\ntfs.sys</li>
+        <li><b>NTOSKRNL.EXE:</b> this file is located at \system32\ntoskrnl.exe</li>
+        <li><b>AUTOCHK.EXE:</b> this file is located at \system32\autochk.exe</li>
+        <li><b>NTDLL.DLL:</b> this file is located at \system32\ntdll.dll</li>
+        <li><b>C_437.NLS:</b> this file is located at \system32\c_437.nls</li>
+        <li><b>C_1252.NLS:</b> this file is located at \system32\c_1252.nls</li>
+        <li><b>L_INTL.NLS:</b> this file is located at \system32\l_intl.nls</li>
+    </ul>
+    <p>
+        &lt;winnt&gt; designates the system directory of the Windows NT/2000/XP installation that contains the NTFS driver you normally use to access your NTFS drives.
+    </p>
+    <p>
+        The setup procedure allows you to assign drive letters to NTFS drives that <i>NTFS for Windows 98</i> mounts. Simply enter a string in the drive-letter selection entry that designates, in order, the drive letters for <i>NTFS for Windows 98</i> to assign. For example, if you want the first NTFS drive mounted to have a drive letter of 'D' and the second to have a drive letter of 'T', you would enter "dt" (without the quotation marks). Note that the entry is case-insensitive. Leaving the entry blank has <i>NTFS for Windows 98</i> assign the first available drive letter to each mounted NTFS drive.
+    </p>
+    <p>
+        After the setup procedure is complete you are prompted to reboot your computer. The next time you boot the Windows 95 or 98 system on which you installed <i>NTFS for Windows 98</i> you will have access to your computer's NTFS volumes. You may rerun the configuration utility at any time to select different drive letters or a different NTFS file.
+    </p>
+    
+    <h2>Chkdsk</h2>
+    <p>
+        <i>NTFS for Windows 98</i> includes a scandisk for NTFS drives named NTFSCHK. In the same way that <i>NTFS for Windows 98</i> creates an NT-like environment for the NTFS driver, NTFSCHK creates an NT-like environment for the AUTOCHK.EXE (chkdsk) program of a Windows NT/2000/XP installation. The files that make up this environment include AUTOCHK.EXE, NTDLL.DLL, and three character mapping files, C_437.NLS, C_1252.NLS, and L_INTL.NLS.
+    </p>
+    <p>
+        The <i>NTFS for Windows 98</i> setup program adds the execution of NTFSCHK to your AUTOEXEC.BAT file so that the consistency of your NTFS drives is checked every time you boot into Windows 95/98. You may also run NTFSCHK from DOS before Windows 95/98 starts, from a DOS-box command prompt, or by selecting the NTFSCHK icon in the <i>NTFS for Windows 98</i> program group in the Start menu.
+    </p>
+    <p>
+        In some cases NTFSCHK will indicate that it cannot lock the specified drive(s). This condition results when applications or Windows has active handles to open files on the NTFS drive for which NTFSCHK reports the condition. If the applications in question do not close their handles, or Windows keeps open handles, you must reboot the computer and run NTFSCHK before the drive is accessed by applications or Windows, or reboot into Windows NT/2000/XP and perform a chkdsk operation there.
+    </p>
+    <p>
+        While NTFSCHK scans a drive that drive will not be accessible. If you click on the drive icon in Explorer you will receive an "access denied" error message. If Explorer is opened to directories on a drive being checked and you attempt to navigate the directories you will receive errors indicating that the directories do not exist.
+    </p>
+    <p>
+        NTFSCHK's command-line usage is as follows (selecting the NTFSCHK program icon results in a check of all the computer's NTFS drives):
+    </p>
+    <p>
+        <b>ntfschk [/s] [/f] [/q] [ drive letter: | * ]</b>
+    </p>
+    <dl class="usage">
+        <dt>/s</dt>
+            <dd>This switch has NTFSCHK display the list of detected NTFS drives. Use this command to determine which drive letters correspond to NTFS volumes.</dd>
+        <dt>/f</dt>
+            <dd>Unless you specify this flag NTFSCHK runs in read-only mode, where it detects and reports errors but does not correct them. Use this flag to fix drives for which NTFSCHK reports corruption.</dd>
+        <dt>/q</dt>
+            <dd>This switch has NTFSCHK perform a quick check of the specified NTFS drive(s), by not setting the NTFS drive "dirty" flag on the disk(s). Thus, NTFSCHK will only check the drive if it is marked as being in a possibly inconsistent state.</dd>
+        <dt>*</dt>
+            <dd>Has NTFSCHK check all NTFS drives, or you can specify a specific drive letter (e.g. D:) to check.</dd>
+    </dl>
+
+
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/NtfsWindows98.exe">Download NTFS for Windows 98 (Read-Only) (1.1 MB)</a>
+    </p>
+    
+    <p>
+        <a href="NtfsWindows98.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

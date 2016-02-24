@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - CPUMon</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>CPUMon</h1>
+    <div class="info">
+        Copyright © 1998-1999 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: April 5, 1999 v2.0</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        <i>CPUMon</i> is an advanced performance measurement tool. Its combination GUI/device driver make the wide range of processor performance counters present on the Pentium, Pentium Pro and Pentium II/III, easily accessible. You select the two counters you're interested in, enable them via the GUI, and at a later point stop the counters in order to see their values. While a measurement is in progress you can watch the values change with NT's built-in Perfmon.
+    </p>
+    <p>
+        <i>CPUMon</i> works on NT 4.0 and Win2K.
+    </p>
+    <p class="note">
+        <i>Note that CPUMon does not work on Pentium 4 CPUs.</i>
+    </p>
+    <img src="../images/screenshots/CpuMon.gif" width="415" height="301" alt="CPUMon Screenshot" />
+    <p>
+        Here is a screenshot of <i>CPUMon's</i> counter selection dialog with Perfmon displaying counter values in real-time.
+    </p>
+    
+    <h2>Using CPUMon</h2>
+    <p>
+        Simply run the <i>CPUMon</i> GUI (cpumon.exe) from the same directory that the driver (cpusys.sys) resides in. Note that it must be located on a non-network drive and that you must have administrative privilege to run <i>CPUMon</i>.
+    </p>
+    <p>
+        After <i>CPUMon</i> has started you select the two performance counters that you wish to enable. The fact that only two counters can be active at any given time is a limitation of the processors, not <i>CPUMon</i>. Just before you are ready to start the activity you are going to measure, press the Start button. This resets and starts the selected counters. When the measured activity is complete, press the Stop button (the Start button toggles to Stop when pressed). A summary of gathered performance information is presented. This information includes the values of the two counters that were enabled, the number of seconds and cycles that have elapsed, and a variety of NT-related counters, such as context switches and page faults.
+    </p>
+    <p>
+        Each time you exit <i>CPUMon</i> it remembers the position of the window and the counters you have selected.
+    </p>
+    
+    <h2>Perfmon</h2>
+    <p>
+        When you start <i>CPUMon</i> it automatically registers the processor performance counters with the built-in Windows NT/2K performance collection facility. Thus, standard tools like NT's Perfmon can be used to watch counter values in real-time. Simply start the desired performance tool (e.g. Perfmon) and select the <i>CPUMon</i> object type. <i>CPUMon</i> exposes both processor performance counters, with instances for each processor on your system. You can stop a <i>CPUMon</i> measurement, select new counters, and restart measurement without starting or stopping the display of the <i>CPUMon</i> counters in Perfmon. <i>CPUMon</i> automatically deregisters the processor performance counters when you exit it.
+    </p>
+    
+    <h2>Processor Counters</h2>
+    <p>
+        The names and descriptions of the Pentium performance counters were obtained from the 
+        <a href="http://developer.intel.com/design/pentiumiii/xeon/manuals/"><i>Intel Architecture Software Developer's Manual, Volume 3: System Programming Guide</i></a>, 
+        available for free download at the Intel Web site. Note that the Pentium (P5) has different counters than the Pentium Pro (P6) 
+        and higher Pentiums (e.g. Pentium II). Certain counters are only available on processors that have MMX support. <i>CPUMon</i> 
+        will detect MMX support and make these counters available for selection when appropriate. Also, some counters are only available 
+        as counter 0 or 1, while most can be selected as either counter. <i>CPUMon</i> correctly displays this information.
+    </p>
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/CpuMon.zip">Download CPUMon (61KB)</a>
+    </p>
+    
+    <p>
+        <a href="CpuMon.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

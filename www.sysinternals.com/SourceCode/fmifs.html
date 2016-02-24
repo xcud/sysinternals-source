@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Chkdskx and Formatx</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<div class="contentbox">
+    <h1>Chkdskx and Formatx</h1>
+    <div class="info">
+        Copyright � 1998 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: October 3, 1998 v1.0</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        Have you ever wondered how exactly NT's two file system management utilities, chkdsk and format, work? Maybe you've had 
+        an application that would have been perfect if you could have incorporated chkdsk or format functionality into it. On this 
+        page I present <i>Chkdskx</i> and <i>Formatx</i>, two utilities that very precisely clone the command-line chkdsk and format utilities 
+        that come with NT. In fact, the clones support the same switches as the standard chkdsk and format and produce almost 
+        exactly the same output. So while they don't do anything special, their source code demonstrates how you can write your 
+        own interfaces to chkdsk and format functionality.
+    </p>
+    <p>
+        <i>Chkdskx</i> and <i>Formatx</i> work on NT 4.0.
+    </p>
+    
+    <h2>FMIFS</h2>
+    <p>
+        <i>Chkdskx</i> and <i>Formatx</i> don't have to know anything about on-disk file system layouts to their jobs because they are clients of a 
+        system utility library that worries about this for them. The library is FMIFS.DLL (Format Manager for Installable File Systems 
+        is my guess at what the name represents) and it is located in the Winnt\System32 directory. It exports a handful of functions 
+        including <b>Chkdsk</b>, <b>ChkdskEx</b>, <b>Format</b> and <b>FormatEx</b>. When you select Format from Explorer's volume context menu (the one you get 
+        when you right-click on a drive icon), Explorer uses <b>FormatEx</b> to format the drive, and when you request a disk consistency 
+        check on the Tools tab of a drive's properties dialog Explorer calls out to <b>Chkdsk</b>. Actually, Explorer uses a yet higher-level 
+        function, SHFormatDrive, in SHELL32.DLL to access <b>FormatEx</b>, and <b>Chkdsk</b> gets called as a result of Explorer's use of Shell32's 
+        internal function, <b>CDrive_Properties</b>. <b>CDrive_Properties</b> creates the drive properties dialog box and pressing the "Check Now" 
+        button results in a chkdsk dialog that is created by Shell32's <b>DiskToolsCommand</b>. <b>SHFormatDrive</b> and <b>ChkdskDlgProc</b> are what actually 
+        present the options and progress dialog boxes that are presented in response to either request.
+    </p>
+    <p>
+        TheFormatEx function in FMIFS.DLL is prototyped like this: 
+    </p>
+    <p>
+        VOID FormatEx ( PWCHAR DriveRoot,<br />
+            &nbsp;&nbsp;&nbsp;DWORD MediaFlag ,<br />
+            &nbsp;&nbsp;&nbsp;PWCHAR Format,<br />
+            &nbsp;&nbsp;&nbsp;PWCHAR Label,<br />
+            &nbsp;&nbsp;&nbsp;BOOL QuickFormat,<br />
+            &nbsp;&nbsp;&nbsp;DWORD ClusterSize,<br />
+            &nbsp;&nbsp;&nbsp;PFMIFSCALLBACK Callback);
+    </p>
+    <p>
+        where the FMIFSCALLBACK is:
+    </p>
+    <p>
+       typedef BOOLEAN (__stdcall *PFMIFSCALLBACK)(<br />
+           &nbsp;&nbsp;&nbsp;CALLBACKCOMMAND Command,<br />
+           &nbsp;&nbsp;&nbsp;DWORD SubAction,<br />
+           &nbsp;&nbsp;&nbsp;PVOID ActionInfo );
+    </p>
+    <p>
+        The callback function takes three arguments, interpreting the first one as a command argument that indicates what 
+        <b>FormatEx</b> is trying to communicate. I've made the command an enumerated type and filled in the table of roughly 16 commands 
+        with the ones that are used during typical <b>FormatEx</b> and <b>Chkdsk</b> operation. For example, one command is OUTPUT, which a 
+        callback function can respond to by intepreting the third parameter (<b>ActionInfo</b>) as a pointer to string and displaying the 
+        string on the screen. Another command type is a PROGRESS command. The ActionInfo parameter is a pointer to a DWORD that the 
+        callback interprets as a precentage. Thus, in a long format process the FMIFS client can keep the user informed of progress 
+        via a progress dialog or text print-outs.
+    </p>
+    <p>
+        The <b>Chkdsk</b> command's definition follows a similar convention:
+    </p>
+    <p>
+        VOID Chkdsk( PWCHAR DriveRoot,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;PWCHAR Format,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;BOOL CorrectErrors,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;BOOL Verbose,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;BOOL CheckOnlyIfDirty,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;BOOL ScanDrive,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;PVOID Unused2,<br />
+            &nbsp;&nbsp;&nbsp;&nbsp;PVOID Unused3,<br />
+            &&nbsp;nbsp;&nbsp;&nbsp;PFMIFSCALLBACK Callback );
+    </p>
+    <p>
+        <b>Chkdsk</b>'s arguments are also self-explanatory and you can see that the exact same callback definition is used for <b>Chkdsk</b>.
+    </p>
+    <p>
+        You might think at this point that FMIFS is where the file system on-disk structure knowledge is located. However, 
+        FMIFS is itself a client of other libraries that contain knowledge about specific file system formats. For example, 
+        UFAT.DLL is the library that actually "knows" about FAT on-disk layout so it can perform FAT formatting or consistency 
+        checking operations. UNTFS.DLL is where NTFS information is located. You'll note that both the <b>Chkdsk</b> and <b>FormatEx</b> FMIFS 
+        functions take file system type string parameters. FMIFS simply takes the file system string and creates a DLL name by placing 
+        a 'U' in front of it and a '.DLL' at the end: U.DLL. It then attempts to load the DLL of that name and calls <b>Chkdsk</b> or <b>Format</b> 
+        functions that the DLL is expected to export. UNTFS.DLL and UFAT.DLL rely on two other libraries, ULIB.DLL and IFSUTIL.DLL, to 
+        provide some low-level utility functions, like converting a DOS drive name to an NT-native version, and reading and writing 
+        from/to a disk. Neither UNTFS.DLL nor UFAT.DLL call file system drivers to take any part in a format or chkdsk operation - 
+        they directly read and write raw clusters on the drive.
+    </p>
+    <p>
+        This hierarchical arrangment makes it easy for Microsoft to add new file system types to the system without having to write custom verions of the file system management tools. They simply write a DLL for the new file system type and make the management tools (like Explorer) aware of the new format name.
+    </p>
+   
+    <h2>Chkdskx and Formatx</h2>
+    <p>
+        <i>Chkdskx</i> and <i>Formatx</i> demonstrate the use of the functions in FMIFS I've described. I've made them behave almost exactly 
+        like the real command-line chkdsk and format. Interestingly, only Explorer uses the FMIFS functions, and then only indirectly 
+        through <b>SHFormatDisk</b>. The command-line chkdsk and format programs bypass FMIFS convenience functions and interface directly 
+        with UFAT.DLL and UNTFS.DLL The utility libraries are where most of the text output you see when you run the commands is 
+        generated, so the output of my <b>Chkdskx</b> and <b>Formatx</b> is very similar to the real chkdsk and format's output.
+    </p>
+   
+   
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/fmifs.zip">Download Chkdskx and Formatx plus Source Code (54KB)</a>
+    </p>
+        
+</div>
+<div class="footer">
+	Copyright � 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

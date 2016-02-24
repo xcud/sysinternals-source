@@ -1,0 +1,218 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - DebugView</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>DebugView</h1>
+  <div class="info">
+        Copyright © 1998-2006 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+      <span>Last Updated: July 11, 2006 v4.62</span></div>
+    
+
+    <h2>Introduction</h2>
+    <p>
+        <i>DebugView</i> is an application that lets you monitor debug output on your local system, or any computer on the network that you can reach via TCP/IP. It is capable of displaying both kernel-mode and Win32 debug output, so you don't need a debugger to catch the debug output your applications or device drivers generate, nor do you need to modify your applications or drivers to use non-standard debug output APIs.
+    </p>
+
+    <p>
+        <i>DebugView</i> works on Windows 95, 98, Me, 2000, XP, Windows Server 2003, Windows for x64 processors and Windows Vista. </p>
+    
+    <h2>DebugView Capture</h2>
+    <p>
+        Under Windows 95, 98, and Me <i>DebugView</i> will capture output from the following sources:
+    </p>
+    <ul>
+        <li>Win32 <b>OutputDebugString</b></li>
+        <li>Win16 <b>OutputDebugString</b></li>
+        <li>Kernel-mode <b>Out_Debug_String</b></li>
+        <li>Kernel-mode <b>_Debug_Printf_Service</b></li>
+    </ul>
+    <p>
+        Under Windows NT, 2000, XP, Server 2003 and Vista <i>DebugView</i> will capture:
+    </p>
+    <ul>
+        <li>Win32 <b>OutputDebugString</b></li>
+        <li>Kernel-mode <b>DbgPrint</b></li>
+        <li>All kernel-mode variants of <b>DbgPrint</b> implemented in Windows XP and Server 2003</li>
+    </ul>
+    <p>
+        <i>DebugView</i> also extracts kernel-mode debug output generated before a crash from Window NT/2000/XP crash dump files if <i>DebugView</i> was capturing at the time of the crash.
+    </p>
+    
+    <h2>DebugView Capabilites</h2>
+    <p>
+        <i>DebugView</i> has a powerful array of features for controlling and managing debug output.
+</p>
+    <p>Features new to version 4.6:</p>
+    <ul>
+      <li><strong>Support for Windows Vista 32-bit and 64-bit </strong></li>
+    </ul>
+    <p>Features new to version 4.5:</p>
+    <ul>
+      <li><strong>Support for log-file rollover:</strong> To better support long-running captures, <em>DebugView </em>can now create a new log file each day, optionally clearing the display when doing so. </li>
+    </ul>
+    <p>Features new to version 4.4:</p>
+    <ul>
+      <li><b>	Support for Windows Server 2003 64-bit Edition and Windows XP 64-bit Edition for x64:</b> <i>DebugView</i> now captures kernel-mode debug output on 64-bit versions of Windows.</li>
+      <li><strong>Clock-time toggle: </strong>you can now toggle between clock time and elapsed time modes.</li>
+    </ul>
+    <p>
+        Features new to version 4.3:
+    </p>
+    <ul>
+        <li><b>Support for Windows XP SP2:</b> <i>DebugView</i> now captures kernel-mode debug output on Windows XP SP2.</li>
+        <li><b>More highlighting filters:</b> Many people have asked for more highlighting filters.</li>
+        <li><b>Log file wrapping:</b> A new log file option has <i>DebugView</i> wrap around to the start of the log file when the specified size limit is reached.</li>
+        <li><b>Larger buffers:</b> Larger Win32 and kernel-mode buffers lessen the chance of dropped debug output.</li>
+        <li><b>Clear-output string:</b> When <i>DebugView</i> sees the special debug output string "DBGVIEWCLEAR" it clears the output.</li>
+        <li><b>Client minimize-to-tray:</b> You can now run the client minimized in the tray.</li>
+    </ul>
+    <p>
+        Features new to version 4.2:
+    </p>
+    <ul>
+        <li><b>Kernel-hook bug fixed:</b> <i>DebugView</i> sometimes mistakenly report that it couldn't hook kernel-mode debug output on Windows XP and Server 2003.</li>
+        <li><b>Client global-capture option:</b> A new option allows the client to capture console Win32 debug output on Terminal Server systems when run from a non-console session.</li>
+        <li><b>Filtering improved:</b> Filters can be much longer and now apply to Win32 process IDs when process IDs are included in the output.</li>
+        <li><b>Crash-dump support improved:</b> Several bugs related to extracting kernel-mode output from crash dumps are fixed and <i>DebugView</i> now loads resulting log files.</li>
+        <li><b>More highlight filters:</b> <i>DebugView</i> now has 10 highlight filters, up from 5.</li>
+        <li><b>Insert comments:</b> A new menu item lets you insert comments into output.</li>
+        <li><b>New switches:</b> New command-line switches allow you to specify history depth and load log files.</li>
+        <li><b>Better balloon tips:</b> If an output line is wider than the screen its mouse hover balloon tip word wraps.</li>
+    </ul>
+    <p>
+        Features new to version 4.1:
+    </p>
+    <ul>
+        <li><b>Save and load filters:</b> You can save and load filters, including the highlighting colors.</li>
+        <li><b>Load saved logs:</b> You can now load a log file back into the <i>DebugView</i> output window.</li>
+        <li><b>Capture boot-time kernel-mode debug output:</b> Under Windows NT/2K, you can use <i>DebugView</i> to capture debug output generated by drivers from the earliest point in the boot process.</li>
+    </ul>
+    <p>
+        Here is a list highlighting some of <i>DebugView</i>'s other features:
+    </p>
+    <ul>
+        <li><b>Remote monitoring:</b> Capture kernel-mode and/or Win32 debug output from any computer accessible via TCP/IP - even across the Internet. You can monitor multiple remote computers simultaneously. <i>DebugView</i> will even install its client software itself if you are running it on a Windows NT/2K system and are capturing from another Windows NT/2K system in the same Network Neighborhood.</li>
+        <li><b>Most-recent-filter lists:</b> <i>DebugView</i> remembers your most recent filter selections, with an interface that makes it easy to reselect them.</li>
+        <li><b>Process ID option:</b> Toggle the display of process IDs for Win32 debug output.</li>
+        <li><b>Clipboard copy:</b> Select multiple lines in the output window and copy their contents to the clipboard.</li>
+        <li><b>Log-to-file:</b> Write debug output to a file as its being captured.</li>
+        <li><b>Printing:</b> Print all or part of captured debug output to a printer.</li>
+        <li><b>One-file payload:</b> <i>DebugView</i> is implemented as one file.</li>
+        <li><b>Crash-Dump Support:</b> <i>DebugView</i> can recover its buffers from a crash dump and save the output to a log file so that users can send you the output your NT driver generated right up to the time of a crash.</li>
+    </ul>
+    <p>
+        The on-line help file describes all these features, and more, in detail.
+    </p>
+    
+    <h2>Installation and Use</h2>
+    <p>
+        Simply execute the <i>DebugView</i> program file (dbgview.exe) and <i>DebugView</i> will immediately start capturing debug output. To 
+        run <i>DebugView</i> on Windows 95 you must get the
+        <a href="http://www.microsoft.com/windows95/downloads/contents/wuadmintools/s_wunetworkingtools/w95sockets2/default.asp?site=95">WinSock2 update</a>
+        from Microsoft. Note that if you run <i>DebugView</i> on Windows NT/2K/XP you must have administrative privilege to view kernel-mode 
+        debug output. Menus, hot-keys, or toolbar buttons can be used to clear the window, save the monitored data to a file, search 
+        output, change the window font, and more. The on-line help describes all of <i>DebugView</i>'s features.
+    </p>
+    <img src="../images/screenshots/DebugView.gif" width="549" height="341" alt="DebugView Screenshot" />
+    <p>
+        This is a screenshot of <i>DebugView</i> capturing Win32 debug output from a remote system. Note the presence of a highlighting filter.
+    </p>
+    <p>
+        <b>In order to help us track its use, please download through the link that represents the operating system on which you will use or mostly use <i>DebugView</i>.</b>
+    </p>
+    <p>
+        <b>Note that the zip files are identical, and <i>DebugView</i> runs on all Windows platforms.</b>
+    </p>
+    
+    <p class="download">
+      <a href="../../download.sysinternals.com/Files/DebugView9x.zip">Download DebugView (x86- 186 KB) - you plan on using DebugView on Win9x</a><br />
+      <br />
+      <a href="../../download.sysinternals.com/Files/DebugViewNt.zip">Download DebugView (x86 - 186 KB) - you plan on using DebugView on </a><a href="../../download.sysinternals.com/Files/DebugViewNt.zip">32-bit versions of NT/2K/XP/Server 2003/Vista</a><br />
+      <br />
+      <a href="../../download.sysinternals.com/Files/DebugViewAmd64.zip">Download DebugView (x64 - 186 KB) - you plan on using DebugView on 64-bit XP/Server 2003/Vista</a></p>
+    <p>
+        <a href="DebugView.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

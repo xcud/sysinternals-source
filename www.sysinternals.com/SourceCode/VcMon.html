@@ -1,0 +1,72 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - VCMon</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<div class="contentbox">
+    <h1>VCMon</h1>
+    <div class="info">
+        Copyright � 1997 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: July 9, 1997 </span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        VCMon is a Windows 95 VxD/GUI combination that appeared in our May, 1996 Dr. Dobb's Journal article, "Examining VxD Service Hooking". While its primary goal is to serve as a demonstration of the interesting things that can be monitored easily with service hooking, disk cache monitoring can be useful and informative in its own right. In addition, the graphs that VCMon implements may be useful in your own programs.
+    </p>
+    
+    <h2>Installation and Use</h2>
+    <p>
+        Install VCMon by copying Vcmon.vxd and Vcmon.exe to the same directory on your hard drive, and start it by running Vcmon.exe from that directory. The GUI dynamically loads the virtual device driver (VxD), which starts watching disk cache activity. The checkboxes can be toggled to pop open graphs that represent recent activity.
+    </p>
+    <img src="../images/screenshots/VcMon.gif" width="335" height="321" alt="VCMon Screenshot" />
+    <br /><br />
+    <img src="../images/screenshots/VcMon2.gif" width="450" height="300" alt="VCMon Screenshot" />
+    
+    <h2>How VCMon Works</h2>
+    <p>
+        The heart of VCMon is in the virtual device driver, Vcmon.vxd. It is dynamically loaded, and in its initialization it installs VxD hooks for disk cache, as well as page faulting services.
+    </p>
+    <p>
+        Periodically (at a rate that can be controlled through the dialog), the GUI asks the VxD to fill in a data structure with the current statistics, which are then used to update the dialog box and the graphs.
+    </p>
+    
+    <h2>More Information</h2>
+    <p>
+        The following serve as additional sources of information on the Windows 95 VxD hooking:
+    </p>
+    <ul>
+        <li>The Windows 95 DDK</li>
+        <li>"Examining VxD Service Hooking," by Mark Russinovich and Bryce Cogswell, Dr. Dobb's Journal, May 1996</li>
+        <li>"Systems Programming for Windows 95," by Walter Oney, Microsoft Press, 1996 (a must have for VxD writers)</li>
+    </ul>
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/VcMon.zip">Download VCMon (39KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/VcMonSource.zip">Download VCMon Plus Source (107KB)</a>
+    </p>
+    
+</div>
+
+<div class="footer">
+	Copyright � 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

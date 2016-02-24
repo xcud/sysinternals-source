@@ -1,0 +1,3275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Inside the Native API</title>
+<style type="text/css">
+<!--
+.style2 {color: #0000FF}
+-->
+</style>
+<style type="text/css">
+<!--
+.style7 {font-size: x-small}
+-->
+</style>
+<style type="text/css">
+<!--
+.style9 {font-size: 1}
+-->
+</style>
+<style type="text/css">
+<!--
+.style10 {font-size: 1mm}
+-->
+</style>
+<style type="text/css">
+<!--
+.style11 {font-size: 10px}
+-->
+</style>
+<style type="text/css">
+<!--
+.style12 {color: #336600}
+-->
+</style>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Inside the Native API</h1>
+    <div class="info">
+        Copyright © 1998-2004 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: Last updated November 23, 2004</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        Virtually everybody familiar with NT has at the minimum heard that there is a hidden API that NT uses internally. 
+        This API, which is called the Native API, is almost entirely hidden from view, with only a handful of its function 
+        documented in generally accessible publications. This obfuscation has lead to a general belief that the Native API 
+        can provide applications magical powers, perhaps even allowing them to bypass security measures implemented by standard 
+        APIs like Win32. Thoughts along these lines usually lead to the Native API conspiracy theory: Microsoft is keeping 
+        the API for themselves and their own application to unfair advantage. The native API does expose some nuances not 
+        available through documented APIs (for example, you can specify whether or not file opens should be case sensitive, 
+        something not possible with Win32's <b>CreateFile</b>() or <b>OpenFile</b>()), however the majority of the APIs capabilities are 
+        accessible through documented channels.
+    </p>
+    <p>
+        This article will introduce you to the Native API and provide you a roadmap for what is in the API. I'll first describe what the Native API is, how it's invoked in normal operation, and how its used as a support infrastructure for the APIs of NT's operating environment subsystems. Then I'll take you on a tour of the API where I break it down into sets of related functions (memory management, synchronization, etc.). I'll talk about the capabilities available through the API's functions and note Win32 APIs that map to particular Native APIs where applicable. This comprehensive look at the Native API should help clarify misconceptions about how it's used, why it's used, and what the undocumented APIs are hiding from us (e.g. whether the conspiracy theory has validity).
+    </p>
+    
+    <h2>Native API Architecture</h2>
+    <p>
+        The Windows NT Native API serves one purpose: as a means for calling operating system services located in kernel mode in a controlled manner. Kernel mode is where the core of NT executes, and it's in kernel mode that components have direct access to hardware and services that perform management of the computer's resources including memory, devices and processes. Thus, whenever a program executing in user mode wants to perform I/O, allocate or deallocate virtual memory, start a thread or process, or interact with global resources, it must call upon one or more services that live in kernel mode.
+    </p>
+    <p>
+        The Native API is equivalent to the system call interface on traditional monolithic operating systems such as most 
+        UNIXes. On most UNIXes, however, the system call interface is well documented and is generally available for use by 
+        standard applications. For example, the <b>read</b>() call for reading data from a file, socket, or input device in most 
+        flavors of UNIX is a system call that is handled by code in kernel mode. In Windows NT the Native API, its system 
+        call interface, is hidden from programmers behind higher level APIs such as Win32, OS/2, POSIX or DOS/Win16. The reason 
+        behind this is NT's architecture.
+    </p>
+    <p>
+        NT is a "modified microkernel" architecture. Instead of supporting one basic operating system API, NT implements 
+        several. It does this efficiently by implementing operating environment subsystems in user mode that export particular 
+        APIs to client programs. The "national language" API of NT is Win32, and the Win32 architecture demonstrates this concept. 
+        The Win32 operating environment subsystem is divided among a server process, CSRSS.EXE (Client/Server Runtime SubSystem), 
+        and client-side DLLs that are linked with programs that use the Win32 API. The core of the Win32 API is divided into three 
+        categories: windowing and messaging, drawing, and base services. Windows and messaging APIs include <b>CreateWindow</b>() and 
+        <b>SendMessage</b>(), and are exported to Win32 programs via the USER32.DLL library. <b>BitBlt</b>() and <b>LineTo</b>() are Win32 drawing 
+        functions and are provided in GDI32.DLL. Finally, base services include all Win32 I/O, process and thread, memory management, 
+        and synchronization APIs, and KERNEL32.DLL is the library that exports them.
+    </p>
+    <p>
+        When a Win32 program calls a Win32 API control is transferred within its address space into one of Win32's client-side DLLs. The DLL can execute one or more of the following options:
+    </p>
+    <ul>
+        <li>return immediately to the caller</li>
+        <li>send a message to the Win32 server to request help</li>
+        <li>invoke Native APIs to carry out the function</li>
+    </ul>
+    <p>
+        The first option of returning to the caller is rarely possible and is only possible when the DLL can service the function 
+        without the help of operating system services. An example of this is <b>GetCurrentProcess</b>(). This API simply returns a 
+        handle to the current process that is cached in KERNEL32 when the process is started.
+    </p>
+    <p>
+        The second option is also rarely required. A client-side DLL only needs to send messages to the Win32 server when the 
+        server must participate with, and be aware of, the function's execution. The Win32 server creates a Win32 execution 
+        environment for its clients that involves maintaining some state associated with its client processes. Thus, the 
+        <b>CreateProcess</b>() API, exported by KERNEL32, requires an interaction with the Win32 server. The server in this case prepares 
+        a new process for execution by mapping in an executable image, creating a command-line argument structure, and so on. The 
+        Win32 server calls Native API functions to create the actual process image and prepare its address map.
+    </p>
+    <p>
+        The final option is the most frequently exercised. Let's talk about USER32 and GDI32 APIs first, before talking about KERNEL32's use of Native APIs. In versions of NT prior to 4.0, windowing and drawing functions were located in the Win32 server (CSRSS.EXE). This meant that whenever an application used these function a message would be sent to the server. In NT 4.0 the windowing and drawing components of Win32 were moved into a kernel mode component named WIN32K.SYS. Instead of sending a message to the server, the client-side DLLs just call directly into the kernel, saving the overhead of messaging and context switching to another process. This has enhanced NT's graphics performance (as evidenced by the Pinball sample game). GDI and USER functions have become NT's second Native API, but they are less mysterious than the primary Native API since drawing, windowing, and messaging APIs are well-documented.
+    </p>
+    <p>
+        KERNEL32 functions that call the Native API directly include all of its I/O (e.g <b>CreateFile</b>(), <b>ReadFile</b>(), 
+        <b>WriteFile</b>()), synchronization (e.g. <b>WaitForSingleObject</b>(), <b>SetEvent</b>()), and memory management (e.g. <b>VirtualAlloc</b>(), 
+        <b>VirtualProtect</b>()) functions. In fact, the majority of KERNEL32's exported routines use the Native API directly. The 
+        figure below shows the flow of control from a Win32 application executing a Win32 call (<b>CreateFile</b>()), through 
+        KERNEL32, NTDLL, and into kernel mode where control is transferred to the <b>NtCreateFile</b> system service. I'll talk 
+        about this process in detail.
+    </p>
+    <img src="../images/screenshots/NativeApi.gif" width="478" height="394" alt="Win32 application flow of control" />
+    
+    <h2>NTDLL.DLL</h2>
+    <p>
+        The Native API is provided to user-mode programs by the NTDLL.DLL library. NTDLL.DLL, besides containing Native API user-mode entry points, has process startup and module loading code in it. The bulk of it, though, are the Native API stubs that transfer control to kernel mode. This is accomplished by executing a software exception. If you look at a stub for a Native API in NTDLL inside of a debugger you'll see something like this (on x86):
+    </p>
+<pre>NtCreateFile:
+    mov    eax, 0x0000001A
+    lea    edx, [esp+04]
+    int    0x2E 
+    ret    0x2C</pre>
+    <p>
+        In this case the call is <b>NtCreateFile</b> but every other native call looks almost identical. The first instruction is loading a register with the Native API's index number. Every Native API has a unique index number, which is generated automatically by a script that runs as part of the NT build process. Thus, the index number for a specific function can vary from build to build as Native APIs are added and removed. The second instruction loads a register with a pointer to the call's parameters. Next is the software exception instruction. NT registers a kernel-mode exception handler specifically for handling Native API software exceptions. On x86's this exception is 0x2E. The final instruction pops the parameters off the caller's stack. Note that on Windows 2000 and higher Windows uses special processor instructions when available instead of INT 0x2E. On Intel systems it uses SYSENTER and on AMD systems it uses SYSCALL.
+    </p>
+    <p>
+        Note that all of the Native APIs begin with "Nt". The export table in NTDLL.DLL also makes the Native API accessible 
+        through an alternate naming convention, one where command names begin with "Zw" instead of "Nt". Thus, <b>ZwCreateFile</b>() 
+        is an alias for <b>NtCreateFile</b>().
+    </p>
+    <p>
+        The Native API exception handler in kernel mode is named <b>KiSystemService</b>, and it is invoked whenever a Native API is 
+        executed in user mode. Its task is to determine if the API's index number is valid, and if so, pass control to the 
+        appropriate system service in kernel mode to service the request. It does this by simply using the index number passed 
+        from user mode to index into an array called <b>KiSystemServiceTable</b>. Each entry in this array includes a pointer to the 
+        appropriate function and the number of parameters the function expects. <b>KiSystemService</b> takes the parameters passed on 
+        the user mode stack (pointed to in the edx register on x86) and pushes them on the kernel stack before calling the function 
+        specified in the array for the index.
+    </p>
+    <p>
+        Win32 Native APIs introduced in NT 4.0 are handled by the same exception handler, but the index numbers of Win32 functions specify that a second array of system service pointers should be used. The function pointers in the second array reference functions in WIN32K.SYS.
+    </p>
+    <p>
+        Each system service performs operations specific to the API they implement, of course, but most of them must deal with the validation of the parameters passed to them from user mode. Many parameters are pointers, and dereferencing an invalid pointer in kernel mode without taking precautionary measures can prove catastrophic. Validating parameters is straight-forward, but the number of Native APIs and the number of parameters they take have made getting it right tough for Microsoft. In 1997 I wrote a program called <i>NTCrash</i> that barraged the Native API interface with garbage parameters. The program discovered 13 WIN32K system services that failed to perform comprehensive parameter validation, the result of which were Blue Screens. Microsoft closed these holes in Service Pack 1.
+    </p>
+    <p>
+        About year later I revisited <i>NTCrash</i> and tweaked it to be more intelligent about generating garbage - the garbage this new version, <i>NTCrash</i>2, produces hits boundary conditions that can be easy to miss in validation. In fact, this revision found 40 more APIs (15 Native APIs and 25 WIN32K Native APIs) with Blue Screen holes. Microsoft has been made aware of the holes and they will be closed in Service Pack 4. Testers within Microsoft have told me that they use a greatly enhanced version of my <i>NTCrash</i> to test system call interfaces.
+    </p>
+    <p>
+        After parameter validation, system services usually call functions supplied by NT's Executive subsystems. These subsystems all live in kernel mode, and each is responsible for managing certain resources. Example subsystems include the Process Manager, Virtual Memory Manager, I/O Manager, and Local Procedure Call facility.
+    </p>
+    
+    <h2>Native API Catalog</h2>
+    <p>
+        There are about 240 Native APIs in Win2K, up from around 200 in NT 3.5.1. In this section I break the Native API down into categories of related functions and I start each category by briefly describing the capabilities of the group. For each function I list Win32 functions that obtain functionality similar to that provided by the Native API (which they usually do by actually calling upon the Native API).
+    </p>
+    <p>
+        Currently, the only documentation on Native APIs is located in the Windows NT Device Driver Kit (DDK) and the Windows NT 
+        Installable File System Kit (IFS Kit). The DDK actually describes the parameters and usage of a around 25 Native APIs, and 
+        includes prototype and parameter information for a few others in NTDDK.H (e.g. <b>NtQueryInformationProcess</b>(). The IFS Kit 
+        documents about 25 more APIS only by providing prototypes in header files that come as part of the kit, and sometimes through 
+        their use in sample code. Most of APIs included in the IFS Kit are in the file I/O and security categories. The IFS Kit is 
+        available from Microsoft for a fee after signing an NDA (see Microsoft's Web site for information). You can find prototypes 
+        and some minimal documentation for many Native APIs in the third-party book 
+        <a href="../Resources.html#Books">Windows NT/2000 Native API Reference</a>.
+    </p>
+    <p>
+        The format of the following tables is as follows: Column 1 shows the native API, column 2 shows Win32 functions that map to the API, column 3 provides a brief description of the APIs functionality, and column 4 shows if its documented in the DDK or not (either explicitly or by its prototype). Functions new to Win2K are shown in red, those new to XP in blue, and those new to Server 2003 in green.
+    </p>
+    
+    <h2>File Maps</h2>
+    <table width="200" border="0" cellpadding="0">
+        <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Special Files </b></font></td>
+        </tr>
+        <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> These 
+                        APIs are used to create files that have custom characteristics. 
+                        </font></td>
+
+        </tr>
+        <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCreateMailslotFile</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">CreateMailSlot</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Creates 
+                        a mailslot end-point.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+        </tr>
+        <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCreateNamedPipeFile</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">CreateNamedPipe</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Creates 
+                        a named-pipe end-point.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+        </tr>
+        <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCreatePagingFile</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">The System 
+                        applet uses this API to create paging files. Parameters 
+                        specify the name, as well as minimum and maximum size.</font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+        </tr>
+        <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+        </tr>
+        <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Drivers </b></font></td>
+        </tr>
+
+        <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> These 
+                        functions are used by NT to load and unload device driver 
+                        images from system memory. </font></td>
+        </tr>
+        <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtLoadDriver</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">CreateFile 
+                        with Service Control Manager</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Loads a 
+                        device driver based on information provided under HKLM\System\CurrentControlSet\Services\<i>driver 
+                        name</i></font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+        </tr>
+        <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtUnloadDriver</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">Service 
+                        Control Manager supported</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Unloads 
+                        the specified driver from memory, presuming the driver 
+                        supports an unload interface.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+        </tr>
+
+        <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtRegisterNewDevice</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">NT 3.51 
+                        only. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+        </tr>
+        <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+
+        </tr>
+        <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Processor and Bus </b></font></td>
+        </tr>
+        <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> Processor 
+                        registers and components can be controlled via these functions. 
+                        </font></td>
+        </tr>
+        <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtFlushInstructionCache</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">The NT 
+                        kernel debugger uses this API, which flushes the processor 
+                        instruction cache using the HAL.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+      </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtFlushWriteBuffer</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">The processor's 
+                        memory write buffer is flushed by this function, which 
+                        uses the HAL.</font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtSetLdtEntries</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">X86 Local 
+                        Descriptor Table entries are initialized using this function.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtEnumerateBus</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">NT 3.51 
+                        only.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style13 style7 style2">NtGetCurrentProcessorNumber</span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style13 style7 style2">New to Server 2K3. Gets the number of the processor on which a thread is executing. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Debugging and Profiling </b></font></td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> The profiling 
+                        APIs provide a mechanism for sample-based profiling of 
+                        kernel-mode execution. The Kernprof tool in the DDK makes 
+                        use of them, and a recent Windows Developer's Journal 
+                        presented a source code to a Kernprof clone. The debug 
+                        control function is used by WinDbg for obtaining internal 
+                        kernel information and controlling thread and process 
+                        execution. </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCreateProfile</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Creates 
+                        a profile object.</font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtQueryIntervalProfile</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Returns 
+                        profiled data.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtSetIntervalProfile</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Specified 
+                        sampling interval. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtStartProfile</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Starts 
+                        sampling. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtStopProfile</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Stops sampling. 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtSystemDebugControl</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Implements 
+                        a range of debugger support commands. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtRegisterThreadTerminatePort</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">A debugger 
+                        registers for thread termination notification with this 
+                        API. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">NtCreateDebugObject </span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">New to WinXP. Creates a debug object.  </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">NtDebugActiveProcess </span></td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">DebugActiveProcess</span></td>
+
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">New to WinXP.  Enables a debugger to attach to an active process and debug it. </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11"> NtDebugContinue</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11"> Continue DebugEvent</span></td>
+
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11"> New to WinXP. Allows a process to contiue a thread that has generated a debug event. </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11"> NtQueryDebugFilterState</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11"> New to WinXP. Queries the debug filter state level for a specific component.</span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11"> NtRemoveProcessDebug</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">DebugActiveProcessStop </span></td>
+
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11"> New to WinXP. Stops debugging the specified process. </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0" height="26"><span class="style29 style2 style11"> NtSetDebugFilterState</span></td>
+                      <td bgcolor="#C0C0C0" height="26">&nbsp; </td>
+
+                      <td bgcolor="#C0C0C0" height="26"><span class="style29 style2 style11"> New to WinXP. Sets the debug output filter level for the specified component. </span></td>
+                      <td bgcolor="#C0C0C0" height="26"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0" height="26"><span class="style29 style2 style11">NtSetInformationDebugObject</span></td>
+                      <td bgcolor="#C0C0C0" height="26"><span class="style11"></span></td>
+                      <td bgcolor="#C0C0C0" height="26"><span class="style29 style2 style11">New to WinXP. Sets the attributes of a debug object. </span></td>
+
+                      <td bgcolor="#C0C0C0" height="26">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0" height="26"><span class="style29 style2 style11">NtWaitForDebugEvent</span></td>
+                      <td bgcolor="#C0C0C0" height="26"><span class="style29 style2 style11">WaitForDebugEvent</span></td>
+                      <td bgcolor="#C0C0C0" height="26"><span class="style29 style2 style11">New to WinXP. Waits for a debugging event on a process being debugged. </span></td>
+                      <td bgcolor="#C0C0C0" height="26">&nbsp;</td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Channels </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> These 
+                        functions were introduced in NT 4.0 and are present in 
+                        Win2K Beta 1. However, they are all stubs that return 
+                        STATUS_NOT_IMPLEMENTED. Their names imply that they were 
+                        intended to provide access to a communications mechanism. 
+                        Why are they in the released versions of NT if they are 
+                        not implemented? </font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCreateChannel</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Not implemented.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtOpenChannel</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Not implemented.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtListenChannel</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Not implemented.</font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtSetContextChannel</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Not implemented.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtReplyWaitSendChannel</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Not implemented.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtSendWaitReplyChannel</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Not implemented.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Power </b></font></td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> There's 
+                        only one Native API for power management in NT 4.0. Interestingly, 
+                        this API was introduced in NT 4.0, but was a stub that 
+                        returned STATUS_NOT_IMPLEMENTED. Win2K fleshes out the 
+                        API and adds more commands.</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000">NtSetSystemPowerState</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000">Not 
+                        implemented in NT 4.0.</font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtInitiatePowerAction </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000">&nbsp; 
+                         </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Initiate a power event (e.g. suspend) </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtPowerInformation </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        GetSystemPowerStatus </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Get the system's power state. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtSetThreadExecutionState </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        SetThreadExecutionState </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Sets a thread's system power state requirement. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtRequestWakeupLatency </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000">&nbsp; 
+                         </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Sets a process' wakeup latency. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Plug-and-Play </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> Like the 
+                        Power API, some of these were introduced in NT 4.0 as 
+                        unimplemented functions. Win2K fleshes them out and adds 
+                        more. </font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000">NtGetPlugPlayEvent</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000">Present, 
+                        but not implemented in NT 4.0. Sets plug and play events.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000">NtPlugPlayControl</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000">Present, 
+                        but not implemented in NT 4.0. Sends commands to the plug-and-play 
+                        subsystem.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Objects </b></font></td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> Object 
+                        manager namespace objects are created and manipualted 
+                        with these routines. A couple of these, like NtClose, 
+                        are general in that they are used with any object type. 
+                        </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtClose</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">CloseHandle</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Closes 
+                        a handle to any object type.</font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtDuplicateObject</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">DuplicateHandle</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Duplicates 
+                        a handle to an object.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCreateDirectoryObject</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Creates 
+                        a directory in the object manager namespace. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCreateSymbolicLinkObject</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Creates 
+                        a symbolic link in the object manager namespace. The Win32 
+                        DefineDosDevice command lets you create links, but only 
+                        in the \?? subdirectory.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtMakeTemporaryObject</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Causes 
+                        a permanent object to be deleted during NT shutdown so 
+                        that it isn't present at the next boot. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtOpenDirectoryObject</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Opens an 
+                        object manager namespace directory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtQueryDirectoryObject</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Used to 
+                        enumerate the objects located in an directory object. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtOpenSymbolicLinkObject</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Opens a 
+                        symbolic link object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtQuerySymbolicLinkObject</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Returns 
+                        the name of the object that the symbolic link points at. 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtQueryObject</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Queries 
+                        an an object's attributes, such as its name. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtSetInformationObject</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Sets an 
+                        object's attributes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">NtMakePermanentObject</span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">New to WinXP. Sets the permanent flag on an object. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">NtTranslateFilePath</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">New to WinXP. Translates a file path from one format (e.g. NT, ARC, EFI) to another. </span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Registry </b></font></td>
+                    </tr>
+
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> Win32 
+                        Registry functions basically map directly to these APIs, 
+                        and many of them are documented in the DDK. </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCreateKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegCreateKey</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Creates 
+                        or opens a Registry key.</font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtOpenKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegOpenKey</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Opens an 
+                        existing Registry key.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtDeleteKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegDeleteKey</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Deletes 
+                        a Registry key. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtDeleteValueKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegDeleteValue</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Deletes 
+                        a value. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtEnumerateKey</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegEnumKey, 
+                        RegEnumKeyEx</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Enumerates 
+                        the subkeys of a key. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtEnumerateValueKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegEnumValue</font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Enumerates 
+                        the values within a key. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtFlushKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegFlushKey</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Flushes 
+                        changes back to the Registry on disk. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtInitializeRegistry</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Gets the 
+                        Registry rolling. The single parameter to this specifies 
+                        whether its a setup boot or a normal boot. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtNotifyChangeKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegNotifyChangeKeyValue</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Allows 
+                        a program to be notified of changes to a particular key 
+                        or its subkeys. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtQueryKey</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegQueryKey</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Queries 
+                        information about a key. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtQueryMultiplValueKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegQueryMultipleValues</font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Retrieves 
+                        information about multiple specified values. This API 
+                        was introduced in NT 4.0. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtQueryValueKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegQueryValue, 
+                        RegQueryValueEx</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Retrieves 
+                        information about a specified value. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtReplaceKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegReplaceKey</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Changes 
+                        the backing file for a key and its subkeys. Used for backup/restore. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtSaveKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegSaveKey</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Saves 
+                        the contents of a key and subkey to a file. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtRestoreKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegRestoreKey</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Loads 
+                        the contents of a key from a specified file. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtSetInformationKey</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets attributes 
+                        of a key. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtSetValueKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegSetValue, 
+                        RegSetValueEx</font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        data associated with a value. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtLoadKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegLoadKey</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Loads 
+                        a hive file into the Registry. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtLoadKey2</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Introduced 
+                        in NT 4.0. Allows for options on loading a hive. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtUnloadKey</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">RegUnloadKey</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Unloads 
+                        a hive from the Registry. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">NtCompactKeys</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">New to WinXP. Makes key storage adjacent. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">NtCompressKey</span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">New to WinXP. Performs in-place compaction  of a hive. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">NtLockRegistryKey</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">New to WinXP. Locks a registry key for modification. </span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">NtRenameKey</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">New to WinXP. Renames a Registry key.</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">NtSaveKeyEx</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">RegSaveKeyEx</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">New to WinXP. Saves the contents of a key and its subkeys to a file. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">NtUnloadKeyEx</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">New to WinXP. Unloads a hive from the Registry. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style14 style2 style11">NtLoadKeyEx</span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style14 style2 style11">New to Server 2K3. Loads a hive into the Registry.</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style14 style2 style11">NtUnloadKey2</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style14 style2 style11">New to Serer 2K3. Unloads a hive from the Registry. </span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style14 style2 style11">NtQueryOpenSubKeysEx</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style14 style2 style11">New to Server 2003. Returns the keys opened beneath a specified key.</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Local Procedure Call </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> LPC is 
+                        NT's core interprocess communications mechanism. If you 
+                        use RPC between processes on the same computer you are 
+                        using LPC indirectly. </font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCreatePort</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Creates 
+                        a port object.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtAcceptConnectPort</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Accepts 
+                        a port connection.</font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCompleteConnectPort</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Completes 
+                        a connection. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtConnectPort</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Connects 
+                        a port to another port that is accepting connections. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtImpersonateClientOfPort</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Thread 
+                        impersonates the identify of the process on the other 
+                        end of a port. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtListenPort</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Listens 
+                        on a port for connection requests. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtQueryInformationPort</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Obtains 
+                        information on a port. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtReadRequestData</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Reads data 
+                        associated with a port message. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtReplyPort</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Sends a 
+                        reply message. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtReplyWaitReceivePort</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Sends a 
+                        reply message and then waits for an incoming request message. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtReplyWaitReplyPort</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Sends a 
+                        reply message and then waits for an incoming reply message. 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtRequestPort</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Sends a 
+                        request message. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtRequestWaitReplyPort</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Sends a 
+                        request message and waits for an incoming reply message. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtWriteRequestData</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1">Fills in 
+                        data for a request message </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtSecureConnectPort </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000">&nbsp; 
+                         </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Creates a secure connection port. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style9 style2 style10 style11">NtQueryPortInformationProcess</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style29 style2 style11">New to WinXP. Used to determine if a process has an associated exception or debug port.</span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Security </b></font></td>
+                    </tr>
+
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> The Native 
+                        security APIs are mapped almost directly by Win32 security 
+                        APIs. </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtAccessCheck</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">AccessCheck</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Checks 
+                        to see whether current thread has access to an object 
+                        based on its security descriptor. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtAccessCheckAndAuditAlarm</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">AccessCheckAuditAlarm</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Generates 
+                        an audit message related to access checking. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtAdjustGroupsToken</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">AdjustTokenGroups</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Adds or 
+                        removes groups associated with a token. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtAdjustPrivilegesToken</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">AdjustTokenPrivileges</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Enables 
+                        or disables privileges associated with a token. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCloseObjectAuditAlarm</font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">ObjectCloseAuditAlarm</font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Generates 
+                        an audit message indicating that an object was closed. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1">NtCreateToken</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">CreateToken</font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Creates 
+                        a token object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtDeleteObjectAuditAlarm</font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ObjectDeleteAuditAlarm</font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Generated 
+                        an audit event indicating that an object was deleted. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtDuplicateToken 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> DuplicateToken, 
+                        DuplicateTokenEx </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Duplicates 
+                        a token object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtImpersonateThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ImpersonateLoggedOnUser 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Allows 
+                        a thread to impersonate the identity of another user. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenObjectAuditAlarm 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ObjectOpenAuditAlarm 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Generated 
+                        an audit event indicating that an object was opened. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenProcessToken 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> OpenProcessToken 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Obtains 
+                        a handle to the token of a specified process. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenThreadToken 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> OpenThreadToken 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Opens 
+                        a handle to the token of a specified thread. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtPrivilegeCheck 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> PrivilegeCheck 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Checks 
+                        to see whether a token has the specified privileges enabled. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtPrivilegeObjectAuditAlarm 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ObjectPrivilegeAuditAlarm 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Generates 
+                        an audit event record associated with a privilege check. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtPrivilegedServiceAuditAlarm 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> PrivilegedServiceAuditAlarm 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Generates 
+                        an audit message indicating the attempt to use specified 
+                        privileges. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryInformationToken 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetTokenInformation 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Obtains 
+                        information about a token. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQuerySecurityObject 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetUserObjectSecurity, 
+                        GetPrivateObjectSecurity </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Retrieves 
+                        information about an object's security settings. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetInformationToken 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetTokenInformation 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets a 
+                        token's attributes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetSecurityObject 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetUserObjectSecurity, 
+                        SetrivateSecurityObject </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        security information of an object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtAccessCheckByType </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        AccessCheckByType </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New object-specific security support in Win2K. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtAccessCheckByTypeAndAuditAlarm </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        AccessCheckByTypeAndAuditAlarm </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New object-specific security support in Win2K. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtAccessCheckByTypeResultList </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        AccessCheckByTypeResultList, AccessCheckByTypeResultListAndAuditAlarm 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New object-specific security support in Win2K. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtFilterToken </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        CreateRestrictedToken </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New object-specific security support in Win2K. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtCompareToken</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Compares two tokens. </span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtOpenProcessTokenEx</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Opens a process token. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtOpenThreadTokenEx</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Opens a thread token. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Processes and Threads </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> These 
+                        functions control processes and threads. Many have direct 
+                        Win32 equivalents. </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtAlertResumeThread 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Resumes 
+                        a thread. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtAlertThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sends 
+                        an alert to a thread. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtTestAlert 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Tests 
+                        for whether a thread has a pending alert. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCreateProcess 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> CreateProcess 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Creates 
+                        a new process. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCreateThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> CreateThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Creates 
+                        a new thread. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCurrentTeb 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Returns 
+                        a pointer to a thread's environment block. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtDelayExecution 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> Sleep, 
+                        SleepEx </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Pauses 
+                        a thread for a specified time. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtGetContextThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetThreadContext 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Retrieves 
+                        the hardware context (registers) of a thread. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetContextThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetThreadContext 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        hardware context (registers) of a thread. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenProcess 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> OpenProcess 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Opens 
+                        a handle to a specified process. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> OpenThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Opens 
+                        a handle to a specified thread. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryInformationProcess 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetProcessTimes, 
+                        GetProcessVersion, GetProcessWorkingSetSize, GetProcessPriorityBoost, 
+                        GetProcessAffinityMask, GetPriorityClass, GetProcessShutdownParameters 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Obtains 
+                        information about a process' attributes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryInformationThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetThreadTimes, 
+                        GetThreadPriority, GetThreadPriorityBoost </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Obtains 
+                        information about a thread's attributes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueueApcThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> QueueUserApc 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Introduced 
+                        in NT 4.0. Queues an Asynchornous Procedure Call to a 
+                        thread. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtResumeThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ResumeThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Wakes 
+                        up a suspended thread. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetInformationProcess 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetProcessAffinityMask, 
+                        SetPriorityClass, SetProcessPriorityBoost, SetProcessShutdownParameters, 
+                        SetProcessWorkingSetSize </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets a 
+                        process' attributes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetInformationThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetThreadAffinityMask, 
+                        SetThreadIdealProcessor, SetThreadPriority, SetThreadPriorityBoost 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets a 
+                        thread's attributes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetLowWaitHighThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> NT 4.0 
+                        only (not in Win2K). </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetHighWaitLowThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> NT 4.0 
+                        only (not in Win2K). </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSuspendThread 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SuspendThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Suspends 
+                        a thread's execution. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtTerminateProcess 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> TerminateProcess 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Deletes 
+                        a process. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtTerminateThread 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> TerminateThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Deletes 
+                        a thread. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtYieldExecution 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SwitchToThread 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Introduced 
+                        in NT 4.0. Causes thread to give up CPU. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtCreateProcessEx</span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Creates a new process. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtResumeProcess</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Resumes a suspended process. </span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtSuspendProcess</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Suspends a process. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style2">NtApphelpCacheControl</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style2">New to Server 2003. Controls the application-compatibility shim cache.</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Atoms </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> Atoms 
+                        allow for the efficient storage and referencing of character 
+                        strings. </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtAddAtom 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> AddAtom 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Introduced 
+                        in NT 4.0. Adds a character string to an atom table. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtDeleteAtom 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> DeleteAtom 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Introduced 
+                        in NT 4.0. Removes an atom from an atom table. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtFindAtom 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> FindAtom 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Introduced 
+                        in NT 4.0. Looks up an atom in an atom table. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryInformationAtom 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetAtomName 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Introduced 
+                        in NT 4.0. Retrieves information about an atom. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Error Handling </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> Device 
+                        drivers and debuggers rely on these error handling routines. 
+                        </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtRaiseException 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> RaiseException 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Signals 
+                        an exception condition to trigger exception handler execution. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtContinue 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> try/except 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Allows 
+                        error processing handling to continue to the next handler. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtRaiseHardError 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Used to 
+                        raise an error message box. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetDefaultHardErrorPort 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetErrorMode 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Used by 
+                        programs to disable hard error message boxes cause by 
+                        their actions. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Execution Environment </b></font></td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> These 
+                        functions are related to general execution environment. 
+                        </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryDefaultLocale 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetLocaleInfo 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Retrieves 
+                        information about the locale. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetDefaultLocale 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetLocaleInfo 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets locale 
+                        information. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQuerySystemEnvironmentValue 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetEnvironmentVariable 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Gets the 
+                        value of an environment variable. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetSystemEnvironmentValue 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetEnvironmentVariable 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        value of an environment variable. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtQueryDefaultUILanguage </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000">&nbsp; 
+                         </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Win2K supports on-the-fly language changes. 
+                        Queries the current language. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtSetDefaultUILanguage </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000">&nbsp; 
+                         </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Win2K supports on-the-fly language changes. 
+                        Sets the current language. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtEnumerateSystemEnvironmentValuesEx</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Enumerates the system environment variables. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtQuerySystemEnvironmentValueEx</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Queries the value of an environment variable. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Timers and System Time </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> Virtually 
+                        all these routines have functionality accessible via Win32 
+                        APIs. </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCancelTimer 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> CancelWaitableTimer, 
+                        timeKillEvent </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Cancels 
+                        a timer. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCreateTimer 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> CreateWaitableTimer 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Creates 
+                        a timer. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenTimer 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> OpenWaitableTimer 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Opens 
+                        a timer object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryTimer 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Queries 
+                        a timer's attributes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryTimerResolution 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> timeGetDevCaps 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Queries 
+                        the system's timer resolution. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetTimer 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> timeSetEvent 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets a 
+                        timer for an expiration event. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetTimerResolution 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> timeBeginPeriod, 
+                        timeEndPeriod </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        system timer resolution. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryPerformanceCounter 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> QueryPerformanceCounter, 
+                        QueryPerformanceFrequency </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Queries 
+                        the system performance counter. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQuerySystemTime 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetSystemTime 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Gets the 
+                        current time. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetSystemTime 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetSystemTime 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        system time. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtGetTickCount 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetTickCount 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Get the 
+                        ticks since system boot. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Synchronization </b></font></td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> Most synchronization 
+                        objects have Win32 APIs, with the notable exception of 
+                        event pairs. Event pairs are used for high-performance 
+                        interprocess synchronization by the LPC facility. </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCreateEvent 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> CreateEvent 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Creates 
+                        an event object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenEvent 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> OpenEvent 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Opens 
+                        an event object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtClearEvent 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Clears 
+                        the signalled state of an event. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtPulseEvent 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> PulseEvent 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Signals 
+                        an event and then resets it. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryEvent 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Queries 
+                        the state of an event. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtResetEvent 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ResetEvent 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Resets 
+                        an event to a non-signalled state. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetEvent 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetEvent 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets an 
+                        event to the signalled state. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCreateEventPair 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Creates 
+                        an event pair. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenEventPair 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Opens 
+                        an event pair. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetHighEventPair 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        high half of an event pair to signalled state. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetHighWaitLowEventPair 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        high half of an event pair to signalled state and waits 
+                        for the low half to become signalled. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetLowEventPair 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        low half of an event pair. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetLowWaitHighEventPair 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        low half of an event pair and waits for the high-half 
+                        to become signalled. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtWaitHighEventPair 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Waits 
+                        for the high-half of an event pair to become signalled. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtWaitLowEventPair 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Waits 
+                        for the low-half of an event pair to become signalled. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCreateMutant 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> CreateMutex 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Creates 
+                        a mutant object (known as a mutex in user mode). </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenMutant 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> OpenMutex 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Opens 
+                        a mutant object (known as a mutex in user mode). </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryMutant 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Queries 
+                        the state of a mutant object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtReleaseMutant 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ReleaseMutex 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Signals 
+                        a mutant </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtReleaseProcessMutant 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> 3.51 only. 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtReleaseThreadMutant 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> 3.51 only. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCreateSemaphore 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> CreateSemaphore 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Creates 
+                        a semaphore object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenSemaphore 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> OpenSemaphore 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Opens 
+                        a semaphore object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQuerySemaphore 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Queries 
+                        the state of a semaphore. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtReleaseSemaphore 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ReleaseSemaphore 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Signals 
+                        a semaphore. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSignalAndWaitForSingleObject 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Introduced 
+                        in NT 4.0. Signals a synchornization object and then waits 
+                        for it to be signalled again. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtWaitForMultipleObjects 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> WaitForMultipleObjects, 
+                        WaitForMultipleObjectsEx </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Waits 
+                        for multiple objects to become signalled. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtWaitForSingleObject 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> WaitForSingleObject, 
+                        WaitForSingleObjectEx </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Waits 
+                        for a single object to become signalled. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtCreateKeyedEvent</span></td>
+
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Creates a keyed event object. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtOpenKeyedEvent</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Opens a named keyed event object. </span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtReleaseKeyedEvent</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Signals a keyed event object. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtWaitForKeyedEvent</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Waits for a keyed event to become signalled. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtSetEventBoostPriority</span></td>
+
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11
+					  style29 style2">New to WinXP. Signals an event and sets the
+					  priority of woken threads.</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Memory </b></font></td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> Most of 
+                        NT's virtual memory APIs are accessible via Win32. </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtAllocateVirtualMemory 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> VirtualAlloc, 
+                        VirtualAllocEx </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Allocates 
+                        virtual memory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtFreeVirtualMemory 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> VirtualFree, 
+                        VirtualFreeEx </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Frees 
+                        virtual memory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryVirtualMemory 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> VirtualQuery, 
+                        VirtualQueryEx </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Queries 
+                        a range of virtual memory's attributes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtProtectVirtualMemory 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> VirtualProtect, 
+                        VirtualProtectEx </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        protection for a range of virtual memory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtLockVirtualMemory 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> VirtualLock 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Locks 
+                        a range of virtual memory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtUnlockVirtualMemory 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> VirtualUnlock 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Unlocks 
+                        a range of virtual memory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtReadVirtualMemory 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ReadProcessMemory 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Reads 
+                        a range of virtual memory from a specied process. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtWriteVirtualMemory 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> WriteProcessMemory 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Writes 
+                        a range of virtual memory from a specied process. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtFlushVirtualMemory 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> FlushViewOfFile 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Flushes 
+                        a memory mapped range of memory to the file on disk. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCreateSection 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> CreateFileMapping 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Creates 
+                        a range of memory backed by a file. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenSection 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> OpenFileMapping 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Opens 
+                        a named memory mapping section object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtExtendSection 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Extends 
+                        an existing range of virtual memory backed by a file. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtMapViewOfSection 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> MapViewOfFile 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Maps a 
+                        portion of a file into virtual memory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtUnmapViewOfSection 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> UnmapViewOfFile 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Unmaps 
+                        a portion of virtual memory backed by a file. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtAllocateVirtualMemory64 </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        VirtualAllocVlm </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Allocates 64-bit virtual memory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtFreeVirtualMemory64 </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        VirtualFreeVlm </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Frees 64-bit virtual memory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtMapViewOfVlmSection </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        MapViewOfFileVlm </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Maps a file into 64-bit virtual memory. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtUnmapViewOfVlmSection </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        UnmapViewOfFileVlm </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Unmaps a view of a file mapped into 64-bit 
+                        virtual memory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtAreMappedFilesTheSame </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000">&nbsp; 
+                         </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. The loader uses this to efficiently see 
+                        if a given file has already been mapped into memory. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtProtectVirtualMemory64 </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        VirtualProtectVlm </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Sets protection on 64-bit virtual memory. 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtQueryVirtualMemory64 </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        VirtualQueryVlm </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Queries the attributes of 64-bit virtual 
+                        memory. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtReadVirtualMemory64 </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        ReadProcessMemoryVlm </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Reads data from 64-bit memory of the specified 
+                        process. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtWriteVirtualMemory64 </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        WriteProcessMemoryVlm </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Writes data to 64-bit memory of the specified 
+                        process. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        File and General I/O </b></font></td>
+                    </tr>
+
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> File I/O 
+                        is the best documented of the native APIs since many device 
+                        drivers must make use of it. </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCancelIoFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> CancelIo 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Cancels 
+                        an I/O request. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCreateFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> CreateFile, 
+                        CreateDirectory, CreateDirectoryEx </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Create 
+                        or opens a file, directory or device object. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCreateIoCompletion 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> CreateIoCompletionPort 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Tells 
+                        the I/O manager that a thread wishes to be notified when 
+                        an I/O completes. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenIoCompletion 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Opens 
+                        a named I/O completion object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetIoCompletion 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets an 
+                        I/O completion object's attributes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryIoCompletion 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Retrieves 
+                        specific information about an I/O completion object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtRemoveIoCompletion 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Removes 
+                        an I/O completion callback. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtDeleteFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> DeleteFile 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Deletes 
+                        a file object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtDeviceIoControlFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> DeviceIoControl 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sends 
+                        an IOCTL to a device's device driver, which represented 
+                        by an open file object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtFlushBuffersFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> FlushFileBuffers 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Flushes 
+                        in-memory file data to disk. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtFsControlFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> DeviceIoControl 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sends 
+                        an I/O control (IOCTL) to a driver represented by an open 
+                        device object. These are typically used for file system-related 
+                        special commands. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtLockFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> LockFile, 
+                        LockFileEx </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Locks 
+                        a range of a file for synchronized access. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtUnlockFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> UnlockFile 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Unlocks 
+                        a range of a file for synchronized access. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtNotifyChangeDirectoryFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> FindFirstChangeNotification, 
+                        FindNextChangeNotification </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Registers 
+                        that a thread wishes to be notified when a directory's 
+                        contents change. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtOpenFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> OpenFile 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Opens 
+                        an existing file. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryAttributesFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetFileAttributesEx 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Gets a 
+                        file's attributes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryDirectoryFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> FindFirstFile, 
+                        FindFirstFileEx, FindNextFile </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Retrieves 
+                        a directory's contents. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryEaFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Retrieves 
+                        a file's extended attributes. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetEaFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets the 
+                        extended attributes of a file. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryFullAttributesFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Introduced 
+                        in NT 4.0. Gets a file's full attributes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryInformationFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetShortPathName, 
+                        GetLongPathName, GetFullPathName, GetFileType, GetFileSize, 
+                        GetFileTime </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Retrieves 
+                        specific information regarding a file. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetInformationFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetEndOfFile, 
+                        SetFileAttributes, SetNamedPipeHandleState, SetMailslotInfo 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets specific 
+                        information regarding a file. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryVolumeInformationFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> GetDiskFreeSpace, 
+                        GetDriveType </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Retrieves 
+                        specific information regarding a disk volume. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetVolumeInformationFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> SetVolumeLabel 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sets information 
+                        about a volume. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtReadFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ReadFile, 
+                        ReadFileEx </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Reads 
+                        data from a file. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtWriteFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> WriteFile, 
+                        WriteFileEx </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Writes 
+                        data to a file. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">DDK</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtReadFileScatter 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ReadFileScatter 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Introduced 
+                        in NT 4.0 SP2 for SQL Server. Reads data from a file into 
+                        virtually discontiguous buffers. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtWriteFileGather 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> WriteFileGather 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Introduced 
+                        in NT 4.0 SP2 for SQL Server. Writes data to a file from 
+                        virtually discontiguous buffers. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtQueryQuotaInformationFile </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        IDiskQuotaControl:: </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Win2K supports NTFS disk quotas. Queries 
+                        disk quota information. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtSetQuotaInformationFile </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        IDiskQuotaControl:: </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Win2K supports NTFS disk quotas. Sets disk 
+                        quota information. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtReadFile64 </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        ReadFileVlm </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Reads data from a file into 64-bit virtual 
+                        memory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtWriteFile64 </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        WriteFileVlm </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Writes data to a file from 64-bit virtual 
+                        memory. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Miscellaneous </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> These 
+                        functions don't fall neatly into other categories. </font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtAllocateLocallyUniqueId 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> AllocateLocallyUniqueId 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Allocates 
+                        an ID that is unique to the system with respect to other 
+                        IDs allocate by this function. The security subsystem 
+                        makes extensive use of this. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtAllocateUuids 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Allocates 
+                        UUIDs. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtDisplayString 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Displays 
+                        a string on the Blue Screen. This is used both during 
+                        system boot and for writing on the Blue Screen of Death. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQuerySystemInformation 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> While 
+                        this function isn't directly documented, the Performance 
+                        Counters in the Registry export much of the information 
+                        obtainable via this call. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtSetSystemInformation 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Various 
+                        administrative applets use this function. For instance, 
+                        quantum boosting is set with this API. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtShutdownSystem 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1"> ExitWindows 
+                        </font></td>
+
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Shuts 
+                        down NT with options for rebooting. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtVdmControl 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> Sends 
+                        commands to a Virtual DOS Machine. </font></td>
+
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtCallbackReturn 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> For returning 
+                        from Win32 into a caller. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtW32Call 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> For calling 
+                        into Win32 user mode. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1"> NtQueryOleDirectoryFile 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="197"><font size="1">&nbsp;  
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1"> NT 4.0 
+                        only. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">NtLockProductActivationKeys</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style29 style2">New to WinXP. Locks the product activation keys for writing. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> 
+                        Jobs </b></font></td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> These 
+                        functions implement Job objects, which are new to Win2K. 
+                        They are essentially a group of associated processes that 
+                        can be controlled as a single unit and that share job-execution 
+                        time restrictions. </font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtCreateJobObject </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        CreateJobObject </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Creates a job object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtOpenJobObject </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        OpenJobObject </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Opens a named Job Object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtQueryInformationJobObject </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        QueryInformationJobObject </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Retrieves information about a Job Object. 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtAssignProcessToJobObject </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        AssignProcessToJobObject </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Assigns a process to a Job Object. </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165"><font size="1" color="#FF0000"> 
+                        NtSetInformationJobObject </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197"><font size="1" color="#FF0000"> 
+                        SetInformationJobObject </font></td>
+                      <td bgcolor="#C0C0C0" width="208"><font size="1" color="#FF0000"> 
+                        New to Win2K. Sets a Job Object's attributes (e.g. priority). 
+                        </font></td>
+                      <td bgcolor="#C0C0C0" width="20"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr> 
+                      <td bgcolor="#C0C0C0" width="165" height="26"><font size="1" color="#FF0000"> 
+                        NtTerminateJobObject </font></td>
+
+                      <td bgcolor="#C0C0C0" width="197" height="26"><font size="1" color="#FF0000"> 
+                        TerminateJobObject </font></td>
+                      <td bgcolor="#C0C0C0" width="208" height="26"><font size="1" color="#FF0000"> 
+                        New to Win2K. Terminates a Job Object, which terminates 
+                        all of its associated processes. </font></td>
+                      <td bgcolor="#C0C0C0" width="20" height="26"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0" height="26"><span class="style29 style11 style2">NtCreateJobSet</span></td>
+
+                      <td bgcolor="#C0C0C0" height="26"><span class="style2"></span></td>
+                      <td bgcolor="#C0C0C0" height="26"><span class="style29 style11 style2">New to WinXP. Creates a job set from multiple job objects. </span></td>
+                      <td bgcolor="#C0C0C0" height="26">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+
+                    <tr>
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> IA64 Boot.ini </b></font></td>
+                    </tr>
+                    <tr>
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> These functions are for managing the IA64 version of Boot.ini, which is stored in non-volatile RAM. On non-IA64 systems these return STATUS_NOT_IMPLEMENTED.</font></td>
+                    </tr>
+                    <tr>
+
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2">NtAddBootEntry </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2">New to WinXP. Adds an entry to the boot menu.  </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2"> NtDeleteBootEntry</span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2">New to WinXP. Deletes an entry from the boot menu.  </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2"> NtEnumerateBootEntries</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2">New to WinXP. Enumerates the boot menu entries.  </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2"> NtModifyBootEntry</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2">New to WinXP. Modifies an existing boot menu entry.  </span></td>
+
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2"> NtQueryBootEntryOrder</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2">New to WinXP. Queries the order of boot menu entries.  </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2"> NtQueryBootOptions</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2">New to WinXP. Queries the options associated with a boot menu entry.  </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+                    </tr>
+
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style29 style11 style2">NtSetBootEntryOrder</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2">New to WinXP. Sets the order of boot menu entries. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2">NtSetBootOptions</span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                      <td bgcolor="#C0C0C0"><span class="style31  style29 style11 style2">New to WinXP. Sets the options associated with a boot menu entry. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr>
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+                    </tr>
+
+                    <tr>
+                      <td colspan="4" bgcolor="#0000A0"><font size="1" color="#FFFFFF"><b> EFI Drivers</b></font></td>
+                    </tr>
+                    <tr>
+                      <td colspan="4" bgcolor="#C0C0C0"><font size="1"> These functions are for managing IA64 Extensible Firmware Interface device drivers. On non-IA64 systems these return STATUS_NOT_IMPLEMTNED.</font></td>
+                    </tr>
+                    <tr>
+
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12">NtAddDriverEntry </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12">New to Server 2003. Adds a driver.  </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12"> NtDeleteDriverEntry</span></td>
+
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12">New to Server 2003. Deletes a driver entry. </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12"> NtEnumerateDriverEntries</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12">New to Server 2003. Enumerates driver entries.  </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12"> NtModifyDriverEntry</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12">New to Server 2003. Modifies an existing driver entry.  </span></td>
+
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;</font></td>
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12"> NtQueryDriverEntryOrder</span></td>
+                      <td bgcolor="#C0C0C0">&nbsp; </td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12">New to Server 2003. Queries the order of driver entries.  </span></td>
+                      <td bgcolor="#C0C0C0"><font size="1">&nbsp;&nbsp;&nbsp;</font></td>
+
+                    </tr>
+                    <tr>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12">NtSetDriverEntryOrder</span></td>
+                      <td bgcolor="#C0C0C0"><span class="style12"></span></td>
+                      <td bgcolor="#C0C0C0"><span class="style11 style14 style12">New to Server 2003. Sets the order of driver entries. </span></td>
+                      <td bgcolor="#C0C0C0">&nbsp;</td>
+                    </tr>
+                    <tr> 
+                      <td colspan="4"><font size="2"><b> &nbsp; </b></font></td>
+
+                    </tr>
+  </table>
+        
+    
+    <p>
+        <a href="NativeApi.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - TCPView</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>TCPView</h1>
+    <div class="info">
+        Copyright © 1998-2005 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: April 15, 2005 v2.4</span>
+    </div>
+    
+    <h2>Awards</h2>
+    <a href="http://www.wugnet.com/"><img src="../images/awards/wugnet.gif" width="" height="" alt="WUGNET Shareware Hall of Fame" /></a>
+    
+    <h2>Introduction</h2>
+    <p>
+         TCPView is a Windows program that will show you detailed listings of all TCP and UDP endpoints on your system, including the local and remote addresses and state of TCP connections. On Windows NT, 2000 and XP TCPView also reports the name of the process that owns the endpoint. TCPView provides a more informative and conveniently presented subset of the Netstat program that ships with Windows. The TCPView download includes Tcpvcon, a command-line version with the same functionality.
+    </p>
+    <p>
+        TCPView works on Windows NT/2000/XP and Windows 98/Me. You can use TCPView on Windows 95 if you get the Windows 95 
+        <a href="http://www.microsoft.com/windows95/downloads/contents/wuadmintools/s_wunetworkingtools/w95sockets2/default.asp?site=95">Winsock 2 Update</a> from Microsoft.
+    </p>
+    <img src="../images/screenshots/TcpView.gif" width="" height="" alt="TCPView Screenshot" />
+    
+    <h2>Using TCPView</h2>
+    <p>
+        When you start TCPView it will enumerate all active TCP and UDP endpoints, resolving all IP addresses to their domain name versions. You can use a toolbar button or menu item to toggle the display of resolved names. On Windows XP systems, TCPView shows the name of the process that owns each endpoint.
+    </p>
+    <p>
+        By default, TCPView updates every second, but you can use the <b>Options|Refresh Rate</b> menu item to change the rate. Endpoints 
+        that change state from one update to the next are highlighted in yellow; those that are deleted are shown in red, and new endpoints 
+        are shown in green.
+    </p>
+    <p>
+        You can close established TCP/IP connections (those labeled with a state of ESTABLISHED) by selecting <b>File|Close Connections</b>, 
+        or by right-clicking on a connection and choosing <b>Close Connections</b> from the resulting context menu.
+    </p>
+    <p>
+        You can save TCPView's output window to a file using the <b>Save</b> menu item.
+    </p>
+    
+    <h2>Tcpvcon Usage</h2>
+    <p>
+        Tcpvcon usage is similar to that of the built-in Windows netstat utility:
+    </p>
+    <p>
+        <b>Usage: tcpvcon [-a] [-c] [-n] [process name or PID]</b>
+    </p>
+    <dl class="usage">
+        <dt>-a</dt>
+            <dd>Show all endpoints (default is to show established TCP connections).</dd>
+        <dt>-c</dt>
+            <dd>Print output as CSV.</dd>
+        <dt>-n</dt>
+            <dd>Don't resolve addresses.</dd>
+    </dl>
+    
+    <h2>Source Code to Netstatp</h2>
+    <p>
+        Wonder how TCPView works? Netstatp is a program with source that demonstrates how to program some of TCPView's functionality. It shows how to use IP Helper interfaces, documented in MSDN, to obtain a list of TCP/IP endpoints. Note, however, that netstatp doesn't show process names on NT 4 and Win2K like TCPView and TCPVCon.
+    </p>
+    
+    <h2>Microsoft TCPView KB Article</h2>
+    <p>
+        This Microsoft KB article references TCPView:
+    </p>
+    <p>
+        <a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;816944">816944: "Unexpected Error 0x8ffe2740 Occurred" Error Message When You Try to Start a Web Site</a>
+    </p>
+    
+    <h2>Related Utility</h2>
+    <p>
+        <a href="TdiMon.html"><i>TDImon</i></a> shows you TCP and UDP activity in real-time.
+    </p>
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsProduct.gif" width="87" height="29" alt="Winternals Product" /></a>
+    <p>
+        If you like TCPView, you'll love TCPView Pro. TCPView Pro, a Winternals Software product, has a number of features that make it much more powerful and useful than TCPView: See what process has each endpoint opened (on Win9x as well)
+    </p>
+    <ul>
+        <li>Watch the TCP and UDP activity processes perform in realtime</li>
+        <li>Used advanced filtering to narrow in on what you want to see</li>
+        <li>And much more...</li>
+    </ul>
+    <p>
+        TCPView Pro is available as part of <a href="http://www.winternals.com/products/repairandrecovery/index.asp">Winternals Administrator's Pak</a>.
+    </p>
+
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/TcpView.zip">Download TCPView and TCPVCon (81 KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/NetstatpSource.zip">Download Netstatp with Source Code (42 KB)</a>
+    </p>
+    
+    <p>
+        <a href="TcpView.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

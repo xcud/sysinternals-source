@@ -1,0 +1,137 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - PsTools</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>PsTools</h1>
+    <div class="info">
+        Copyright © 1999-2006 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: July 10, 2006 v2.34</span></div>
+    
+
+    <h2>Awards</h2>
+    <a href="http://www.wugnet.com/"><img src="../images/awards/wugnet.gif" width="114" height="41" alt="WUGNET Shareware Hall Of Fame" /></a>
+    
+    <h2>Introduction</h2>
+    <p>
+        The Windows NT and Windows 2000 Resource Kits come with a number of command line tools that help you administer your Windows NT/2K systems. Over time, I've grown a collection of similar tools, including some not included in the Resource Kits. What sets these tools apart is that they all allow you to manage remote systems as well as the local one. The first tool in the suite was PsList, a tool that lets you view detailed information about processes, and the suite is continually growing. The "Ps" prefix in PsList relates to the fact that the standard UNIX process listing command-line tool is named "ps", so I've adopted this prefix for all the tools in order to tie them together into a suite of tools named <i>PsTools</i>.
+    </p>
+    <p>
+        <i>Note: some anti-virus scanners report that one or more of the tools are infected with a "remote admin" virus. None of the <i>PsTools</i> contain viruses, but they have been used by viruses, which is why they trigger virus notifications.</i>
+    </p>
+    <p>
+        The tools included in the <i>PsTools</i> suite, which are downloadable individually or as a package, are:
+    </p>
+    <ul>
+        <li><a href="PsExec.html"><i>PsExec</i></a> - execute processes remotely</li>
+        <li><a href="PsFile.html"><i>PsFile</i></a> - shows files opened remotely</li>
+        <li><a href="PsGetSid.html"><i>PsGetSid</i></a> - display the SID of a computer or a user</li>
+        <li><a href="PsKill.html"><i>PsKill</i></a> - kill processes by name or process ID</li>
+        <li><a href="PsInfo.html"><i>PsInfo</i></a> - list information about a system</li>
+        <li><a href="PsList.html"><i>PsList</i></a> - list detailed information about processes</li>
+        <li><a href="PsLoggedOn.html"><i>PsLoggedOn</i></a> - see who's logged on locally and via resource sharing (full source is included)</li>
+        <li><a href="PsLogList.html"><i>PsLogList</i></a> - dump event log records</li>
+        <li><a href="PsPasswd.html"><i>PsPasswd</i></a> - changes account passwords</li>
+        <li><a href="PsService.html"><i>PsService</i></a> - view and control services</li>
+        <li><a href="PsShutdown.html"><i>PsShutdown</i></a> - shuts down and optionally reboots a computer</li>
+        <li><a href="PsSuspend.html"><i>PsSuspend</i></a> - suspends processes</li>
+        <li><i>PsUptime</i> - shows you how long a system has been running since its last reboot (PsUptime's functionality has been incorporated into <a href="PsInfo.html"><i>PsInfo</i></a>)</li>
+    </ul>
+    <p>
+         All of the utilities in the <i>PsTools</i> suite work on Windows NT, Windows 2000, Windows XP and Windows Server 2003. The <i>PsTools</i> download package includes an HTML help file with complete usage information for all the tools.
+    </p>
+    <h2>Installation</h2>
+    <p>
+        None of the tools requires any special installation. You don't even need to install any client software on the remote computers at which you target them. Run them by typing their name and any command-line options you want. To show complete usage information, specify the "-?" command-line option.
+</p>
+    <h2>PsTools Forum</h2>
+    <p>If you have questions or problems please visit the <a href="http://www.sysinternals.com/Forum/forum_topics.asp?FID=8">Sysinternals PsTools Forum</a>. </p>
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/PsTools.zip">Download PsTools Suite (550 KB)</a>
+    </p>
+    
+    <p>
+        <a href="PsTools.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

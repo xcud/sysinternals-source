@@ -1,0 +1,133 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - NTFSInfo</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>NTFSInfo</h1>
+    <div class="info">
+        Copyright © 1997 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: November 11, 1997 v1.0</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        <i>NTFSInfo</i> is a little applet that shows you information about NTFS volumes. Its dump includes the size of a drive's allocation units, 
+        where key NTFS files are located, and the sizes of the NTFS metadata files on the volume. This information is typically of little more 
+        than curiosity value, but <i>NTFSInfo</i> does show some interesting things. For example, you've probably heard about the NTFS equivalent of 
+        the FAT file system's File Allocation Table. Its called the Master File Table (MFT), and it is made up of constant sized records that 
+        describe the location of all the files and directories on the drive. What's surprising about the MFT is that it is managed as a file, 
+        just like any other. <i>NTFSInfo</i> will show you where on the disk (in terms of clusters) the MFT is located and how large it is, in 
+        addition to specifying how large the volume's clusters and MFT records are. In order to protect the MFT from fragmentation, NTFS 
+        reserves a portion of the disk around the MFT that it will not allocate to other files unless disk space runs low. This area is known 
+        as the MFT-Zone and <i>NTFSInfo</i> will tell you where on the disk the MFT-Zone is located and what percentage of the drive is reserved for it.
+    </p>
+    <p>
+        You might also be surprised to know that like the MFT, all NTFS meta-data are managed in files. For instance, there is a file called $Boot that is mapped to cover the drive's boot sector. The volume's cluster map is maintained in another file named $Bitmap. These files reside right in the NTFS root directory, but you can't see them unless you know they are there. Try typing "dir /ah $boot" at the root directory of an NTFS volume and you'll actually see the $boot file. <i>NTFSInfo</i> performs the equivalent of the "dir /ah" to show you the names and sizes of all of NTFS (3.51 and 4.0) meta-data files.
+    </p>
+    <p>
+        <i>NTFSInfo</i> is intended to accompany my January 1998 Windows NT Magazine "NT Internals" column, which describes NTFS internal data structures.
+    </p>
+    
+    <h2>Installation and Use</h2>
+    <p>
+        <i>NTFSInfo</i> works on all versions of NTFS, but NTFS for Windows NT 5.0 has different meta-data files that <i>NTFSInfo</i> has not been programmed for yet. In order for <i>NTFSInfo</i> to work you must have administrative privilege. To use it, type "<i>NTFSInfo</i> x", where 'x' is the drive letter of the NTFS volume that you want to examine.
+    </p>
+    
+    <h2>How It Works</h2>
+    <p>
+        <i>NTFSInfo</i> uses an undocumented File System Control (FSCTL) call to obtain information from NTFS about a volume. It prints this information along with a directory dump of NTFS meta-data files.
+    </p>
+
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/NtfsInfo.zip">Download NTFSInfo (12KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/NtfsInfoSource.zip">Download NTFSInfo Plus Source (26KB )</a>
+    </p>
+    
+    <p>
+        <a href="NtfsInfo.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

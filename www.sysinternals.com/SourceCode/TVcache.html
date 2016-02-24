@@ -1,0 +1,77 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - TVCache</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<div class="contentbox">
+    <h1>TVCache</h1>
+    <div class="info">
+        Copyright � 1996 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: July 9, 1997</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        TVCACHE is a replacement for VCACHE that implements compression on cached blocks in an attempt to improve performance (our benchmarks show that it doesn't fare too great). In any case, we are posting the complete source for TVCACHE because the VCACHE interface is undocumented. The source presented here is the only complete specification for the VCACHE interface that we are aware of. Note that the source is presented solely for educational purposes and is not licensed for commercial use.
+    </p>
+    
+    <h2>How it Works</h2>
+    <p>
+        In yet another brilliant design move, the current implementation of Windows 95 does not provide any official way to replace the default VCACHE with an alternate VxD. However, TVCACHE overcomes this limitation by replacing the function pointers in the VCACHE service table with pointers to its own routines before VCACHE is activated for the first time. Thus, using VCACHE's Device Declaration Block, TVCACHE subsumes VCACHE's role as the cache manager for Windows.
+    </p>
+    <p>
+        Once active, TVCACHE actually does much more work than VCACHE needs to do. This extra work involves fragmented memory management and compressed buffer management. VCACHE only has to deal with page sized (4K) chunks, whereas TVCACHE must deal with almost arbitrary sized chunks of data (in 128 byte increments). TVCACHE mimics VCACHE's exact policy of cache growing and shrinking and our benchmarks show VCACHE and TVCACHE (with compression disabled) have identical performance characteristics.
+    </p>
+    <p>
+        Whether you are writing your own Windows 95 file system driver, just curious about how VCACHE works, or want to experiment with VCACHE grow/shrink policies, TVCACHE serves as the only source of precise and accurate information on how VCACHE actually functions internally.
+    </p>
+    
+    <h2>Building TVCache</h2>
+    <p>
+        TVCACHE is a Windows 95 VxD that is written in C, and it requires VtoolsD Version 2.0 or greater to build. Defining the TESTING flag has the build produce a stand-alone Windows console program that stress tests the TVCACHE code by simulating multi-threaded cache accesses. Setting COMPRESSON to 0 disables compression so that TVCACHE functions in a manner similar to VCACHE.
+    </p>
+    
+    <h2>Installing TVCache</h2>
+    <p>
+        To install TVCACHE, add the following line to the [386enh] section of system.ini:
+    </p>
+    <p>
+        device=&lt;path&gt;\tvcache.vxd
+    </p>
+    <p>
+        where &lt;path&gt; is the directory in which tvache.vxd is located. You must reboot your machine for TVCACHE to start.
+    </p>
+    
+    <h2>More Information</h2>
+    <p>
+        The VCACHE interface is only partially documented in the Windows 95 DDK, and there are no guidelines for using it. While we're not taking the time to write up a document on the VCACHE interface specification, the source to TVCACHE indirectly documents everything you need to know. In its stress testing of TVCACHE code, the main() test function at the bottom of vcache.c serves as an example of how the VCACHE interface is used.
+    </p>
+    <p>
+        Let us know if you find TVCACHE useful.
+    </p>
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/TVcache.zip">Download TVCACHE (72KB)</a>
+    </p>
+        
+</div>
+
+<div class="footer">
+	Copyright � 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

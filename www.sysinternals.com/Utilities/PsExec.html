@@ -1,0 +1,219 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - PsExec</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>PsExec</h1>
+    <div class="info">
+        Copyright © 2001-2006 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: July 10, 2006 v1.72</span></div>
+    
+
+    <h2>Introduction</h2>
+    <p>
+        Utilities like Telnet and remote control programs like Symantec's PC Anywhere let you execute programs on remote systems, but they can be a pain to set up and require that you install client software on the remote systems that you wish to access. PsExec is a light-weight telnet-replacement that lets you execute processes on other systems, complete with full interactivity for console applications, without having to manually install client software. PsExec's most powerful uses include launching interactive command-prompts on remote systems and remote-enabling tools like IpConfig that otherwise do not have the ability to show information about remote systems.
+    </p>
+    <p>
+        Note: some anti-virus scanners report that one or more of the tools are infected with a "remote admin" virus. None of the PsTools contain viruses, but they have been used by viruses, which is why they trigger virus notifications.
+    </p>
+    
+    <h2>Installation</h2>
+    <p>
+        Just copy PsExec onto your executable path. Typing "psexec" displays its usage syntax.
+    </p>
+    <p>
+        PsExec works on NT 4.0, Win2K, Windows XP and Server 2003 including x64 versions of Windows.
+    </p>
+    
+    <h2>Usage</h2>
+    <p>
+        See the July 2004 issue of Windows  IT Pro Magazine for <a href="http://www.windowsitpro.com/Windows/Article/ArticleID/42919/42919.html" target="_blank">Mark's article</a> that covers advanced usage of PsExec.
+    </p>
+    <p>
+        <b>usage: psexec [\\computer[,computer[,..] | @file ][-u user [-p psswd]][-n s][-l][-s|-e][-i][-x][-c [-f|-v]][-d][-w directory][-&lt;priority&gt;][-a n,n,...] cmd [arguments]</b>
+    </p>
+    <dl class="usage">
+        <dt>computer</dt>
+            <dd>Direct PsExec to run the application on the computer or computers specified. If you omit the computer name PsExec runs the application on the local system and if you enter a computer name of "\\*" PsExec runs the applications on all computers in the current domain.</dd>
+        <dt>@file</dt>
+            <dd>Directs PsExec to run the command on each computer listed in the text file specified.</dd>
+        <dt>-a</dt>
+            <dd>Separate processors on which the application can run with commas where 1 is the lowest numbered CPU. For example, to run the application on CPU 2 and CPU 4, enter: "-a 2,4"</dd>
+        <dt>-c</dt>
+            <dd>Copy the specified program to the remote system for execution. If you omit this option then the application must be in the system's path on the remote system.</dd>
+        <dt>-d</dt>
+            <dd>Don't wait for application to terminate. Only use this option for non-interactive applications.</dd>
+        <dt>-e</dt>
+            <dd>Loads the specified account's profile.</dd>
+        <dt>-f</dt>
+            <dd>Copy the specified program to the remote system even if the file already exists on the remote system.</dd>
+        <dt>-i</dt>
+            <dd>Run the program so that it interacts with the desktop on the remote system.</dd>
+            <dt>-l</dt>
+            <dd>Run process as limited user (strips the Administrators group and allows only priviliges assigned to the Users group).</dd>
+        <dt>-n</dt>
+            <dd>Specifies timeout in seconds connecting to remote computers.</dd>
+        <dt>-p</dt>
+            <dd>Specifies optional password for user name. If you omit this you will be prompted to enter a hidden password.</dd>
+        <dt>-s</dt>
+            <dd>Run remote process in the System account .</dd>
+        <dt>-u</dt>
+            <dd>Specifies optional user name for login to remote computer.</dd>
+        <dt>-v</dt>
+            <dd>Copy the specified file only if it has a higher version number or is newer on than the one on the remote system.</dd>
+        <dt>-w</dt>
+            <dd>Set the working directory of the process (relative to the remote computer).</dd>
+            <dt>-x</dt>
+            <dd>Display the UI on the Winlogon desktop (local system only). </dd>
+            <dt>-priority</dt>
+            <dd>Specifies -low, -belownormal, -abovenormal, -high or -realtime to run the process at a different priority.</dd>
+        <dt>program</dt>
+            <dd>Name of the program to execute.</dd>
+        <dt>arguments</dt>
+            <dd>Arguments to pass (note that file paths must be absolute paths on the target system)</dd>
+    </dl>
+    <p>
+        You can enclose applications that have spaces in their name with quotation marks e.g. "psexec \\marklap "c:\long name\app.exe". Input is only passed to the remote system when you press the enter key, and typing Ctrl-C terminates the remote process.
+    </p>
+    <p>
+        If you omit a username the remote process runs in the same account from which you execute PsExec, but because the remote process is impersonating it will not have access to network resources on the remote system. When you specify a username the remote process executes in the account specified, and will have access to any network resources the account has access to. Note that the password is transmitted in clear text to the remote system.
+</p>
+    <p>You can use the current version of PsExec as a Runas replacement when you target the local system because PsExec does not require you to be an administrator. </p>
+    <h2>Examples</h2>
+    <p>
+        This article I wrote describes how PsExec works and gives tips on how to use it:
+    </p>
+    <p>
+        <a href="http://www.winnetmag.com/Windows/Issues/IssueID/714/Index.html">http://www.winnetmag.com/Windows/Issues/IssueID/714/Index.html</a>
+    </p>
+    <p>
+        The following command launches an interactive command prompt on \\marklap:
+    </p>
+    <p>
+        <b>psexec \\marklap cmd</b>
+    </p>
+    <p>
+        This command executes IpConfig on the remote system with the /all switch, and displays the resulting output locally:
+    </p>
+    <p>
+        <b>psexec \\marklap ipconfig /all</b>
+    </p>
+    <p>
+        This command copies the program test.exe to the remote system and executes it interactively:
+    </p>
+    <p>
+        <b>psexec \\marklap -c test.exe</b>
+    </p>
+    <p>
+        Specify the full path to a program that is already installed on a remote system if its not on the system's path:
+    </p>
+    <p>
+        <b>psexec \\marklap c:\bin\test.exe</b>
+    </p>
+    <p>
+        Run Regedit interactively in the System account to view the contents of the SAM and SECURITY keys::
+    </p>
+    <p>
+        <b>psexec -i -d -s c:\windows\regedit.exe</b>
+</p>
+    <p>To run Internet Explorer as with limited-user privileges use this command:</p>
+    <p><strong>psexec -l -d &quot;c:\program files\internet explorer\iexplore.exe&quot;</strong></p>
+    <h2>PsTools</h2>
+    <p>
+        <i>PsExec</i> is part of a growing kit of Sysinternals command-line tools that aid in the adminstration of local and remote 
+        Windows NT/2K systems named <a href="PsTools.html">PsTools</a>.
+    </p>
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/PsExec.zip">Download PsExec (50 KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/PsTools.zip">Download PsTools</a>
+    </p>
+    
+    <p>
+        <a href="PsExec.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

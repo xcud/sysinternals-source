@@ -1,0 +1,167 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - CacheSet</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>CacheSet</h1>
+    <div class="info">
+        Copyright © 1997 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>ast Updated: December 31, 1998, Version 1.0</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+         <i>CacheSet</i> is an applet that allows you to manipulate the working-set parameters of the system file cache. Unlike CacheMan, <i>CacheSet</i> runs on all versions of NT and will work without modifications on new Service Pack releases. In addition to providing you the ability to control the minimum and maximum working set sizes, it also allows you to reset the Cache's working set, forcing it to grow as necessary from a minimal starting point. Also unlike CacheMan, changes made with <i>CacheSet</i> have an immediate effect on the size of the Cache. Full source code is included.
+    </p>
+    <p>
+        Use <i>CacheSet</i> to performance tune the system Cache size in a way not possible without tweaking internal variables the way CacheMan does.
+    </p>
+    <p>
+        Note: To use <i>CacheSet</i> on NT 4.0 Service Pack 4 and later you must have the "Increase Quota" privilege (administrator accounts have this privilege by default). <i>CacheSet</i> has been updated to enable this privilege so that it works on SP4.
+    </p>
+    <img src="../images/screenshots/CacheSet.gif" width="342" height="217" alt="CacheSet Screenshot" />
+    
+    <h2>Installation and Use</h2>
+    <p>
+        <i>CacheSet</i> works on all released versions of NT. After it starts it presents the system file cache's current size (updated twice a second), it's peak size (the largest it's been since the last reboot), and lets you set new minimum and maximum working set sizes.
+    </p>
+    <p>
+        <b>Setting New Sizes</b><br />
+        Simply enter the new minimum and maximum sizes and hit the Apply button. If you get an error, then one of the following conditions holds: you've entered a maximum that is smaller than the minimum, the minimum you've entered is smaller than the minimum system working-set size, or the maximum you've entered is larger than the maximum system working-set sizes. Adjust the values you've entered and try again.
+    </p>
+    <p>
+        You may notice that the Cache's size changes immediately and then proceeds to shrink or grow quickly. This is because the system automatically trims working sets once a second. The Cache pages that are released are still in memory, but can be relinquished quickly for use by other programs that need more memory. Similarly, the Cache can eaily regain pages as applications access file system data.
+    </p>
+    <p>
+        <b>Resetting Previous Values</b><br />
+        At any time you can restore the Cache's working set values that were active when you last started <i>CacheSet</i> by hitting the Reset button.
+    </p>
+    <p>
+        <b>Clearing the Cache's Working Set</b><br />
+        You can force the Cache to release all of it's pages by pressing the Clear button. Note that the Cache can grow again as necessary, and that this is not the same as flushing the Cache - pages that were assigned to it are simply made available to other programs and can be reclaimed by the Cache.
+    </p>
+    <p>
+        <b>Using the Command-Line Interface</b><br />
+        You can enter the minimum and maximum working set sizes on <i>CacheSet</i>'s command line. <i>CacheSet</i> will apply these new values silently. Thus, you can add <i>CacheSet</i> to your Start program group to automatically set the Cache's sizes every time you boot.
+    </p>
+    <p>
+        <b>Usage: <i>CacheSet</i> [minimum working set] [maximum working set]</b>
+    </p>
+    
+    <h2>How It Works</h2>
+    <p>
+        <i>CacheSet</i> uses a <b>NtQuerySystemInformation</b> call to obtain information about the Cache's settings and <b>NtSetSystemInformation</b> 
+        to set new sizing information. The working-set information for a process serves as guidelines for NT's Memory Manager regarding how 
+        many pages of physical memory should be assigned to the application. Because they are guidelines, conditions can result such that 
+        the Memory Manager grows a working-set to a size greater than the maximum, or shrinks it to less than the minimum. However, the 
+        settings are factors that will affect the overall allocation, and hence responsiveness, of an application. In the case of 
+        <i>CacheSet</i> the application is the file system Cache.
+    </p>
+    <p>
+        Internally <b>NtSetSystemInformation</b> calls <b>MmAdjustWorkingSetSize</b>, which either grows an application's working set or trims it. If the 
+        third parameter passed to <b>MmAdjustWorkingSetSize</b> is 1, the system Cache's working set is adjusted, otherwise the adjustment occurs 
+        on the current process (the system information calls affect only the system cache). Passing in a minimum and maximum of -1 causes 
+        <b>MmAjustWorkingSetSize</b> to perform a working-set clear operation, releasing all pages from the application's working set.
+    </p>
+    
+    <h2>Security Hole?</h2>
+    <p>
+         What's particularly interesting about the interface that <i>CacheSet</i> uses to do it's work is that it requires no special privilege to invoke. Thus, you can run <i>CacheSet</i> from even the Guest account, something it would be hard to argue is not a form of a security hole, where anybody can affect the system cache sizing policy.
+    </p>
+    <p>
+        Update: As of NT 4.0 Service Pack 4 Microsoft has closed this hole by requiring the account changing the Cache's working set to have the "Increase Quota" privilege. The Administrator user and group accounts have this privilege by default.
+    </p>
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/CacheSet.zip">Download CacheSet (15KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/CacheSetSource.zip">Download CacheSet Plus Source (42KB)</a>
+    </p>
+    
+    <p>
+        <a href="CacheSet.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

@@ -1,0 +1,146 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - LDMDump</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>LDMDump</h1>
+    <div class="info">
+        Copyright © 2000-2002 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: October 5, 2002 v1.02</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        Windows 2000 introduces a new type of disk partitioning scheme that is managed by a component called the Logical Disk Manager (LDM). Basic disks implement standard DOS-style partition tables, whereas Dynamic disks use LDM partitioning. LDM partitioning offers several advantages over DOS partitioing including replication across disks, on-disk storage of advanced volume configuration (spanned volume, mirrored volumes, striped volumes and RAID-5 volumes). My March/April two-part series on Windows NT/2000 storage management in Windows 2000 Magazine describes the details of each partitioning scheme.
+    </p>
+    <p>
+        Other than the Disk Management MMC-snapin and a tool called dmdiag in the Windows 2000 Resource Kit, there are no tools for investigating the internals of the LDM on-disk database that describes a system's partitioning layout. <i>LDMDump</i> is a utility that lets you examine exactly what is stored in a disk's copy of the system LDM database. <i>LDMDump</i> shows you the contents of the LDM database private header, table-of-contents, and object database (where partition, component and volume definitions are stored), and then summarizes its finding with partition table and volume listings.
+    </p>
+    <p>
+        <i>LDMDump</i> works on Windows 2000.
+    </p>
+    
+    <h2>Installation and Use</h2>
+    <p>
+        To use <i>LDMDump</i> simply pass it the identifier of a disk.
+    </p>
+    <p>
+        <b>usage: ldmdump [-?] [-d#]</b>
+    </p>
+    <dl class="usage">
+        <dt>-?</dt>
+            <dd>Displays the supported options and the units of measurement used for output values.</dd>
+        <dt>-d#</dt>
+            <dd>Specifies the number of the disk for <i>LDMDump</i> to examine. For example, "ldmdump /d0" has <i>LDMDump</i> show the LDM database information stored on disk 0.</dd>
+    </dl>
+    
+    <h2>How it Works</h2>
+    <p>
+        There are no published APIs available for obtiaining detailed information about a disk's LDM partitioning, and the LDM database format is completely undocumented. <i>LDMDump</i> was developed based on study of LDM database contents on a variety of different systems and under changing conditions.
+    </p>
+    
+    <h2>More Information</h2>
+    <p>
+        For more information on the LDM on-disk structure, see:
+    </p>
+    <ul>
+        <li><a href="../Publications.html">Inside Storage Management, Part 2</a>, by Mark Russinovich, Windows 2000 Magazine, April 2000.</li>
+    </ul>
+    
+    <p>
+        For information on how Windows NT 4.0 stores advanced volume information, see:
+    </p>
+    <ul>
+        <li><a href="../Information/DiskKey.html">Inside the Disk Key</a></li>
+    </ul>
+
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/LdmDump.zip">Download LDMDump (17KB)</a>
+    </p>
+    
+    <p>
+        <a href="LdmDump.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

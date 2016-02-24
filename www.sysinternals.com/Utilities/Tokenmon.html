@@ -1,0 +1,188 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Tokenmon</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Tokenmon</h1>
+    <div class="info">
+        Copyright © 2000 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: September 21, 2000 v1.01</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        <i>Tokenmon</i> is a application that monitors and displays a variety of security-related activity taking place on a system. <i>Tokenmon</i> gets its name from the fact that Windows NT/2000 stores a process' security information, including the user account context in which the process executes, in an object called a token. <i>Tokenmon</i> monitors includes the following:
+    </p>
+    <ul>
+        <li>User logon/logoff</li>
+        <li>Applications enabling or disabling security privileges in their process tokens</li>
+        <li>Process startup and exit (token creation/deletion)</li>
+        <li>Impersonation</li>
+    </ul>
+    <p>
+        <i>Tokenmon</i> has advanced filtering and search capabilities that make it a powerful tool for exploring the way NT works, seeing how applications use security functions, or tracking down problems in system or application configurations.
+    </p>
+    <p>
+        <i>Tokenmon</i> works on NT 4.0 and Windows 2000.
+    </p>
+    <img src="../images/screenshots/Tokenmon.gif" width="549" height="273" alt="Tokenmon Screenshot" />
+    
+    <h2>Installation and Use</h2>
+    <p>
+        Simply run the <i>Tokenmon</i> GUI (Tokenmon.exe). Note that you must have administrative privilege to run Tokenmon. Menus, hot-keys, or toolbar buttons can be used to clear the window, save the monitored data to a file, and to filter and search output.
+    </p>
+    <p>
+        When a thread impersonates you'll see the thread's primary identity in the domain\user column and the identity its adopting in the Other column. Any security actions it performs at that point are in the impersonation context. When it reverts back to its own identity the thread's primary identity is again shown in the domain\user column.
+    </p>
+    <p>
+        As events are printed to the output, they are tagged with a sequence number. If Tokenmon's internal buffers are overflowed during extremely heavy activity, this will be reflected with gaps in the sequence number.
+    </p>
+    <p>
+        Each time you exit <i>Tokenmon</i> it remembers the position of the window and the widths of the output columns.
+    </p>
+    
+    <h2>How Tokenmon Works</h2>
+    <p>
+        <i>Tokenmon</i> intercepts logon by hooking the <b>NtCreateToken</b> native API. The local security authority uses this API to create an 
+        initial login token when a user logs in either remotely or locally. When a user logs on the Local Security Authority 
+        Subsystem (LSASS) assigns the logon session a locally unique identifer (LUID) called a logon ID. To see a corresponding 
+        logoff, <i>Tokenmon</i> registers with the Security Reference Monitor (SRM) using the <b>SeRegisterLogonSessionTerminatedRoutine</b> 
+        kernel function, which requests that the SRM call the driver back whenever a user is logged off.
+    </p>
+    <p>
+        In order to see a process enable and disable privileges, <i>Tokenmon</i> hooks the <b>NtAdjustPrivilegesToken</b> function, 
+        which is the native API-equivalent of the Win32 <b>AdjustTokenPrivileges</b> functions. This function takes an array of privileges 
+        with a flag for each indicating whether the process wants to enable or disable it. <i>Tokenmon</i> shows the action for each 
+        privilege affected by a single call in separate output lines.
+    </p>
+    <p>
+        <i>Tokenmon</i> uses the <b>PsSetCreateProcessNotifyRoutine</b> kernel function, which is documented in the Windows 2000 DDK 
+        (but available on NT 4), to register a callback function whenever a process starts or exits.
+    </p>
+    <p>
+        Finally, there are several functions that applications can use to impersonate another user. <i>Tokenmon</i> hooks 
+        <b>NtSetInformationThread</b>, a variant of which is the native API-equivalent of the <b>ImpersonateLoggedOnUser</b> and <b>ImpersonateSelf</b> 
+        Win32 APIs, the FSCTL_PIPE_IMPERSONATE variant of <b>NtFsControlFile</b> (the native-equivalent of <b>ImpersonateNamedPipeClient</b>), 
+        and <b>NtImpersonateClientOfPort</b>, which is called by applications using the Local Procedure Call (LPC) facility and local 
+        RPC for impersonating the remote end of a LPC connection.
+    </p>
+    <p>
+        <i>Tokenmon</i> relies on several undocumented SRM functions to obtain a logon ID from a thread's primary and impersonation tokens, 
+        and <b>GetSecurityUserInfo</b>, an undocumented function exported by the KSecDD (Kernel Security-support driver) that retrieves a logon 
+        session user's name, domain name, and logon server given a logon ID. Another interesting implementation detail is that several of 
+        the native API functions that <i>Tokenmon</i> hooks are not exported by ntoskrnl.exe for use by drivers. Thus, the <i>Tokenmon</i> GUI must reach 
+        into NTDLL.DLL, extract their system call numbers, and pass them to the driver. This contrasts with <a href="Regmon.html">Regmon</a>, which reaches into 
+        ntoskrnl.exe using Registry function exports to obtain system call numbers.
+    </p>
+    <p>
+        See <a href="../InsideWindows2000.html">Inside Windows 2000, 3rd Edition</a> by David Solomon and Mark Russinovich (Microsoft Press) for more information on the Windows NT/2000 security subsystem.
+    </p>
+    
+    <h2>Related Utilities</h2>
+    <p>
+        Here are some other monitoring tools available at Sysinternals:
+    </p>
+    <ul>
+        <li><a href="Regmon.html">Regmon</a> - a Registry monitor</li>
+        <li><a href="Filemon.html">Filemon</a> - a file system monitor</li>
+        <li><a href="TdiMon.html">TDImon</a> - a TCP/IP monitor</li>
+        <li><a href="Portmon.html">Portmon</a> - a serial and parallel port monitor</li>
+        <li><a href="PMon.html">PMon</a> - a process and thread monitor (NT/Win2K)</li>
+        <li><a href="Diskmon.html">Diskmon</a> - a hard disk monitor (NT/Win2K)</li>
+        <li><a href="DebugView.html">DebugView/EE</a> - a debug output monitor</li>
+    </ul>
+
+
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/Tokenmon.zip">Download Tokenmon (60 KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/TokenmonSource.zip">Download Tokenmon plus Source (190 KB)</a>
+    </p>
+    
+    <p>
+        <a href="Tokenmon.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

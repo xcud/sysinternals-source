@@ -1,0 +1,140 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Remote Recover</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Remote Recover</h1>
+    <div class="info">
+        Copyright © 1999-2002 <a href="http://www.winternals.com/">Winternals Software LP</a><br />
+        <span>Last Updated: April 8, 2002 v2.0</span><br />
+        <a href="http://www.winternals.com/"><img src="../images/WinternalsProduct.gif" width="87" height="29" alt="Winternals Product" /></a>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        <i>Remote Recover</i> is an advanced Windows NT dead-system recovery utility for Windows NT/2000/XP installations. Using <i>Remote Recover</i>, Windows NT/2000/XP machines that fail to boot because of data corruption, improperly installed software or hardware, or faulty configuration, can be accessed and recovered using standard administrative tools, as if the machine were up and running. Using an Windows NT/2000/XP-based computer that can access the unbootable system via a TCP/IP LAN/WAN connection, <i>Remote Recover</i> allows an administrator to:
+    </p>
+    <ul>
+        <li>Partition or format the drives of the unbootable system with Disk Administrator or third-party tools like Partition Magic.</li>
+        <li>Copy files between the non-booting system and the working Windows NT/2000/XP system.</li>
+        <li>Edit or delete files that may be preventing the system from booting.</li>
+        <li>Access and modify the Registry of the unbootable system with Regedt32/Regedit's Hive Load capability.</li>
+        <li>Salvage data from the unbootable system or restore the system from a backup.</li>
+        <li>Run virus detection and removal programs.</li>
+        <li>Repair damaged filesystem structures using chkdsk.</li>
+    </ul>
+    <p>
+        <i>Remote Recover</i> consists of host and client software, where the host software runs on a "good" Windows NT/2000/XP system, and the client software executes on a "dead" system in need of repair. The "dead" system is booted off a floppy disk directly to the <i>Remote Recover</i> program, so repair is possible even when basic startup code in Windows NT/2000/XP, such as NTLDR, fails.
+    </p>
+    <p>
+        The <i>Remote Recover</i> host software creates virtual disk drives on the host machine that represent the drives present on the client computer. When native Windows NT/2000/XP file systems, such as NTFS and FAT, access the drives, <i>Remote Recover</i> manages communications over theTCP/IP connection to the client software to transfer disk data back and forth between the two machines. As far as Windows NT on the host machine is concerned, the drives created by <i>Remote Recover</i> are indistinguishable from the local drives present on the host, and so they can be manipulated with Windows NT disk utilties, including high-level tools like the Windows NT Explorer, and low-level tools such as chkdsk and format.
+    </p>
+    
+    <h2>System Requirements</h2>
+    <p>
+        <i>Remote Recover</i> requires DOS NDIS2 device drivers for the network adapater card of the unbootable system you wish to access. <i>Remote Recover</i> also requires that the host and client machines be accessible to each other via TCP/IP.
+    </p>
+    <p>
+        <i>Remote Recover</i> is designed to repair drives that are inacessible due to misconfigured or missing software. It is not meant for drives that have been physically damaged or with substantial destruction of on-disk data.
+    </p>
+    
+    <h2>Version Information</h2>
+    <p>
+        We are offering a free trial version of <i>Remote Recover</i> that behaves just as the retail version, except that it permits only 
+        read-access to unbootable system drives. It permits a maximum of 100 MB of dat to be read, which is sufficient for limited salvaging 
+        data off dead Windows NT/2000/XP systems, and demonstrates the ease with which files and data on a dead system can be inspected and 
+        corrected. Restoring files or repairing drives on a dead system is possible with the write-capable retail version of <i>Remote Recover</i>, 
+        which is available as part of 
+        <a href="http://www.winternals.com/products/repairandrecovery/index.asp">Winternals Administrator's Pak</a>.
+    </p>
+
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/RemoteRecover.exe">Download Read-Only Trial Version (2.22 MB)</a>
+    </p>
+    
+    <p>
+        <a href="RemoteRecover.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

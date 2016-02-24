@@ -1,0 +1,228 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Regmon</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Regmon for Windows NT/9x</h1>
+    <div class="info">
+        Copyright © 1996-2006 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a> and <a href="mailto:cogswell@winternals.com">Bryce Cogswell</a><br />
+        <span>Last Updated: July 13, 2005 v7.03</span></div>
+    
+    <h2>Awards</h2>
+    <img src="../images/awards/ZdNetEditorsPick.gif" width="81" height="81" alt="ZD Net Editor's Pick" />
+    <img src="../images/awards/PcWorldEditorsPick.gif" width="137" height="65" alt="PC World Editor's Pick" />
+    <a href="../images/wugnet.html"><img src="../images/awards/wugnet.gif" width="114" height="41" alt="WUGNET Shareware Hall of Fame" /></a>
+    <img src="../images/awards/pricelessware.gif" width="170" height="63" />  <h2>Introduction</h2>
+    <p>
+        <i>Regmon</i> is a Registry monitoring utility that will show you which applications are accessing your Registry, which keys they are accessing, and the Registry data that they are reading and writing - all in real-time. This advanced utility takes you one step beyond what static Registry tools can do, to let you see and understand exactly how programs use the Registry. With static tools you might be able to see what Registry values and keys changed. With <i>Regmon</i> you'll see how the values and keys changed..
+    </p>
+    <p>
+        <i>Regmon</i> works on Windows NT/2000/XP/2003, Windows 95/98/Me and Windows 64-bit for x64. 
+    </p>
+    <img src="../images/screenshots/Regmon.gif" width="549" height="296" alt="Regmon Screenshot" />
+    
+    <h2>Installation and Use</h2>
+    <p>
+    If you have questions or problems using Regmon please visit the <a href="http://www.sysinternals.com/Forum/forum_topics.asp?FID=4">Sysinternals Regmon Forum</a>.</p>
+    <p>Install <i>Regmon</i> by copying the files to your hard drive, and start it by running <i>Regmon</i>.exe. Menu items and tool bar buttons can be used to toggle on and off monitoring, disable event capturing, control the scrolling of the listview, and save the listview contents to an ASCII file. </p>
+    <p>
+        Use the Filter dialog, which is accessed with a toolbar button or the Option|Filter/Highlight menu selection, to select what data will be shown in the list view. The '*' wildcard matches arbitrary strings, and the filters are case-insensitive. Only matches shown in the include filter, but that are not excluded with the exclude filter, are displayed. Use ';' to separate multiple strings in a filter (e.g. "regmon;software").
+    </p>
+    <p>
+        For example, if the include filter is HKLM", and the exclude filter is "HKLM\Software", all references to keys and values under HKLM, except to those under HKLM\Software will be monitored.
+    </p>
+    <p>
+        Wildcards allow for complex pattern matching, making it possible to match specific Registry accesses by specific applications, for example. The include filter "Winword*Windows" would have <i>Regmon</i> only show accesses by Microsoft Word to keys and values that include the word "Windows".
+    </p>
+    <p>
+        Use the highlight filter specify output that you want to have highlighted in the listview output. Select highlighting colors with Options|Highlight Colors.
+    </p>
+    <p>
+        <i>Regmon</i> can either timestamp events or show the time elapsed from the last time you cleared the output window (or since you started <i>Regmon</i>). The Options menu and the clock toolbar button let you toggle between the two modes. The button on the toolbar shows the current mode with a clock or a stopwatch. When showing duration the Time field in the output shows the number of seconds it took for the underlying file system to service particular requests.
+    </p>
+    <p>
+        When you see a Registry value or key in <i>Regmon</i>'s output that you want to edit, simply double click on the line that includes the reference (or use the Regedit toolbar button) and <i>Regmon</i> will take you directly to the specific value using Regedit.
+    </p>
+    <p>
+        Click <a href="../Information/BootTimeRegistryActivity.html">here</a> to learn about <i>Regmon</i>'s boot monitoring capability, which is available on Windows NT.
+    </p>
+    
+    <h2>How Regmon Works</h2>
+    <p>
+        The heart of </i>Regmon</i> on Windows 9x is in the virtual device driver, Regvxd.vxd. It is dynamically loaded, and in its initialization it uses VxD service hooking (see our May 1996 Dr. Dobb's Journal article on VxD service hooking for more information) to insert itself onto the call chain of 16 registry access functions in the Windows 95 kernel (Virtual Machine Manager). All registry activity, be it from 16-bit programs, Win32 applications, or device drivers, are directed at these routines, so </i>Regmon</i> catches all registry activity taking place on a machine.
+    </p>
+    <p>
+        On Windows NT, 2000 and XP the </i>Regmon</i> loads a device driver that uses a technique we pioneered for NT called system-call hooking. When a user-mode component makes a privileged system call, control is transfered to a software interrupt handler in NTOSKRNL.EXE (the core of the Windows NT operating system). This handler takes a system call number, which is passed in a machine register, and indexes into a system service table to find the address of the NT function that will handle the request. By replacing entries in this table with pointers to hooking functions, it is possible to intercept and replace, augment, or monitor NT system services. </i>Regmon</i>, which obviously hooks just the Registry-related services, is merely one example of this capability in action.
+    </p>
+    <p>
+        On Windows .NET Server </i>Regmon</i> takes advantage of a new operating system Registry callback mechanism to register for and receive information about Registry accesses as they occur. When you run </i>Regmon</i> on .NET Server it loads a version of the </i>Regmon</i> driver utlizing the callbacks.
+    </p>
+    <p>
+        When </i>Regmon</i> sees an open, create or close call, it updates an internal hash table that serves as the mapping between key handles and registry path names. Whenever it sees calls that are handle based, it looks up the handle in the hash table to obtain the full name for display. If a handle-based access references a key opened before </i>Regmon</i> started, </i>Regmon</i> will fail to find the mapping in it hash table and will simply present the key's value instead.
+    </p>
+    <p>
+        Information on accesses is dumped into an ASCII buffer that is periodically copied up to the GUI for it to print in its listbox.
+    </p>
+    <p>
+        For more detailed information on how </i>Regmon</i> works on Windows NT, see:
+    </p>
+    <ul>
+        <li>"Windows NT System Call Hooking," by Mark Russinovich and Bryce Cogswell, Dr. Dobb's Journal, January 1997</li>
+        <li>"<a href="http://www.win2000mag.com/Articles/Index.cfm?ArticleID=4795">Inside NT Utilities</a>", Windows NT Magazine, February 1999.</li>
+    </ul>
+    
+    <h2>Related Utilities</h2>
+    <p>
+        Here are some other monitoring tools available at Sysinternals:
+    </p>
+    <ul>
+        <li><a href="Filemon.html">Filemon</a> - a file system activity monitor</li>
+        <li><a href="TdiMon.html">TDIMon</a> - a TCP/IP monitor</li>
+        <li><a href="Portmon.html">Portmon</a> - a serial and parallel port monitor</li>
+        <li><a href="PMon.html">PMon</a> - a process and thread monitor (NT/Win2K)</li>
+        <li><a href="Diskmon.html">Diskmon</a> - a hard disk monitor (NT/Win2K)</li>
+        <li><a href="DebugView.html">DebugView</a> - a debug output monitor</li>
+    </ul>
+    
+    <h2>More Information</h2>
+    <p>
+        The following serve as additional sources of information on the Windows NT/2000/XP and Windows 9x/Me registries:
+    </p>
+    <ul>
+        <li><a href="../InsideWindows2000.html">Inside Windows 2000, 3rd Edition</a> by David Solomon and Mark Russinovich, 2000</li>
+        <li>"Examining the Windows 95 Registry," by Mark Russinovich and Bryce Cogswell, Windows Developer's Journal, October 1996</li>
+        <li>"<a href="../Publications.html">Inside the Windows NT Registry</a>," by Mark Russinovich, Windows NT Magazine, April 1997</li>
+        <li><img src="../images/Amazon.gif" width="68" height="15" alt="Amazon.com" /> "<a href="http://www.amazon.com/exec/obidos/ASIN/1565921704/systemsinternals">Inside the Windows 95 Registry</a>," by Ron Petrusha, O'Reilly and Associates, 1996</li>
+        <li><img src="../images/Amazon.gif" width="68" height="15" alt="Amazon.com" /> "<a href="http://www.amazon.com/exec/obidos/ASIN/1565923782/o/qid=946526688/sr=8-1/102-9688892-9937604/systemsinternals">Managing the Windows NT Registry</a>" by Paul Robichaux and Robchauxg , O'Reilly and Associates, 1998</li>
+        <li><img src="../images/Amazon.gif" width="68" height="15" alt="Amazon.com" /> "<a href="http://www.amazon.com/exec/obidos/ASIN/0764504371/systemsinternals">Windows 98 Registry For Dummies</a>," by Glenn Weadock, IDG Press, 1998</li>
+        <li><img src="../images/Amazon.gif" width="68" height="15" alt="Amazon.com" /> "<a href="http://www.amazon.com/exec/obidos/ASIN/0789716585/systemsinternals">Using the Windows 98 Registry</a>," by Jerry Honeycutt, Que, 1998</li>
+    </ul>
+    
+    <h2>Microsoft Regmon KB Articles</h2>
+    <p>
+        The following Microsoft KB articles reference Regmon for troubleshooting or diagnosing various problems:
+    </p>
+    <ul>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q296/2/05.ASP">296205: ACC: Error Message: ActiveX Component Can't Create Object</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;830761">830761: Best practices for deploying Visual Basic 6.0 applications</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/q269/2/51.asp">269251: BUG: Automating Windows Installer May Hang When Enumerating Products</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;q323639">323639: HOW TO: Create Custom Administrative Templates in Windows 2000</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q286/1/98.ASP">286198: HOWTO: Track "Permission Denied" Errors on DLL Files</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=KB;EN-US;Q309051&amp;">309051: HOW TO: Troubleshoot ASP in IIS 5.0</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;Q308940">308940: HOWTO: Troubleshoot Error 1928 "Error Registering COM+ Application"</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;814774">814774: HOW TO: Troubleshoot Site Deployment Issues in Microsoft Content Management Server 2002</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q183/0/60.ASP">183060: INFO: Troubleshooting Guide for 80004005 and Other Error Messages</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;198038">198038: INFO: Useful Tools for Package and Deployment Issues</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=KB;en-us;327657&amp;">327657: OL2002: How to Create Trusted Outlook COM Add-ins</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q260/5/13.ASP">260513: PRB: An Error Occurs When You Install Visual Studio Products</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q274/0/38.ASP">274038: PRB: ASP Error 8002801d "Library Not Registered"</a></li>
+        <li><a href="http://support.microsoft.com/support/kb/articles/Q269/3/83.ASP">269383: PRB: 'Error Accessing the System Registry' Message When Displaying VB/VBA References</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;EN-US;q296108">296108: PRB: Various Issues in Visual Studio Programs on Windows NT-Based Systems</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;310586">310586: The Exchange MSSearch instance does not come online on a cluster and event IDs 3055 and 10006 are logged</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=kb;en-us;555069">555069: Top 10 Potential Problematic Security Settings for Microsoft Windows XP Professional Edition and Microsoft Windows Server 2003.</a></li>
+        <li><a href="http://support.microsoft.com/default.aspx?scid=KB;EN-US;Q318746&amp;">296136: XADM: Error Message: Error 123: The Filename, Directory Name, or Volume Label Syntax Is Incorrect</a></li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsProduct.gif" width="87" height="29" alt=" Witnernals Product" /></a>
+    <p>
+        <i>Regmon Enterprise Edition</i>, the commercial version of <i>Regmon</i>, extends the functionality of <i>Regmon</i> with several 
+        powerful features, including the ability to monitor remote systems and save output to a log file as the output generates. It is 
+        available as part of <a href="http://www.winternals.com/products/repairandrecovery/index.asp">Winternals Adminstrator's Pak</a>.
+    </p>
+    <p>
+        <b>In order to help us track its use, please download through the link that represents the operating system on which you will use or mostly use <i>Regmon</i>. Note that the 32-bit zip files (the first two) are identical, and works on either Win9x or NT as well as 64-bit (x64) Windows XP and Server 2003.</b> </p>
+
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/Regmon9x.zip">Download Regmon (x86 - 176 KB) - you plan on using Regmon on Win9x/Me</a>
+        <br />
+        <br />
+        
+        <a href="../../download.sysinternals.com/Files/RegmonNt.zip">Download Regmon (x86 - 176 KB) - you plan on using Regmon on 32-bit NT/2K/XP/Server 2003 </a></p>
+    <p class="download"><a href="../../download.sysinternals.com/Files/Regmonamd64.zip">Download Regmon (x64 - 176 KB) - you plan on using Regmon on 64-bit XP/Server 2003</a> </p>
+    <p class="download">
+        <a href="Regmon.html#top">Back to Top</a>
+    </p>
+    
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

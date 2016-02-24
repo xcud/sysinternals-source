@@ -1,0 +1,153 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - PsLoggedOn</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>PsLoggedOn</h1>
+    <div class="info">
+        Copyright © 2000-2006 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: March 27, 2006 v1.32</span>
+    </div>
+    
+
+    <h2>Introduction</h2>
+    <p>
+        You can determine who is using resources on your local computer with the "net" command ("net session"), however, there is no built-in way to determine who is using the resources of a remote computer. In addition, NT comes with no tools to see who is logged onto a computer, either locally or remotely. <i>PsLoggedOn</i> is an applet that displays both the locally logged on users and users logged on via resources for either the local computer, or a remote one. If you specify a user name instead of a computer, <i>PsLoggedOn</i> searches the computers in the network neighborhood and tells you if the user is currently logged on. Full source code is included.
+    </p>
+    <p>
+        <i>PsLoggedOn</i>'s definition of a locally logged on user is one that has their profile loaded into the Registry, so 
+        <i>PsLoggedOn</i> determines who is logged on by scanning the keys under the HKEY_USERS key. For each key that has a name 
+        that is a user SID (security Identifier), <i>PsLoggedOn</i> looks up the corresponding user name and displays it. To 
+        determine who is logged onto a computer via resource shares, <i>PsLoggedOn</i> uses the <i>NetSessionEnum</i> API. Note that 
+        <i>PsLoggedOn</i> will show you as logged on via resource share to remote computers that you query because a logon is 
+        required for <i>PsLoggedOn</i> to access the Registry of a remote system.
+    </p>
+    
+    <h2>Installation</h2>
+    <p>
+        Just copy <i>PsLoggedOn</i> onto your executable path, and type "psloggedon".
+    </p>
+    <p>
+        <i>PsLoggedOn</i> works on NT 4.0, Win2K, Windows XP and Server 2003.
+    </p>
+    
+    <h2>Usage</h2>
+    <p>
+        <b>usage: psloggedon [-?] [-l] [-x] [\\computername | username]</b>
+    </p>
+    <dl class="usage">
+        <dt>-?</dt>
+            <dd>Displays the supported options and the units of measurement used for output values.</dd>
+        <dt>-l</dt>
+            <dd>Shows only local logons instead of both local and network resource logons.</dd>
+        <dt>-x</dt>
+            <dd>Don't show logon times.</dd>
+        <dt>\\computername</dt>
+            <dd>Specifies the name of the computer for which to list logon information.</dd>
+        <dt>username</dt>
+            <dd>If you specify a user name <i>PsLoggedOn</i> searches the network for computers to which that user is loggedon. This is useful if you want to ensure that a particular user is not logged on when you are about to change their user profile configuration.</dd>
+    </dl>
+    
+    
+    <h2>PsTools</h2>
+    <p>
+        <i>PsLoggedOn</i> is part of a growing kit of Sysinternals command-line tools that aid in the adminstration of local and remote 
+        Windows NT/2K systems named <a href="PsTools.html">PsTools</a>.
+    </p>
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/PsLoggedOn.zip">Download PsLoggedOn (19KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/PsLoggedOnSource.zip">Download PsLoggedOn Plus Source (35KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/PsTools.zip">Download PsTools</a>
+    </p>
+    
+    <p>
+        <a href="PsLoggedOn.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

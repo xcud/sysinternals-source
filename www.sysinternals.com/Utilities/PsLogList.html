@@ -1,0 +1,183 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - PsLogList</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>PsLogList</h1>
+    <div class="info">
+        Copyright © 2000-2006 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: April 10, 2006 v2.63</span>
+    </div>
+    
+
+    <h2>Introduction</h2>
+    <p>
+        The Resource Kit comes with a utility, elogdump, that lets you dump the contents of an Event Log on the local or a remote computer. <i>PsLogList</i> is a clone of elogdump except that <i>PsLogList</i> lets you login to remote systems in situations your current set of security credentials would not permit access to the Event Log, and <i>PsLogList</i> retrieves message strings from the computer on which the event log you view resides.
+    </p>
+    
+    <h2>Installation</h2>
+    <p>
+        Just copy <i>PsLogList</i> onto your executable path, and type "psloglist".
+    </p>
+    <p>
+        <i>PsLogList</i> works on NT 3.51, NT 4.0, Win2K, Windows XP and Server 2003.
+    </p>
+    
+    <h2>Usage</h2>
+    <p>
+        The default behavior of <i>PsLogList</i> is to show the contents of the System Event Log on the local computer, with visually-friendly formatting of Event Log records. Command line options let you view logs on different computers, use a different account to view a log, or to have the output formatted in a string-search friendly way.
+    </p>
+    <p>
+        <b>usage: psloglist [-?] [\\computer[,computer[,...] | @file [-u username [-p password]]] [-s [-t delimiter]] [-m #|-n #|-h #|-d #|-w][-c][-x][-r][-a mm/dd/yy][-b mm/dd/yy][-f filter]   [-i ID[,ID[,...] | -e ID[,ID[,...]]] [-o event source[,event source][,..]]] [-q event source[,event source][,..]]]  [-l event log file] &lt;eventlog&gt;</b>
+    </p>
+    <dl class="usage">
+        <dt>@file</dt>
+            <dd>Execute the command on each of the computers listed in the file.</dd>
+        <dt>-a</dt>
+            <dd>Dump records timestamped after specified date.</dd>
+        <dt>-b</dt>
+            <dd>Dump records timestamped before specified date.</dd>
+        <dt>-c</dt>
+            <dd>Clear the event log after displaying.</dd>
+        <dt>-d</dt>
+            <dd>Only display records from previous n days.</dd>
+        <dt>-e</dt>
+            <dd>Exclude events with the specified ID or IDs (up to 10).</dd>
+        <dt>-f</dt>
+            <dd>Filter event types with filter string (e.g. "-f w" to filter warnings).</dd>
+        <dt>-h</dt>
+            <dd>Only display records from previous n hours.</dd>
+        <dt>-i</dt>
+            <dd>Show only events with the specified ID or IDs (up to 10).</dd>
+        <dt>-l</dt>
+            <dd>Dump records from the specified event log file.</dd>
+        <dt>-m</dt>
+            <dd>Only display records from previous n minutes.</dd>
+        <dt>-n</dt>
+            <dd>Only display the number of most recent entries specified.</dd>
+        <dt>-o</dt>
+            <dd>Show only records from the specified event source (e.g. \"-o cdrom\").</dd>
+        <dt>-p</dt>
+            <dd>Specifies optional password for user name. If you omit this you will be prompted to enter a hidden password.</dd>
+        <dt>-q</dt>
+            <dd>Omit records from the specified event source or sources (e.g. \"-q cdrom\").</dd>
+        <dt>-r</dt>
+            <dd>Dump log from least recent to most recent.</dd>
+        <dt>-s</dt>
+            <dd>This switch has <i>PsLogList</i> print Event Log records one-per-line, with comma delimited fields. This format is convenient for text searches, e.g. psloglist | findstr /i text, and for importing the output into a spreadsheet.</dd>
+        <dt>-t</dt>
+            <dd>The default delimeter is a comma, but can be overriden with the specified character.</dd>
+        <dt>-u</dt>
+            <dd>Specifies optional user name for login to remote computer.</dd>
+        <dt>-w</dt>
+            <dd>Wait for new events, dumping them as they generate (local system only).</dd>
+        <dt>-x</dt>
+            <dd>Dump extended data.</dd>
+        <dt>eventlog</dt>
+            <dd>By default <i>PsLogList</i> shows the contents of the System Event Log. Specify a different event log by typing in the first few letters of the log name, application, system, or security.</dd>
+    </dl>
+    
+    <h2>How it Works</h2>
+    <p>
+        Like Win NT/2K's built-in Event Viewer and the Resource Kit's elogdump, <i>PsLogList</i> uses the Event Log API, which is documented in Windows Platform SDK. <i>PsLogList</i> loads message source modules on the system where the event log being viewed resides so that it correctly displays event log messages.
+    </p>
+    
+    <h2>PsTools</h2>
+    <p>
+        <i>PsLogList</i> is part of a growing kit of Sysinternals command-line tools that aid in the adminstration of local and remote 
+        Windows NT/2K systems named <a href="PsTools.html">PsTools</a>.
+    </p>
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/PsLogList.zip">Download PsLogList (25KB)</a>
+        <br /><br />
+        
+        <a href="../../download.sysinternals.com/Files/PsTools.zip">Download PsTools</a>
+    </p>
+    
+    <p>
+        <a href="PsLogList.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

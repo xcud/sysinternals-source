@@ -1,0 +1,330 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - Systems Internals Tips and Trivia</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Systems Internals Tips and Trivia</h1>
+    <div class="info">
+        Copyright © 1996-1999 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: February 22, 1999</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        This page is an ever-expanding collection of NT information that I accumulate over time. You'll find practical tips as well useless trivia, with new items added at the top of the page.
+    </p>
+    <ul style="list-style: none">
+        <li><a href="TipsAndTrivia.html#NamedPipeList">Named Pipe Directory Listings</a></li>
+        <li><a href="TipsAndTrivia.html#PhysMem">NT's \dev\kmem</a></li>
+        <li><a href="TipsAndTrivia.html#HiddenKeys">Hidden Registry Keys?</a></li>
+        <li><a href="TipsAndTrivia.html#WksFaultTolerance">Fault Tolerance on Workstation?</a></li>
+        <li><a href="TipsAndTrivia.html#NativeApi">The Native API</a></li>
+        <li><a href="TipsAndTrivia.html#IdleTrivia">Idle Trivia</a></li>
+        <li><a href="TipsAndTrivia.html#NeverEndingQuantum">Never-ending Quantum?</a></li>
+        <li><a href="TipsAndTrivia.html#NtsMain">NT's Main</a></li>
+        <li><a href="TipsAndTrivia.html#TuneWksForLoad">Tuning Workstation for Server-like Loads </a></li>
+    </ul>
+    
+    
+    
+    <h2><a name="NamedPipeList">Named Pipe Directory Listings</a></h2>
+    <p>
+        Did you know that the device driver that implements named pipes is actually a file system driver? In fact, the driver's name is NPFS.SYS, for "Named Pipe File System". What you might also find surprising is that its possible to obtain a directory listing of the named pipes defined on a system. This fact is not documented, nor is it possible to do this using the Win32 API. Directly using NtQueryDirectoryFile, the native function that the Win32 FindFile APIs rely on, makes it possible to list the pipes. The directory listing NPFS returns also indicates the maximum number of pipe instances set for each pipe and the number of active instances.
+    </p>
+    <p>
+        To demonstrate the listing of named pipes I've written a program called PipeList. PipeList displays the named pipes on your system, including the number of maximum instances and active instances for each pipe. Full source code is included.
+    </p>
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/PipeList.zip">Download PipeList (25KB)</a>
+        <br /><br />
+        <span style="font-weight: normal">Related tip: You can watch named pipe activity with Filemon by selecting the Drives, Named Pipe menu entry.</span>
+    <p>
+    
+    
+    
+    <h2><a name="PhysMem">NT's "\dev\kmem"</a></h2>
+    <p>
+        Many UNIX afficianados like to point out that UNIX has a flexible file system namespace that allows non-file system 
+        devices and psuedo-devices to be accessed through it. The most commonly offered example of this feature is the <b>\dev\kmem</b> 
+        file. When an application opens and reads or writes this file (assuming it has permission to do so) it is actually 
+        accessing the physical memory of the computer.
+    </p>
+    <p>
+        What most people don't know is that NT charges its Object Manager subsystem with providing a namespace (see my 
+        <a href="../Publications.html">article</a> on the Object Manager for more information), and the Object Manager allows virtually anything to be 
+        mapped as part of it, just like UNIX's file system namespace. And what even fewer people know is that NT has a mechanism that 
+        lets an application view (and even modify, with the proper security configuration) a system's physical memory. Its a section 
+        (memory mapping) object that is named <b>\Device\PhysicalMemory</b> in NT's namspace (you can verify its existance by using our 
+        <a href="../Utilities/WinObj.html">WinObj</a> tool). An application with sufficient access rights can open the section and map 
+        portions of it into its own address space. The result of such a mapping is the creation of a window to physical memory in 
+        the application's virtual address map. By default administrators have read-only access to physical memory, but it is 
+        possible for an application running as administrator to modify the security attributes so that write access is enabled.
+    </p>
+    <p>
+        In order to demonstrate the ability to view physical memory, and to give you the opportunity of browsing through your 
+        computer's RAM, I've written PhysMem. It is a Win32 console program that will open the physical memory section and dump 
+        the contents of regions (in hexadecimal and ASCII) that you specify in a simple command-line interface. Here is what the 
+        interface looks like:
+    </p>
+<pre>Physmem v1.0: physical memory viewer
+By Mark Russinovich
+Sysinternals - http://www.Sysinternals.com
+
+Enter values in hexadecimal. Enter 'q' to quit.
+Address: 1000
+Bytes: 1000
+00001000: 4D 5A 90 00 03 00 00 00 -04 00 00 00 FF FF 00 00 MZ..............
+00001010: B8 00 00 00 00 00 00 00 -40 00 00 00 00 00 00 00 +...............
+00001020: 00 00 00 00 00 00 00 00 -00 00 00 00 00 00 00 00 ................
+00001030: 00 00 00 00 00 00 00 00 -00 00 00 00 80 00 00 00 ................
+00001040: 0E 1F BA 0E 00 B4 09 CD -21 B8 01 4C CD 21 54 68 ..¦....-.+.L-.Th
+00001050: 69 73 20 70 72 6F 67 72 -61 6D 20 63 61 6E 6E 6F is program canno
+00001060: 74 20 62 65 20 72 75 6E -20 69 6E 20 44 4F 53 20 t be run in DOS
+00001070: 6D 6F 64 65 2E 0D 0D 0A -24 00 00 00 00 00 00 00 mode............
+00001080: 50 45 00 00 4C 01 06 00 -53 3A 4D 33 00 00 00 00 PE..L...S.M3....
+...</pre>
+    <p>
+        While you are browsing your memory, some places of interest you might want to take a look at are offset 0x1000, which is where NTLDR is located (you can see its header in the example output above, which states that it can't be run in DOS mode), and 0xF9000-0xFFFFF, which is where ROM BIOS is mapped. You'll likely see strings belonging to the vendor of your computer and sometimes video adapter strings in the BIOS.
+    </p>
+    <p>
+        The source code for PhysMem is fairly self-explanatory. PhysMem uses the native API to open and map \Device\PhysicalMemory because that name is inaccessible via the Win32 API. It also uses the native APIs (all of which are documented in the Windows NT DDK) to map and unmap views of the section, though this could have been done using Win32.
+    </p>
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/PhysMem.zip">Download PhysMem (28KB)</a>
+    </p>
+    
+    
+    
+    <h2><a name="HiddenKeys">Hidden Registry Keys?</a></h2>
+    <p>
+        A subtle but significant difference between the Win32 API and the Native API (see 
+        <a href="NativeApi.html">Inside the Native API</a> for more information on this largely undocumented interface) is the way that names are described. In the Win32 API strings are interpreted as NULL-terminated ANSI (8-bit) or wide character (16-bit) strings. In the Native API names are counted Unicode (16-bit) strings. While this distinction is usually not important, it leaves open an interesting situation: there is a class of names that can be referenced using the Native API, but that cannot be described using the Win32 API.
+    </p>
+    <p>
+        How is this possible? The answer is that a name which is a counted Unicode string can explicitly include NULL characters (0) as part of the name. For example, "Key\0". To include the NULL at the end the length of the Unicode string is specified as 4. There is absolutely no way to specify this name using the Win32 API since if "Key\0" is passed as a name, the API will determine that the name is "Key" (3 characters in length) because the "\0" indicates the end of the name.
+    </p>
+    <p>
+        When a key (or any other object with a name such as a named Event, Semaphore or Mutex) is created with such a name any 
+        applications using the Win32 API will be unable to open the name, even though they might seem to see it. The program below, 
+        RegHide(source code is included), illustrates this point. It creates a key called "HKEY_LOCAL_MACHINE\Software\Sysinternals\Can't 
+        touch me!\0" using the Native API, and inside this key it creates a value. Then the program pauses to give you an opportunity 
+        to see if you can view the value using any Registry editor you have handy (Regedit, Regedt32 or a third-party Registry editor). 
+        Because Regedit and Regedt32 (and likely an third party Registry editor) use the Win32 API, they will see the key listed as a 
+        child of Sysinternals, but when you try to open the key you'll get an error. This is because the Registry editor will try to 
+        open "Can't touch me!" without the trailing NULL (which is interpreted as the end of the string) and won't find this name. After 
+        you've verified this exit the program and this special key will be deleted.
+    </p>
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/RegHide.zip">Download RegHide (24KB)</a>
+    </p>
+    
+    
+    
+    <h2><a name="WksFaultTolerance">Fault Tolerance on Workstation?</a></h2>
+    <p>
+        One of the differences I highlighted in my November 1996 <i>Windows NT Magazine</i> article, "Inside the Difference 
+        Between Windows NT Workstation and Windows NT Server," was that fault tolerant disk configurations are only available on 
+        Server. This is because the Windows NT disk administrative program, <i>Windisk.exe</i>, checks to see if its running on a 
+        Workstation, and if so, does not display its <i>Fault Tolerance</i> menu, which contains the entries that are used to create 
+        mirrors and parity striped sets.
+    </p>
+    <p>
+        It turns out that whoever wrote the Workstation Resource Kit program FTEDIT was unaware of Microsoft's official policy on 
+        fault tolerance and Workstation: it appears you can use this utility to create mirrors and striped sets with parity on Workstations.
+    </p>
+    <p>
+        <i>Update: several people have complained that this doesn't work, which isn't surprising since I left out an important step: the Fault-tolerant disk driver must be enabled. If you have an existing volume-set then it is already is, but if you don't, use a Registry editor to set the value of:</i>
+    </p>
+    <p>
+        <b>HKEY_LOCAL_MACHINE\System\CurrentControlSet\Services\FtDisk\Start</b>
+    </p>
+    <p>
+        <i>to 0. The next time you boot your workstation, the fault-tolerant drives you have created will be functional.</i>
+    </p><br />
+    
+    
+    
+    <h2><a name="NativeApi">The Native API</a></h2>
+    <p>
+        NT's native API are services that are core operating system services available to device drivers and user-mode applications. The Win32 subsystem relies heavily on this API, as do many Microsoft Windows NT Resource Kit utilities. There are over 200 system calls in NT's native API and only 21 of them are documented by Microsoft.
+    </p><br />
+    
+    
+    
+    <h2><a name="IdleTrivia">Idle Trivia</a></h2>
+    <p>
+        Did you know that unlike all the other threads in an NT system, the idle-thread executes at an IRQL (interrupt request level) 
+        of DISPATCH_LEVEL (rather than PASSIVE_LEVEL)? See <a href="AdvancedDpcs-2.html">Advanced DPCs</a> for more information.
+    </p>
+    <p>
+        On uniprocessor x86 systems the idle-thread actually performs a HLT (Halt) instruction, which effectively turns the CPU off to everything except for hardware interrupts.
+    </p><br />
+    
+    
+    
+    <h2><a name="NeverEndingQuantum">Never-ending Quantum?</a></h2>
+    <p>
+        In NT, as with most time-sharing operating systems, threads run in turns called quantums. Normally, a thread executes until 
+        its quantum runs out. The next time it is scheduled it starts with a full quantum. However, in NT a thread also gets its quantum 
+        refreshed every time its thread or process priority is set. This means that a thread can reset its quantum by calling <b>SetThreadPriority</b> 
+        (without changing its priority) before its turn runs out. If it continues to do this it will effectively have an infinite quantum. 
+        Why does NT do this? Its not clear, but it appears to be a bug.
+    </p><br />
+    
+    
+    
+    <h2><a name="NtsMain">NTOSKRNL's Main</a></h2>
+    <p>
+        NTOSKRNL.EXE, the core file of the kernel-mode component of Windows NT, contains the Cache Manager, the Executive, the Kernel, the Security Reference Monitor, the Memory Manager, and the Scheduler, among other things, and is in charge of getting NT up and running. You may be surprised to know that it has a standard main() that is executed when it is loaded by the OSLOADER:
+    </p>
+<pre><b>// 
+// NTOSKRNL main 
+// 
+int main( boot parameters ) 
+{ 
+    // 
+    // Fire up NT! 
+    // 
+    KiSystemStartup(); 
+    return 0; 
+}</b></pre><br />
+
+
+
+    <h2><a name="TuneWksForLoad">Tuning Workstation for Server-like Loads</a></h2>
+    <p>
+        NT Workstation and NT Server have vastly different performance characteristics due to the internal tuning that the NT operating system, which is identical on both, performs. Most tuning parameters are inaccessible, but a few are located in the Registry. If you are running Server and you double-click on the Server entry of the Services tab in the Control Panel's Network applet, you will get a dialog that lets you determine what type of application you want the machine to be tuned for. Choices let you select between "Minimize Memory Used", "Balance", "Maximize Usage for File Sharing", and "Maximize Usage for Network Applications". This dialog box is not presented on Workstation installations. The various selections actually change the values of two Registry values:
+    </p>
+    <p>
+        HKLM\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management\LargeSystemCache
+    </p>
+    <p>
+        and
+    </p>
+    <p>
+        HKLM\SYSTEM\CurrentControlSet\Services\LanmanServer\Parameters\Size
+    </p>
+    <p>
+        This table (which was derived from sessions with <a href="../Utilities/Regmon.html">Regmon</a>) presents the settings you 
+        should select on a Workstation to achieve the same effect you would get using the dialog box were your system a Server.
+    </p>
+    <table border="1" cellpadding="3" style="text-align: center; background-color: #fff">
+        <tr> 
+            <th style="vertical-align: middle; text-align: center; background-color: #c0c0c0">Tuning Target</th>
+            <th style="vertical-align: middle; text-align: center; background-color: #c0c0c0">LargeSystemCache</th>
+            <th style="vertical-align: middle; text-align: center; background-color: #c0c0c0">Size </th>
+
+        </tr>
+        <tr> 
+            <th style="vertical-align: middle; text-align: center; background-color: #c0c0c0">Minimize Memory Used</th>
+            <td style="vertical-align: middle; text-align: center; background-color: #c0c0c0">0</td>
+            <td style="vertical-align: middle; text-align: center; background-color: #c0c0c0">1</td>
+        </tr>
+        <tr> 
+            <th style="vertical-align: middle; text-align: center; background-color: #c0c0c0">Balance</th>
+            <td style="vertical-align: middle; text-align: center; background-color: #c0c0c0">0</td>
+            <td style="vertical-align: middle; text-align: center; background-color: #c0c0c0">2</td>
+        </tr>
+        <tr>
+            <th style="vertical-align: middle; text-align: center; background-color: #c0c0c0">File Sharing</thh>
+            <td style="vertical-align: middle; text-align: center; background-color: #c0c0c0">1</td>
+            <td style="vertical-align: middle; text-align: center; background-color: #c0c0c0">3</td>
+
+        </tr>
+        <tr> 
+            <th style="vertical-align: middle; text-align: center; background-color: #c0c0c0">Network Applications</th>
+            <td style="vertical-align: middle; text-align: center; background-color: #c0c0c0">0</td>
+            <td style="vertical-align: middle; text-align: center; background-color: #c0c0c0">3</td>
+        </tr>
+    </table><br /><br />
+    
+    
+    
+    <p>
+        <a href="TipsAndTrivia.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

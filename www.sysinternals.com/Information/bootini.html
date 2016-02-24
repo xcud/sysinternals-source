@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - BOOT.INI Reference</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>Boot INI Options Reference</h1>
+    <div class="info">
+        Copyright © 1996-2004 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a><br />
+        <span>Last Updated: October 15, 2004</span>
+    </div>
+    
+    <h2>Introduction</h2>
+    <p>
+        There are number of BOOT.INI switches that are useful for driver developers that wish to test their drivers under 
+        a variety of different system configurations without having to have a separate machine for every one. For example, 
+        limiting the amount of memory NT sees can be useful for stressing memory loads, and limiting the number of processors 
+        for testing scalability. I've compiled a complete list of the options that BOOT.INI currently supports. This list is 
+        reproduced in the Startup, Shutdown and Crashes chapter of <a href="../WindowsInternals.html">Windows Internals</a>, where you'll find more information 
+        about the boot process. Entries in red were introduced in Windows 2000 and those in blue introduced in Windows XP or Windows Server 2003.
+    </p>
+    <p>
+        Note: to see what options I system has booted with examine HKLM\System\CurrentControlSet\Control\SystemStartOptions.
+    </p>
+    <dl class="bootinilist">
+        <dt>/3GB</dt>
+            <dd>Increases the size of the user process address space from 2 GB to 3 GB (and therefore reduces the size of system space from 2 GB to 1 GB). Giving virtual-memory- intensive applications such as database servers a larger address space can improve their performance. For an application to take advantage of this feature, however, two additional conditions must be met: the system must be running Windows XP, Windows Server 2003, Windows NT 4 Enterprise Edition, Windows 2000 Advanced Server or Datacenter Server and the application .exe must be flagged as a 3-GB-aware application. Applies to 32-bit systems only.</dd>
+        
+        <dt>/BASEVIDEO</dt>
+            <dd>Causes Windows to use the standard VGA display driver for GUI-mode operations.</dd>
+
+        <dt>/BAUDRATE=</dt>
+            <dd>Enables kernel-mode debugging and specifies an override for the default baud rate (19200) at which a remote kernel debugger host will connect. Example: /BAUDRATE=115200.</dd>
+
+        <dt class="win2k">/BOOTLOG</dt>
+            <dd>Causes Windows to write a log of the boot to the file %SystemRoot%\Ntbtlog.txt.</dd>
+
+        <dt class="winxp-2k3">/BOOTLOGO</dt>
+            <dd>Use this switch to have Windows XP or Windows Server 2003 display an installable splash screen instead of the standard splash screen. First, create a 16-color (any 16 colors) 640x480 bitmap and save it in the Windows directory with the name Boot.bmp. Then add "/bootlogo /noguiboot" to the boot.ini selection.</dd>
+
+        <dt>/BREAK</dt>
+            <dd>Causes the hardware abstraction layer (HAL) to stop at a breakpoint at HAL initialization. The first thing the Windows kernel does when it initializes is to initialize the HAL, so this breakpoint is the earliest one possible. The HAL will wait indefinitely at the breakpoint until a kernel-debugger connection is made. If the switch is used without the /DEBUG switch, the system will Blue Screen with a STOP code of 0x00000078 (PHASE0_ EXCEPTION).</dd>
+
+        <dt>/BURNMEMORY=</dt>
+            <dd>Specifies an amount of memory Windows can't use (similar to the /MAXMEM switch). The value is specified in megabytes. Example: /BURNMEMORY=128 would indicate that Windows can't use 128 MB of the total physical memory on the machine.</dd>
+
+        <dt class="win2k">/CHANNEL=</dt>
+            <dd>Used on conjunction with /DEBUGPORT=1394 to specify the IEEE 1394 channel through which kernel debugging communications will flow. This can be any number between 0 and 62 and defaults to 0 if not set.</dd>
+
+        <dt>/CLKLVL</dt>
+            <dd>Causes the standard x86 multiprocessor HAL (Halmps.dll) to configure itself for a level-sensitive system clock rather then an edge-triggered clock. Level-sensitive and edge-triggered are terms used to describe hardware interrupt types.</dd>
+
+        <dt class="win2k">/CMDCONS</dt>
+            <dd>Passed when booting with into the Recovery Console (described later in this chapter).</dd>
+
+        <dt>/CRASHDEBUG</dt>
+            <dd>Causes the kernel debugger to be loaded when the system boots, but to remain inactive unless a crash occurs. This allows the serial port that the kernel debugger would use to be available for use by the system until the system crashes (vs. /DEBUG, which causes the kernel debugger to use the serial port for the life of the system session).</dd>
+
+        <dt>/DEBUG</dt>
+            <dd>Enables kernel-mode debugging.</dd>
+
+        <dt>/DEBUGPORT=</dt>
+            <dd>Enables kernel-mode debugging and specifies an override for the default serial (usually COM2 on systems with at least two serial ports) to which a remote kernel-debugger host is connected. Windows XP and Windows Server 2003 also support debugging through accept IEEE 1394 ports. Examples: /DEBUGPORT=COM2, /DEBUGPORT=1394.</dd>
+
+        <dt class="winxp-2k3">/EXECUTE</dt>
+            <dd>This option disables no-execute protection. See the /NOEXECUTE switch for more information.</dd>
+
+        <dt class="win2k">/FASTDETECT</dt>
+            <dd>Default boot option for Windows. Replaces the Windows NT 4 switch /NOSERIALMICE. The reason the qualifier exists (vs. just having NTDETECT perform this operation by default) is so that NTDETECT can support booting Windows NT 4. Windows Plug and Play device drivers perform detection of parallel and serial devices, but Windows NT 4 expects NTDETECT to perform the detection. Thus, specifying /FASTDETECT causes NTDETECT to skip parallel and serial device enumeration (actions that are not required when booting Windows), whereas omitting the switch causes NTDETECT to perform this enumeration (which is required for booting Windows NT 4).</dd>
+
+        <dt>/INTAFFINITY</dt>
+            <dd>Directs the standard x86 multiprocessor HAL (Halmps.dll) to set interrupt affinities such that only the highest numbered processor will receive interrupts. Without the switch, the HAL defaults to its normal behavior of letting all processors receive interrupts.</dd>
+
+        <dt>/KERNEL=<br />/HAL=</dt>
+            <dd>
+                Enable you to override Ntldr's default filename for the kernel image (Ntoskrnl.exe) and/or the HAL (Hal.dll). These options are useful for alternating between a checked kernel environment and a free (retail) kernel environment or even to manually select a different HAL. If you want to boot a checked environment that consists solely of the checked kernel and HAL, which is typically all that is needed to test drivers, follow these steps on a system installed with the free build:
+                <ul>
+                    <li>Copy the checked versions of the kernel images from the checked build CD to your \Windows\System32 directory, giving the images different names than the default. For example, if you're on a uniprocessor, copy Ntoskrnl.exe to Ntoschk.exe and Ntkrnlpa.exe to Ntoschkpa.exe. If you're on a multiprocessor, copy Ntkrnlmp.exe to Ntoschk.exe and Ntkrpamp.exe to Ntoschkpa.exe. The kernel filename must be an 8.3-style short name.</li>
+                    <li>Copy the checked version of the appropriate HAL needed for your system from \I386\Driver.cab on the checked build CD to your \Windows\System32 directory, naming it Halchk.dll. To determine which HAL to copy, open \Windows\Repair\Setup.log and search for Hal.dll; you'll find a line like \WINDOWS\system32\ hal.dll="halacpi.dll","1d8a1". The name immediately to the right of the equals sign is the name of the HAL you should copy. The HAL filename must be an 8.3-style short name.</li>
+                    <li>Make a copy of the default line in the system's Boot.ini file.</li>
+                    <li>In the string description of the boot selection, add something that indicates that the new selection will be for a checked build environment (for example, "Windows XP Professional Checked").</li>
+                    <li>Add the following to the end of the new selection's line: /KERNEL=NTOSCHK.EXE /HAL= HALCHK.DLL</li>
+                </ul>
+                Now when the selection menu appears during the boot process you can select the new entry to boot a checked environment or select the entry you were using to boot the free build.
+            </dd>
+        
+        <dt>/LASTKNOWNGOOD</dt>
+            <dd>Causes the system to boot as if the LastKnownGood boot option was selected.</dd>
+
+        <dt>/MAXMEM=</dt>
+            <dd>Limits Windows to ignore (not use) physical memory beyond the amount indicated. The number is interpreted in megabytes. Example: /MAXMEM=32 would limit the system to using the first 32 MB of physical memory even if more were present.</dd>
+
+        <dt>/MAXPROCSPERCLUSTER=</dt>
+            <dd>For the standard x86 multiprocessor HAL (Halmps.dll), forces cluster-mode Advanced Programmable Interrupt Controller (APIC) addressing (not supported on systems with an 82489DX external APIC interrupt controller).</dd>
+
+        <dt class="winxp-2k3">/MININT</dt>
+            <dd>This option is used by Windows PE (Preinstallation Environment) and causes the Configuration Manager to load the Registry SYSTEM hive as a volatile hive such that changes made to it in memory are not saved back to the hive image.</dd>
+
+        <dt>/NODEBUG</dt>
+            <dd>Prevents kernel-mode debugging from being initialized. Overrides the specification of any of the three debug-related switches, /DEBUG, /DEBUGPORT, and /BAUDRATE.</dd>
+
+        <dt class="winxp-2k3">/NOEXECUTE</dt>
+            <dd>
+                This option is only available on 32-bit versions of Windows when running on processors supporting no-execute protection. It enables no-execute protection (also known as Data Execution Protection - DEP), which results in the Memory Manager marking pages containing data as no-execute so that they cannot be executed as code. This can be useful for preventing malicious code from exploiting buffer overflow bugs with unexpected program input in order to execute arbitrary code. No-execute protection is always enabled on 64-bit versions of Windows on processors that support no-execute protection. There are several options you can specify with this switch:
+                <ul>
+                    <li><b>/NOEXECUTE=OPTIN</b> Enables DEP for core system images and those specified in the DEP configuration dialog.</li>
+                    <li><b>/NOEXECUTE=OPTOUT</b> Enables DEP for all images except those specified in the DEP configuration dialog.</li>
+                    <li><b>/NOEXECUTE=ALWAYSON</b> Enables DEP on all images.</li>
+                    <li><b>/NOEXECUTE=ALWAYSOFF</b> Disables DEP.</li>
+                </ul>
+            </dd>
+
+        <dt class="win2k">/NOGUIBOOT</dt>
+            <dd>Instructs Windows not to initialize the VGA video driver responsible for presenting bitmapped graphics during the boot process. The driver is used to display boot progress information, so disabling it will disable the ability of Windows to show this information.</dd>
+
+        <dt class="win2k">/NOLOWMEM</dt>
+            <dd>Requires that the /PAE switch be present and that the system have more than 4 GB of physical memory. If these conditions are met, the PAE-enabled version of the Windows kernel, Ntkrnlpa.exe, won't use the first 4 GB of physical memory. Instead, it will load all applications and device drivers, and allocate all memory pools, from above that boundary. This switch is useful only to test device driver compatibility with large memory systems.</dd>
+
+        <dt class="win2k">/NOPAE</dt>
+            <dd>Forces Ntldr to load the non-Physical Address Extension (PAE) version of the Windows kernel, even if the system is detected as supporting x86 PAEs and has more than 4 GB of physical memory.</dd>
+
+        <dt>/NOSERIALMICE=[COMx | COMx,y,z...]</dt>
+            <dd>Obsolete Windows NT 4 qualifier-replaced by the absence of the /FASTDETECT switch. Disables serial mouse detection of the specified COM ports. This switch was used if you had a device other than a mouse attached to a serial port during the startup sequence. Using /NOSERIALMICE without specifying a COM port disables serial mouse detection on all COM ports. See Microsoft Knowledge Base article Q131976 for more information.</dd>
+
+        <dt>/NUMPROC=</dt>
+            <dd>Specifies the number of CPUs that can be used on a multiprocessor system. Example: /NUMPROC=2 on a four-way system will prevent Windows from using two of the four processors.</dd>
+
+        <dt>/ONECPU</dt>
+            <dd>Causes Windows to use only one CPU on a multiprocessor system.</dd>
+
+        <dt class="win2k">/PAE</dt>
+            <dd>Causes Ntldr to load Ntkrnlpa.exe, which is the version of the x86 kernel that is able to take advantage of x86 PAEs. The PAE version of the kernel presents 64-bit physical addresses to device drivers, so this switch is helpful for testing device driver support for large memory systems.</dd>
+
+        <dt>/PCILOCK</dt>
+            <dd>Stops Windows from dynamically assigning IO/IRQ resources to PCI devices and leaves the devices configured by the BIOS. See Microsoft Knowledge Base article Q148501 for more information.</dd>
+
+        <dt class="winxp-2k3">/RDPATH=</dt>
+            <dd>Specifies the path to a System Disk Image (SDI) file, which can be on the network, that the system will use to boot from. Often used in conjunction with the /RDIMAGEOFFSET= flag to indicate to NTLDR where in the file the system image starts.</dd>
+
+        <dt class="winxp-2k3">/REDIRECT</dt>
+            <dd>Introduced with Windows XP. Used to cause Windows to enable Emergency Management Services (EMS) that reports boot information and accepts system management commands through a serial port. Specify serial port and baudrate used in conjunction with EMS with redirect= and redirectbaudrate= lines in the [boot loader] section of the Boot.ini file.</dd>
+
+        <dt class="win2k">/SAFEBOOT:</dt>
+            <dd>
+                Specifies options for a safe boot. You should never have to specify this option manually, since Ntldr specifies it 
+                for you when you use the F8 menu to perform a safe boot. (A safe boot is a boot in which Windows only loads drivers 
+                and services that are specified by name or group under the Minimal or Network registry keys under 
+                HKLM\SYSTEM\CurrentControlSet\Control\SafeBoot.) Following the colon in the option you must specify one of three 
+                additional switches: MINIMAL, NETWORK, or DSREPAIR. The MINIMAL and NETWORK flags correspond to safe boot with no 
+                network and safe boot with network support, respectively. The DSREPAIR (Directory Services Repair) switch causes 
+                Windows to boot into a mode in which it restores the Active Directory directory service from a backup medium you 
+                present. An additional option you can append is (ALTERNATESHELL), which tells Windows to use the program specified by 
+                the HKLM\SYSTEM\CurrentControlSet\ SafeBoot\AlternateShell value as the graphical shell rather than to use the default, 
+                which is Windows Explorer.
+            </dd>
+
+        <dt>/SCSIORDINAL:</dt>
+            <dd>Directs Windows to the SCSI ID of the controller. (Adding a new SCSI device to a system with an on-board SCSI controller can cause the controller's SCSI ID to change.) See Microsoft Knowledge Base article Q103625 for more information.</dd>
+
+        <dt class="winxp-2k3">/SDIBOOT=</dt>
+            <dd>Used in Windows XP Embedded systems to have Windows boot from a RAM disk image stored in the specified System Disk Image (SDI) file.</dd>
+
+        <dt>/SOS</dt>
+            <dd>Causes Windows to list the device drivers marked to load at boot time and then to display the system version number (including the build number), amount of physical memory, and number of processors.</dd>
+
+        <dt>/TIMERES=</dt>
+            <dd>
+                Sets the resolution of the system timer on the standard x86 multiprocessor HAL (Halmps.dll). The argument is a number interpreted in hundreds of nanoseconds, but the rate is set to the closest resolution the HAL supports that isn't larger than the one requested. The HAL supports the following resolutions:
+                <br /><br />
+                Hundreds of nanoseconds Milliseconds (ms)<br />
+                9766 0.98<br />
+                19532 2.00<br />
+                39063 3.90<br />
+                78125 7.80
+                <br /><br />
+                The default resolution is 7.8 ms. The system timer resolution affects the resolution of waitable timers. Example: /TIMERES=21000 would set the timer to a resolution of 2.0 ms.
+            </dd>
+
+        <dt class="winxp-2k3">/USERVA=</dt>
+            <dd>This switch is only supported on Windows XP and Windows Server 2003. Like the /3GB switch, this switch gives applications a larger address space. Specify the amount in MB between 2048 and 3072. This switch has the same application requirements as the /3GB switch and requires that the /3GB switch be present. Applies to 32-bit systems only.</dd>
+
+        <dt>/WIN95</dt>
+            <dd>Directs Ntldr to boot the Consumer Windows boot sector stored in Bootsect.w40. This switch is pertinent only on a triple-boot system that has MS-DOS, Consumer Windows, and Windows installed. See Microsoft Knowledge Base article Q157992 for more information.</dd>
+
+        <dt>/WIN95DOS</dt>
+            <dd>Directs Ntldr to boot the MS-DOS boot sector stored in Bootsect.dos. This switch is pertinent only on a triple-boot system that has MS-DOS, Consumer Windows, and Windows installed. See Microsoft Knowledge Base article Q157992 for more information.</dd>
+
+        <dt class="win2k">/YEAR=</dt>
+            <dd>Instructs the Windows core time function to ignore the year that the computer's real-time clock reports and instead use the one indicated. Thus, the year used in the switch affects every piece of software on the system, including the Windows kernel. Example: /YEAR=2001. (This switch was created to assist in Y2K testing.)</dd>
+    </dl>
+    <p>
+        Thanks to Jonas Fischer for pointing out the PCILOCK and NOSERIALMICE switches. Thanks to Rob Green for information on the FASTDETECT switch.
+    </p>
+        
+    
+    <p>
+        <a href="bootini.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>

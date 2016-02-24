@@ -1,0 +1,307 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Sysinternals Freeware - NTFSDOS</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<base />
+<style type="text/css">
+    @import "../includes/main.css";
+</style>
+<script type="text/javascript" src="../includes/main.js"></script>
+<link rel="alternate" title="Sysinternals RSS" href="../sysinternals.xml" type="application/rss+xml">
+<link rel="shortcut icon" href="../favicon.html" type"image/x-icon">
+</head>
+
+<body>
+
+<a name="top"></a>
+<div class="headercontainer">
+    <div class="header">
+        <a href="../index.html"><span>Sysinternals Freeware - Mark Russinovich &amp; Bryce Cogswell</span></a>
+        <ul>
+            <li>Advanced Utilities</li>
+            <li>Technical Information</li>
+            <li>Source Code</li>
+        </ul>
+    </div>
+</div>
+
+
+<div class="navmaincontainer">
+    <ul class="navmain">
+        <li><a href="../Utilities.html">Utilities</a>
+            <ul>
+                <li><a href="../FileAndDiskUtilities.html">File and Disk</a></li>
+                <li><a href="../SecurityUtilities.html">Security</a></li>
+                <li><a href="../NetworkingUtilities.html">Networking</a></li>
+                <li><a href="../ProcessesAndThreadsUtilities.html">Processes &amp; Threads</a></li>
+                <li><a href="../SystemInformationUtilities.html">System Information</a></li>
+                <li><a href="../MiscellaneousUtilities.html">Miscellaneous</a></li>
+            </ul>
+        </li>
+        <li><a href="../SourceCode.html">Source Code </a></li>
+        <li><a href="../Information.html">Information</a></li>
+        <li><a href="../Blog/index.html">Mark's Blog</a></li>
+        <li><a href="../../forum.sysinternals.com/index.html">Forum</a></li>
+
+        <li><a href="../chat/index.html" id="chatlink">Chat</a></li>
+        <li id="newsletter">
+            <div>
+                <a href="../Information/SysinternalsNewsletter.html" style="background: none">Newsletter</a>
+                <form method="get" action="http://groups.yahoo.com/subscribe/sysinternals">
+                    <input type="text" size="18" name="user" value="email address" onfocus="this.value=''" style="width: 130px" /><br />
+                    <input type="image" name="submit_email" src="../images/NewsletterSignupButton.gif" alt="Sign Up" style="margin-top: 3px; width: 53px; height: 21px; border: none" />
+                </form>
+            </div>
+        </li>
+    </ul>
+    
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsSponsor.gif" width="149" height="55" alt="Sponsored by Winternals" style="margin: 30px 0 0 8px; border: none" /></a>
+</div>
+
+<div style="position: absolute; top: 20px; left: 0;">
+    <form method="get" action="http://www.sysinternals.com/search/default.aspx" style="display: inline">
+        <input type="text" size="13" name="query" value="search" onclick="this.value=''" style="width: 100px" />
+        <input type="image" src="../images/SearchButton.gif" alt="Search" style="margin-left: 5px; width: 20px; height: 16px; vertical-align: middle; border: none" />
+    </form>
+</div>
+
+
+<div class="contentbox">
+    <h1>NTFSDOS</h1>
+    <div class="info">
+        Copyright © 1996-2001 <a href="mailto:mark@sysinternals.com">Mark Russinovich</a> and <a href="mailto:cogswell@winternals.com">Bryce Cogswell</a><br />
+        <span>Last Updated: September 11, 2001 v3.02R+</span>
+    </div>
+    
+    <h2>Awards</h2>
+    <img src="../images/awards/ZdNetEditorsPick.gif" width="81" height="81" alt="ZDNet Editor's Pick" />
+    <img src="../images/awards/ZdShareware.gif" width="81" height="81" alt="ZD Shareware 6th Annual Awards" />
+    
+    <h2>Introduction</h2>
+    <p>
+        If you are interested in accessing NTFS drives from Windows 95 or Windows 98, then you should use 
+        <a href="NtfsWindows98.html">NTFS for Windows 98</a> rather than NTFSDOS. Full read/write access to NTFS drives from DOS 
+        is available with NTFSDOS Professional Edition, part of 
+        <a href="http://www.winternals.com/products/repairandrecovery/index.asp">Winternals Administrator's Pak</a>. If you want to salvage 
+        files off a corrupt NTFS volume or repair an NTFS boot sector or partition table, see Disk Commander, also available in 
+        <a href="http://www.winternals.com/products/repairandrecovery/index.asp">Winternals Administrator's Pak</a>
+    </p>
+    <p>
+        NTFSDOS.EXE is a read-only network file system driver for DOS/Windows that is able to recognize and mount NTFS drives for transparent access. It makes NTFS drives appear indistinguishable from standard FAT drives, providing the ability to navigate, view and execute programs on them from DOS or from Windows, including from the Windows 3.1 File Manager and Windows 95 Explorer.
+    </p>
+    <p>
+        Please read this entire file before contacting us for help.
+    </p>
+    
+    <h2>Enhancements over v2.00</h2>
+    <p>
+        Version 3.0's enhancement over v2.0 is that it is capable of accessing NTFS drives with sizes larger than 4GB.
+    </p>
+    
+    <h2>Contents of the Package</h2>
+    <p>
+        The NTFSDOS package (see the bottom of this page) contains the following files:
+    </p>
+    <ul>
+        <li>README.TXT: This file</li>
+        <li>NTFSDOS.EXE: File system driver</li>
+        <li>NTFSHLP.VXD: Helper VxD needed only for long filename support in Windows 95</li>
+    </ul>
+    
+    <h2>Installation and Use</h2>
+    <p>
+        To use NTFSDOS, simply execute it from the DOS command line (DOS 5.0 or greater is required), or from your AUTOEXEC.BAT. Executing NTFSDOS before Windows is started will create NTFS drives that are visible globally once inside Windows. Executing NTFSDOS in a DOS box means that the NTFS drives only exist within the DOS box where NTFSDOS was executed.
+    </p>
+    <p>
+        When NTFSDOS starts, it will scan all hard-disk partitions on your system to look for NTFS drives. It will mount all NTFS drives it finds as unique DOS logical drive letters, and will inform you as it does so.
+    </p>
+    <p>
+        If you run NTFSDOS under DOS 7.0, NTFS drives will support long filename calls even before Windows starts. To propagate this support into Windows 95, NTFSDOS automatically has Windows run the NTFSHLP.VXD VxD device driver. No changes to SYSTEM.INI or the registry are necessary for this to occur - NTFSDOS will detect when Windows 95 starts and load the driver without user-intervention. You need NTFSHLP.VXD only if you will be running NTFSDOS with Windows 95.
+    </p>
+    <p>
+        NTFSDOS implements its own caching, and uses one of two types of memory, depending on how your system is configured. Its first choice is to use XMS memory for caching, as this minimizes demands placed on conventional memory. If you start NTFSDOS before Windows, then HIMEM.SYS, which can be found in the WINDOWS directory under Windows 95 or the DOS directory under Windows 3.1, or its equivalent, must be started before NTFSDOS. If NTFSDOS does not detect an XMS server, it will resort to allocating 64KB of conventional memory for its cache. In either case, it will inform you of its action.
+    </p>
+    <p>
+        NTFSDOS takes six command line parameters:
+    </p>
+    <ul>
+        <li>The /L parameter lets you specify which drive letters NTFSDOS should attempt to use as it mounts NTFS drives.</li>
+        <li>The /C option lets you override the default XMS cache size.</li>
+        <li>The /V option directs NTFSDOS to print some messages detailing the drives it looks at and the memory it allocates.</li>
+        <li>The /X switch forces NTFSDOS to use standard BIOS Int 13 services. Use this if NTFSDOS has problems with your computer's extended Int 13 services.</li>
+        <li>The /U option has NTFSDOS correctly sort through files with unicode names. You should only use this if a NTFSDOS directory listing enters an infinite loop within directories that contain files with unicode names.</li>
+        <li>Finally, the /N switch can be used to disable NTFSDOS support for compression. Much of the conventional memory that NTFSDOS normally uses is for compression buffers, so if you will be accessing drives or files that are not compressed and would like to optimize NTFSDOS use of memory, use this switch.</li>
+    </ul>
+    <p>
+        The syntax for these parameters is:
+    </p>
+    <dl class="usage">
+        <dt>/L:&lt;letter&gt;</dt>
+            <dd>Specifies drive letter to start mounting at</dd>
+        <dt>/C:&lt;size&gt;</dt>
+            <dd>Specifies size of XMS cache in KB</dd>
+        <dt>/V</dt>
+            <dd>Verbose</dd>
+        <dt>/X</dt>
+            <dd>Disable extended int 13 support</dd>
+        <dt>/U</dt>
+            <dd>Tolerate unicode file names</dd>
+        <dt>/N</dt>
+            <dd>Disable support for compression</dd>
+    </dl>
+    
+    <h2>If You Have Problems Running NTFSDOS</h2>
+    <p>
+        This section lists and addresses various issues that may arise when you run NTFSDOS.
+    </p>
+    <ul>
+        <li><b><i>NTFSDOS does not recognize my NTFS drive</i></b>
+            <p>
+                NTFSDOS does not handle cluster sizes > 4K on NT 4.0 formatted drives. This is rare, since NTFS compression does not handle these cluster sizes either.
+            </p>
+            <p>
+                NTFSDOS requires that disks be accessible via BIOS, using the INT 13 or extended INT 13 services. In some cases, SCSI drives may not be fully accessible without a DOS device driver (see your SCSI adapter documentation).
+            </p>
+        </li>
+        <li><b><i>NTFSDOS uses too much conventional memory</i></b>
+            <p>
+                Some people have complained that NTFSDOS is a memory hog. Unfortunately, this fact is largely imposed on us by the architecture of NTFS itself (sorry, but its a little more complicated than FAT, and much more memory intensive), coupled with our desire to provide reasonable performance across a wide variety of NTFS installations. In general, the footprint of NTFSDOS increases largely with the clustersize of the largest NTFS partition, and slightly with the number of NTFS volumes mounted.
+            </p>
+        </li>
+        <li><b><i>Accessing an NTFSDOS drive causes a hang or crash</i></b>
+            <p>
+                NTFSDOS does not support disk striping. Further, it cannot handle drives that are on partitions extending beyond the 2GB boundary, or that are larger than 2GB in size, UNLESS the computer's BIOS has extended INT 13 support for the drives in question. The latter restrictions are due to limitations in standard disk BIOS code that prevent it from addressing sectors 2GB or more from the start of a disk.
+            </p>
+            <p>
+                NTFSDOS has not been thoroughly bullet-proofed against corrupt NTFS drive data structures, so it may cause Windows to crash or hang when it runs into problems. To insure that a crash or hang is due to a problem with NTFSDOS rather than your NTFS drive, be sure to chkdsk the drive from Windows NT and try NTFSDOS again.
+            </p>
+        </li>
+        <li><b><i>Starting programs or loading files seems very slow</i></b>
+            <p>
+                Access of large compressed files may be noticeably slower than of their non-compressed versions.
+            </p>
+        </li>
+        <li><b><i>File times are not correct when running under DOS 7.0 without Windows 95</i></b>
+            <p>
+                This problem is due to the fact that NTFS and LFN FAT time stamps are stored in Coordinated Universal Time (UTC), which is based on Greenwich Mean Time, and Windows 95 automatically converts times stamps returned by LFN calls to local time. Since local time zone information is not accessible outside of Windows 95, running NTFSDOS under DOS 7.0 without Windows 95 results in the display of unadjusted times.
+            </p>
+        </li>
+        <li><b><i>Programs complain about not being able to find files when they are there</i></b>
+            <p>
+                A directory listing of files that have no short filename will result in the short filename field of the listing being blank. Changing the current directory to a path where any component of the pathname does not have a short filename will result in all short filename calls failing while in the directory. This makes most Windows 3.1 and DOS programs and many DOS commands (e.g. MORE) inoperative in these directories. However, LFN calls are supported in these directories.
+            </p>
+        </li>
+        <li><b><i>Data read from a file appears to be corrupt</i></b>
+            <p>
+                Since this work is based on reverse-engineering rather than official Microsoft specifications (which are reportedly available under special circumstances for large amounts of money), we do not guarantee data integrity of NTFSDOS drives. This is especially important if you are considering using NTFSDOS as a file backup utility.
+            </p>
+        </li>
+        <li><b><i>Files or directories seem to be missing</i></b>
+            <p>
+                Remember that files and directories that were created with no DOS 8.3 short filenames will not be visible if you are running DOS versions earlier than 7.0.
+            </p>
+        </li>
+        <li><b><i>You get the message "No drive letter to mount NTFS partition..."</i></b>
+            <p>
+                If NTFSDOS complains that it cannot mount a drive because there are no available drive letters, you must find the line in your CONFIG.SYS that begins with "LASTDRIVE=". If you do not find one, then add one. Set the LASTDRIVE variable to a letter that is greater, by the number of NTFS drives on your system, than the largest drive letter you normally have under DOS/Windows. For example, if the highest drive letter normally in use is E: and you have two NTFS drives, set LASTDRIVE to G: with a statement in CONFIG.SYS like:
+            </p>
+            <p>
+                LASTDRIVE=G:
+            </p>
+            <p>
+                If you still get the message then increment the letter and try again. Remember to reboot after every change to CONFIG.SYS.
+            </p>
+        </li>
+        <li><b><i>You get the message "Could not allocate XMS or conventional cache"</i></b>
+            <p>
+                Memory usage on your machine is so high that NTFSDOS could not allocate 64KB for a conventional cache. Try removing unnecessary TSRs and drivers and/or running a DOS memory optimizer or manager.
+            </p>
+        </li>
+        <li><b><i>XCOPY does not work in a DOS box</i></b>
+            <p>
+                XCOPY will not work on NTFS drives that are mounted in DOS boxes under Windows 95 (e.g. running NTFSDOS in a DOS box). This is because you cannot run Windows programs off of non-global drives, and under Windows 5, XCOPY starts the Windows console program XCOPY32.EXE.
+            </p>
+        </li>
+    </ul>
+    
+    <h2>Reporting Bugs</h2>
+    <p>
+        When you report a bug please provide the following information about your system:
+    </p>
+    <ul>
+        <li>disk types (IDE, etc.)</li>
+        <li>disk and partition sizes</li>
+        <li>BIOS version</li>
+        <li>drive sizes and formats</li>
+        <li>version of NT that was used to format NTFS drives</li>
+        <li>version of NTFSDOS you are using</li>
+        <li>an output dump of NTFSDOS run with the /V (verbose) option</li>
+        <li>version of DOS and/or Windows you are running NTFSDOS on</li>
+    </ul>
+    
+    <h2>Implementation</h2>
+    <p>
+        NTFSDOS scans the system's partition tables looking for partitions that have the NTFS attribute byte. When it finds one, it looks for an unused DOS driver letter and registers a network drive on it. After it completes the drive search it hooks the network redirector interrupt and goes resident. Requests come into NTFSDOS as full path names, or continuations of a previous directory traversal (as with findnext), so it proceeds to determine where, based on NTFS internal data structures, the target file is located. When it retrieves the header for the target file it can determine where the file's data is located, and read it when it receives requests to do so.
+    </p>
+    <p>
+        To provide long filename support (LFN), NTFSDOS hooks INT 21/AH=0x71 calls and implements LFN functionality when it sees an LFN call. Under Windows 95, NTFSHLP.VXD is required to send LFN calls down to the NTFSDOS for it to process; otherwise NTFSDOS would not see LFN calls since Windows assumes DOS redirected drives do not provide LFN support.
+    </p>
+    <p>
+        NTFSDOS also uses the INT 2F/11 and INT 13 APIs. In addition, it contains memory and cache management plus interpretation of the NTFS on-disk structures
+    </p>
+    
+    <h2>Read-write NTFSDOS</h2>
+    <a href="http://www.winternals.com/"><img src="../images/WinternalsProduct.gif" width="87" height="29" alt="Winternals Product" /></a>
+    <p>
+        Full read/write capability for NTFS from DOS is available with NTFSDOS Professional, available as part of 
+        <a href="http://www.winternals.com/products/repairandrecovery/index.asp">Winternals Administrator's Pak</a> Read-only capability 
+        for DOS from Windows 95/98 is available with 
+        <a href="NtfsWindows98.html">NTFS for Windows 98</a>.
+    </p>
+    <p>
+        Full read/write capability for NTFS drives from a boot floppy is now available in the form of 
+        <a href="http://www.winternals.com/products/repairandrecovery/erdcommander2002.asp"><i>ERD Commander 2003</i></a>. <i>ERD Commander 2003</i> is a 
+        command-line that starts after booting off of a standard set of Windows NT boot disks. NTFS and FAT drives can be accessed with a 
+        full suite of standard file-related commands like move, copy, delete, and rename. Get more information and download a free read-only 
+        version that has working <i>rmdir</i> and <i>mkdir</i> commands 
+        <a href="http://www.winternals.com/products/repairandrecovery/erdcommander2002.asp">here</a>.
+    </p>
+    
+    <h2>Acknowlegements</h2>
+    <p>
+        We thank everybody that e-mailed us with bug reports and other feedback.
+    </p>
+    <p>
+        Significant understanding of the NTFS file system layout was derived by studying the Linux-based NTFS driver code maintained by 
+        <a href="http://www.informatik.hu-berlin.de/~loewis">Martin von Loewis</a>. We acknowledge his indirect contribution to this endeavor.
+    </p>
+    <p>
+        Andrew Schulman, et. al.'s, book, <i>Undocumented DOS 2nd Edition</i> (Addison-Wesley), was invaluable in providing network redirector information necessary for implementing NTFSDOS.
+    </p>
+    
+    
+    <p class="download">
+        <a href="../../download.sysinternals.com/Files/NtfsDos.zip">Download NTFSDOS (39KB)</a>
+    </p>
+    
+    <p>
+        <a href="NtfsDos.html#top">Back to Top</a>
+    </p>
+</div>
+
+<ul class="navmisc">
+    <li><a href="../index-2.html">Home</a></li>
+    <li><a href="../Resources.html">Resources</a></li>
+    <li><a href="../SysinternalsSiteMap.html">Site Map</a></li>
+    <li><a href="../Licensing.html">Licensing</a></li>
+    <li><a href="../AboutUs.html">About Us</a></li>
+</ul>
+<div class="footer">
+	Copyright © 2006 Sysinternals. All rights reserved. | <a href="../PrivacyStatement.html">Privacy Statement</a>
+</div>
+
+
+</body>
+</html>
